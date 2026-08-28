@@ -269,14 +269,17 @@ export default function SettingsPage() {
 
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <p className="text-sm font-medium text-gray-700">Role</p>
-                    <Badge variant="info" className="mt-2">
-                      Administrator
-                    </Badge>
+                    <div className="mt-2">
+                      <Badge variant="info">Administrator</Badge>
+                    </div>
                   </div>
 
                   <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <p className="text-sm font-medium text-gray-700">Member Since</p>
-                    <p className="text-sm text-gray-600 mt-2">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}</p>
+                    <p className="text-sm font-medium text-gray-700">Account Active</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <BiCheckCircle className="text-green-600" size={18} />
+                      <span className="text-sm font-medium text-green-700">Yes</span>
+                    </div>
                   </div>
                 </div>
               </Card>
