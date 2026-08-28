@@ -248,10 +248,10 @@ export default function PilgrimsPage() {
   };
 
   const columns = [
-    { key: 'registration_id', label: 'ID', width: '12%', render: (v: string) => <span className="font-medium text-amber-600">{v}</span> },
-    { key: 'full_name', label: 'Name', width: '25%', render: (v: string) => <span className="font-medium">{v}</span> },
-    { key: 'email', label: 'Email', width: '20%' },
-    { key: 'phone', label: 'Phone', width: '15%' },
+    { key: 'registration_id', label: 'ID', width: '12%', render: (v: string) => <span className="font-medium text-blue-600">{v}</span> },
+    { key: 'full_name', label: 'Name', width: '25%', render: (v: string) => <span className="font-medium text-gray-900">{v}</span> },
+    { key: 'email', label: 'Email', width: '20%', render: (v: string) => <span className="text-gray-700">{v}</span> },
+    { key: 'phone', label: 'Phone', width: '15%', render: (v: string) => <span className="text-gray-700">{v}</span> },
     {
       key: 'status',
       label: 'Status',
@@ -266,56 +266,56 @@ export default function PilgrimsPage() {
       key: 'total_amount_due',
       label: 'Amount Due',
       width: '12%',
-      render: (v: number) => <span className="font-semibold text-gray-900">${v.toLocaleString()}</span>,
+      render: (v: number) => <span className="text-gray-900 font-medium">${v.toLocaleString()}</span>,
     },
   ];
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 p-8">
+      <div className="min-h-screen bg-white p-8">
         {/* Page Header */}
-        <PageHeader
-          title="Pilgrims Management"
-          description="Manage and register pilgrims for Hajj operations"
-          action={
-            <div className="flex gap-3 flex-wrap">
-              {draftsList.length > 0 && (
-                <ProfessionalButton
-                  variant="secondary"
-                  size="md"
-                  onClick={() => setShowDraftList(!showDraftList)}
-                >
-                  Drafts ({draftsList.length})
-                </ProfessionalButton>
-              )}
+        <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
+          <div>
+            <h1 className="text-3xl font-semibold text-gray-900">Pilgrims</h1>
+            <p className="text-gray-600 mt-1">Manage and register pilgrims for Hajj operations</p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {draftsList.length > 0 && (
               <ProfessionalButton
-                variant="primary"
+                variant="secondary"
                 size="md"
-                icon={<BiPlus size={20} />}
-                onClick={() => {
-                  setDraftData({});
-                  setShowInlineForm(true);
-                }}
+                onClick={() => setShowDraftList(!showDraftList)}
               >
-                Add Pilgrim
+                Drafts ({draftsList.length})
               </ProfessionalButton>
-            </div>
-          }
-        />
+            )}
+            <ProfessionalButton
+              variant="primary"
+              size="md"
+              icon={<BiPlus size={18} />}
+              onClick={() => {
+                setDraftData({});
+                setShowInlineForm(true);
+              }}
+            >
+              Add Pilgrim
+            </ProfessionalButton>
+          </div>
+        </div>
 
         {/* Drafts List */}
         {showDraftList && draftsList.length > 0 && (
-          <Card padding="lg" className="mb-6" shadow="md">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Saved Drafts</h3>
-            <div className="space-y-3">
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Saved Drafts</h3>
+            <div className="space-y-2">
               {draftsList.map((draft) => (
-                <div key={draft.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-transparent rounded-lg border border-amber-200">
+                <div key={draft.id} className="flex items-center justify-between p-3 bg-white rounded border border-gray-200 hover:border-gray-300 transition">
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900">
                       {draft.data.first_name || 'Unnamed'} {draft.data.last_name || ''}
                     </p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Saved at {new Date(draft.savedAt).toLocaleString()} • Step {draft.currentStep + 1}/4
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Step {draft.currentStep + 1}/4 • {new Date(draft.savedAt).toLocaleString()}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -326,41 +326,40 @@ export default function PilgrimsPage() {
                     >
                       Load
                     </ProfessionalButton>
-                    <ProfessionalButton
-                      variant="danger"
-                      size="sm"
-                      icon={<BiTrash size={14} />}
+                    <button
                       onClick={() => {
                         deleteDraft('pilgrim_registration');
                         loadDrafts();
                         toast.success('Draft deleted');
                       }}
+                      className="p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded transition"
+                      title="Delete draft"
                     >
-                      Delete
-                    </ProfessionalButton>
+                      <BiTrash size={16} />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          </Card>
+          </div>
         )}
 
         {/* Inline Form Section - Shows inline on Add Pilgrim click */}
         {showInlineForm && (
-          <div className="mb-8 animate-slideInUp">
-            <Card padding="lg" shadow="lg" className="border-amber-200">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Register New Pilgrim</h2>
-                  <p className="text-gray-600 text-sm mt-1">Complete all steps • Save drafts anytime</p>
-                </div>
-                <button
-                  onClick={() => setShowInlineForm(false)}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition"
-                >
-                  <BiX size={24} />
-                </button>
+          <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200 animate-slideInUp">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900">Register New Pilgrim</h2>
+                <p className="text-gray-600 text-sm mt-1">Complete all steps to register a new pilgrim</p>
               </div>
+              <button
+                onClick={() => setShowInlineForm(false)}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-white rounded transition"
+              >
+                <BiX size={24} />
+              </button>
+            </div>
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
               <MultiStepForm
                 steps={pilgrimFormSteps}
                 onSubmit={handleFormSubmit}
@@ -371,55 +370,55 @@ export default function PilgrimsPage() {
                 voiceEnabled={true}
                 language="en-US"
               />
-            </Card>
+            </div>
           </div>
         )}
 
-        {/* Search and Filter - Modern Card Design */}
-        <Card padding="lg" shadow="sm" className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Search Pilgrims</label>
-              <div className="relative">
-                <BiSearch className="absolute left-4 top-3.5 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search by name, email, or ID..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition bg-white"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Status</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-4 py-3 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition bg-white cursor-pointer"
-              >
-                <option value="">All Statuses</option>
-                <option value="registered">Registered</option>
-                <option value="paid">Paid</option>
-                <option value="departed">Departed</option>
-                <option value="returned">Returned</option>
-              </select>
+        {/* Search and Filter */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2">
+            <div className="relative">
+              <BiSearch className="absolute left-3 top-3 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search by name, email, or ID..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-sm"
+              />
             </div>
           </div>
-        </Card>
+          <div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white cursor-pointer text-sm"
+            >
+              <option value="">All Statuses</option>
+              <option value="registered">Registered</option>
+              <option value="paid">Paid</option>
+              <option value="departed">Departed</option>
+              <option value="returned">Returned</option>
+            </select>
+          </div>
+        </div>
 
         {/* Pilgrims Table */}
         <div>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Registered Pilgrims</h3>
-            <p className="text-sm text-gray-600 mt-1">{filteredPilgrims.length} pilgrim{filteredPilgrims.length !== 1 ? 's' : ''} found</p>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Registered Pilgrims</h2>
+              <p className="text-sm text-gray-500 mt-0.5">{filteredPilgrims.length} pilgrim{filteredPilgrims.length !== 1 ? 's' : ''} found</p>
+            </div>
           </div>
-          <ProfessionalTable
-            columns={columns}
-            data={filteredPilgrims}
-            loading={loading}
-            emptyMessage="No pilgrims registered yet • Click 'Add Pilgrim' to register a new one"
-          />
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <ProfessionalTable
+              columns={columns}
+              data={filteredPilgrims}
+              loading={loading}
+              emptyMessage="No pilgrims registered yet • Click 'Add Pilgrim' to register a new one"
+            />
+          </div>
         </div>
       </div>
     </Layout>
