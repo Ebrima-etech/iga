@@ -198,8 +198,17 @@ export default function VoiceInputButton({
   // Handle not-allowed error
   if (error && error.includes('not-allowed')) {
     return (
-      <div className="w-full max-w-md">
-        <div className="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 border-2 border-red-400 rounded-xl p-5 shadow-lg">
+      <>
+        <button
+          type="button"
+          disabled
+          className="p-2.5 text-gray-400 cursor-not-allowed opacity-50"
+          title="Microphone access denied"
+        >
+          <BiMicrophone size={22} />
+        </button>
+        <div className="fixed inset-0 pointer-events-none z-50 flex items-end justify-center pb-6">
+          <div className="max-w-md w-11/12 mx-auto pointer-events-auto bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 border-2 border-red-400 rounded-xl p-5 shadow-lg">
           <div className="flex items-start gap-3 mb-4">
             <div className="text-3xl">🎤</div>
             <div className="flex-1">
@@ -238,11 +247,12 @@ export default function VoiceInputButton({
             </button>
           </div>
 
-          <p className="text-xs text-gray-600 text-center mt-3">
-            💡 Make sure your microphone is connected and not being used by another app
-          </p>
+            <p className="text-xs text-gray-600 text-center mt-3">
+              💡 Make sure your microphone is connected and not being used by another app
+            </p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -260,42 +270,56 @@ export default function VoiceInputButton({
       : `🎤 ${error}`;
 
     return (
-      <div className="w-full max-w-sm">
-        <div className="bg-red-50 border-2 border-red-300 rounded-lg p-3 shadow-md animate-pulse">
-          <p className="text-sm font-medium text-red-700 mb-2">{displayError}</p>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition"
-          >
-            Try Again
-          </button>
+      <>
+        <button
+          type="button"
+          onClick={() => {
+            setShowError(false);
+            handleStart();
+          }}
+          className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition"
+        >
+          <BiMicrophone size={22} />
+        </button>
+        <div className="fixed inset-0 pointer-events-none z-50 flex items-end justify-center pb-6">
+          <div className="max-w-sm w-11/12 mx-auto pointer-events-auto bg-red-50 border-2 border-red-300 rounded-lg p-3 shadow-md animate-pulse">
+            <p className="text-sm font-medium text-red-700 mb-2">{displayError}</p>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="flex items-center gap-2 w-full">
-      {!isListening ? (
-        // Idle state - microphone button
-        <button
-          type="button"
-          onClick={handleStart}
-          title={`Click to start voice input for ${fieldName}`}
-          className={`relative p-2.5 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 active:bg-indigo-100 rounded-lg transition transform hover:scale-110 active:scale-95 group ${className}`}
-        >
-          <BiMicrophone size={22} />
-          <div className="absolute inset-0 rounded-lg bg-indigo-400 opacity-0 group-hover:opacity-10 transition"></div>
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-indigo-600 rounded-full group-hover:animate-pulse"></div>
-        </button>
-      ) : (
-        // Recording state - animated recording UI
-        <div className={`flex-1 rounded-xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom duration-300 transition-all ${
-          cancelDetected
-            ? 'bg-orange-100 border-2 border-orange-400'
-            : 'bg-red-50 border-2 border-red-200'
-        }`}>
+    <>
+      {/* Microphone Button */}
+      <button
+        type="button"
+        onClick={handleStart}
+        disabled={isListening}
+        title={`Click to start voice input for ${fieldName}`}
+        className={`relative p-2.5 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 active:bg-indigo-100 rounded-lg transition transform hover:scale-110 active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      >
+        <BiMicrophone size={22} />
+        <div className="absolute inset-0 rounded-lg bg-indigo-400 opacity-0 group-hover:opacity-10 transition"></div>
+        <div className="absolute -top-1 -right-1 w-2 h-2 bg-indigo-600 rounded-full group-hover:animate-pulse"></div>
+      </button>
+
+      {/* Recording Overlay - Fixed Position (doesn't affect layout) */}
+      {isListening && (
+        <div className="fixed inset-0 pointer-events-none z-50 flex items-end justify-center pb-6">
+          <div className={`max-w-md w-11/12 mx-auto pointer-events-auto rounded-xl p-4 shadow-2xl animate-in fade-in slide-in-from-bottom duration-300 transition-all ${
+            cancelDetected
+              ? 'bg-orange-100 border-2 border-orange-400'
+              : 'bg-red-50 border-2 border-red-200'
+          }`}>
           <div className="flex items-center gap-3 mb-3">
             {/* Animated recording pulse */}
             <div className="relative flex items-center justify-center">
@@ -371,30 +395,32 @@ export default function VoiceInputButton({
         </div>
       )}
 
-      {/* Display completed transcript */}
+      {/* Display completed transcript - Overlay */}
       {transcript && !isListening && (
-        <div className="flex-1 bg-green-50 border-2 border-green-300 rounded-xl p-3 shadow-md animate-in fade-in slide-in-from-bottom duration-500">
-          <div className="flex items-start gap-2">
-            <BiCheckCircle className="text-green-600 mt-1 flex-shrink-0" size={20} />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-green-700 mb-1">✓ Captured</p>
-              <p className="text-sm text-gray-800 mb-2 line-clamp-2">{transcript}</p>
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-600">
-                  Confidence: <span className="font-semibold">{(confidence * 100).toFixed(0)}%</span>
-                </p>
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  className="text-xs text-gray-600 hover:text-gray-800 underline"
-                >
-                  Clear
-                </button>
+        <div className="fixed inset-0 pointer-events-none z-50 flex items-end justify-center pb-6">
+          <div className="max-w-md w-11/12 mx-auto pointer-events-auto bg-green-50 border-2 border-green-300 rounded-xl p-3 shadow-md animate-in fade-in slide-in-from-bottom duration-500">
+            <div className="flex items-start gap-2">
+              <BiCheckCircle className="text-green-600 mt-1 flex-shrink-0" size={20} />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-green-700 mb-1">✓ Captured</p>
+                <p className="text-sm text-gray-800 mb-2 line-clamp-2">{transcript}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-600">
+                    Confidence: <span className="font-semibold">{(confidence * 100).toFixed(0)}%</span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="text-xs text-gray-600 hover:text-gray-800 underline"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
