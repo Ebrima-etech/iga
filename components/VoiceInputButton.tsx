@@ -70,75 +70,132 @@ export default function VoiceInputButton({
   };
 
   const handlePermissionRequest = async () => {
-    try {
-      // Request microphone permission explicitly
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const toastId = toast.loading('🎤 Requesting microphone access...');
 
-      // Stop the stream immediately - we just needed permission
-      stream.getTracks().forEach(track => track.stop());
+    try {
+      console.log('Requesting microphone permission...');
+
+      // Check if browser supports getUserMedia
+      if (!navigator.mediaDevices?.getUserMedia) {
+        toast.dismiss(toastId);
+        toast.error('❌ Your browser does not support microphone access', {
+          duration: 3000,
+        });
+        return;
+      }
+
+      // Request microphone permission
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        }
+      });
+
+      // Stop the stream - we just needed permission
+      stream.getTracks().forEach(track => {
+        console.log('Stopping audio track:', track.label);
+        track.stop();
+      });
 
       setPermissionDenied(false);
       setShowError(false);
+      clearTranscript();
 
-      // Now start listening
-      setTimeout(() => {
-        startListening();
-      }, 500);
-
-      toast.success('🎤 Microphone enabled! Ready to record.', {
+      toast.dismiss(toastId);
+      toast.success('✅ Microphone enabled! Ready to record.', {
         duration: 2000,
       });
+
+      // Start listening after a short delay
+      setTimeout(() => {
+        console.log('Starting speech recognition...');
+        startListening();
+      }, 300);
+
     } catch (err: any) {
-      if (err.name === 'NotAllowedError') {
-        toast.error('❌ Permission denied. Please enable microphone in browser settings.', {
+      toast.dismiss(toastId);
+      console.error('Permission error:', err.name, err.message);
+
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        toast.error(
+          '❌ Microphone permission was blocked by your browser.\n\nTo fix this:\n1. Click the lock icon in your address bar\n2. Find "Microphone" and set to "Allow"\n3. Refresh the page',
+          {
+            duration: 5000,
+            style: {
+              background: '#fee2e2',
+              color: '#991b1b',
+              border: '2px solid #dc2626',
+            },
+          }
+        );
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        toast.error('🎧 No microphone found. Please connect a microphone to your device.', {
           duration: 3000,
         });
-      } else if (err.name === 'NotFoundError') {
-        toast.error('🎧 No microphone found. Please connect one.', {
+      } else if (err.name === 'NotReadableError' || err.name === 'OverconstrainedError') {
+        toast.error('🎤 Microphone is being used by another application. Please close other apps and try again.', {
+          duration: 3000,
+        });
+      } else if (err.name === 'SecurityError') {
+        toast.error('🔒 Security error: This site may not have permission to access microphone.', {
           duration: 3000,
         });
       } else {
-        toast.error('Failed to access microphone', {
-          duration: 2000,
+        toast.error(`❌ Error: ${err.name || 'Failed to access microphone'}`, {
+          duration: 3000,
         });
       }
-      console.error('Microphone permission error:', err);
     }
   };
 
   // Handle not-allowed error
   if (error && error.includes('not-allowed')) {
     return (
-      <div className="w-full max-w-sm">
-        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-orange-400 rounded-xl p-4 shadow-lg animate-pulse">
-          <div className="flex items-start gap-3">
-            <div className="text-3xl animate-bounce">🎤</div>
+      <div className="w-full max-w-md">
+        <div className="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 border-2 border-red-400 rounded-xl p-5 shadow-lg">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="text-3xl">🎤</div>
             <div className="flex-1">
-              <p className="font-bold text-gray-900 mb-1">Microphone Permission Required</p>
-              <p className="text-xs text-gray-600 mb-3">
-                Click the button below to enable microphone access. Your browser will ask for permission.
+              <p className="font-bold text-gray-900">Microphone Permission Blocked</p>
+              <p className="text-xs text-gray-700 mt-1">
+                Your browser is blocking microphone access
               </p>
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={handlePermissionRequest}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition transform hover:scale-105 active:scale-95 shadow-md"
-                >
-                  🎤 Enable Microphone
-                </button>
-                <p className="text-xs text-gray-600 text-center">
-                  Look for a permission popup at the top of your browser
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleClear}
-                className="w-full mt-2 text-gray-600 hover:text-gray-800 text-xs underline"
-              >
-                Dismiss
-              </button>
             </div>
           </div>
+
+          <div className="bg-white rounded-lg p-3 mb-4 border border-orange-200">
+            <p className="text-xs font-semibold text-gray-900 mb-2">📍 How to Fix:</p>
+            <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside">
+              <li>Click the <strong>lock icon</strong> in the address bar</li>
+              <li>Find <strong>"Microphone"</strong> in the popup</li>
+              <li>Change it to <strong>"Allow"</strong></li>
+              <li><strong>Refresh</strong> this page (F5)</li>
+              <li>Click <strong>"Enable Microphone"</strong> button again</li>
+            </ol>
+          </div>
+
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={handlePermissionRequest}
+              className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition transform hover:scale-105 active:scale-95 shadow-md"
+            >
+              🎤 Enable Microphone
+            </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="w-full text-gray-600 hover:text-gray-800 text-xs underline py-1"
+            >
+              Dismiss
+            </button>
+          </div>
+
+          <p className="text-xs text-gray-600 text-center mt-3">
+            💡 Make sure your microphone is connected and not being used by another app
+          </p>
         </div>
       </div>
     );
