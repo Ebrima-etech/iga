@@ -95,7 +95,7 @@ export default function BanksManagementPage() {
       await api.post('/user-roles/', {
         user_id: userResponse.data.id,
         role: 'bank_admin',
-        bank: parseInt(adminFormData.bank_id),
+        bank_id: parseInt(adminFormData.bank_id),
         is_active: true,
       });
 
