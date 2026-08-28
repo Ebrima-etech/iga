@@ -29,19 +29,34 @@ export async function fetchRealtimeRates(): Promise<Record<CurrencyCode, number>
     const response = await fetch(
       'https://api.exchangerate.host/latest?base=GMD&symbols=USD,GBP,EUR'
     );
+
+    if (!response.ok) {
+      throw new Error(`API returned status ${response.status}`);
+    }
+
     const data = await response.json();
 
-    if (data.rates) {
-      return {
-        GMD: 1,
-        USD: data.rates.USD || currentRates.USD,
-        GBP: data.rates.GBP || currentRates.GBP,
-        EUR: data.rates.EUR || currentRates.EUR,
-      };
+    // Check if success flag is present and true
+    if (data.success === false) {
+      throw new Error('API returned success: false');
     }
-    throw new Error('No rates in response');
+
+    // Verify rates exist
+    if (!data.rates || typeof data.rates !== 'object') {
+      console.warn('API response structure:', data);
+      throw new Error('No rates in response or rates is not an object');
+    }
+
+    // Extract rates, fallback to current rates if missing
+    return {
+      GMD: 1,
+      USD: data.rates.USD ?? currentRates.USD,
+      GBP: data.rates.GBP ?? currentRates.GBP,
+      EUR: data.rates.EUR ?? currentRates.EUR,
+    };
   } catch (error) {
     console.error('Failed to fetch realtime rates:', error);
+    // Return current rates as fallback
     return currentRates;
   }
 }
