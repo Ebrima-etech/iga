@@ -94,9 +94,12 @@ export default function VoiceInputButton({
       // Detect "spell" command (switch to spelling mode)
       if (spellRegex.test(text) && !spellingMode) {
         console.log('🎙️ Voice command detected: SPELL - switching to spelling mode');
+
+        // Remove "spell" from transcript, keep the rest
+        const beforeSpell = text.replace(/\bspell\b/i, '').trim();
+
         setSpellingMode(true);
-        setSpelledText('');
-        // Don't clear transcript - keep listening for spelling
+        setSpelledText(beforeSpell ? beforeSpell + ' ' : '');
 
         toast.success('🎙️ Entering spelling mode - continue speaking...', {
           icon: '🔤',
@@ -128,9 +131,11 @@ export default function VoiceInputButton({
   }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected, spellingMode]);
 
   // Auto-submit when speech ends (transcript becomes available and not listening)
-  // BUT skip if cancel was just detected or in spelling mode
+  // BUT skip if cancel was detected, in spelling mode, or "spell" word is in transcript
   useEffect(() => {
-    if (!isListening && transcript && transcript.trim() && !error && !cancelDetected && !spellingMode) {
+    const containsSpellCommand = transcript.toLowerCase().includes('spell');
+
+    if (!isListening && transcript && transcript.trim() && !error && !cancelDetected && !spellingMode && !containsSpellCommand) {
       console.log('🎤 Speech ended, auto-submitting transcript:', transcript);
       onTranscript(transcript);
 
