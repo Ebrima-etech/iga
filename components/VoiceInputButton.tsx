@@ -53,9 +53,16 @@ export default function VoiceInputButton({
   };
 
   const handleStop = () => {
+    console.log('🛑 handleStop called, calling stopListening()');
     const finalText = stopListening();
 
+    console.log('📝 finalText from stopListening():', finalText);
+    console.log('📝 typeof finalText:', typeof finalText);
+    console.log('📝 fieldName:', fieldName);
+    console.log('📝 onTranscript callback:', onTranscript);
+
     if (finalText && finalText.trim()) {
+      console.log('✅ Text is valid, calling onTranscript with:', finalText);
       // Use the returned transcript immediately (don't wait for state update)
       onTranscript(finalText);
 
@@ -64,8 +71,9 @@ export default function VoiceInputButton({
         duration: 2000,
       });
 
-      console.log('Voice input captured:', finalText);
+      console.log('✅ Voice input captured and passed:', finalText);
     } else {
+      console.warn('❌ No text to capture');
       toast.error('No speech detected. Please try again.', {
         duration: 2000,
       });
