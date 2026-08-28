@@ -166,6 +166,7 @@ export default function PilgrimsPage() {
 
   useEffect(() => {
     filterPilgrims();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, statusFilter, pilgrims]);
 
   const fetchPilgrims = async () => {

@@ -118,9 +118,9 @@ export default function SpeechInput({
       <div className="text-xs text-gray-500 p-3 bg-gray-50 rounded-lg">
         <p className="font-semibold mb-1">💡 Tips:</p>
         <ul className="space-y-1">
-          <li>• Click "Start Speaking" to begin</li>
+          <li>• Click &quot;Start Speaking&quot; to begin</li>
           <li>• Speak clearly and at a normal pace</li>
-          <li>• Click "Stop Listening" to finish or it will auto-stop after silence</li>
+          <li>• Click &quot;Stop Listening&quot; to finish or it will auto-stop after silence</li>
           <li>• Text appears automatically when you finish speaking</li>
         </ul>
       </div>

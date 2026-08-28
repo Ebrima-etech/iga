@@ -201,7 +201,7 @@ export default function TextToSpeech({
       <div className="text-xs text-gray-500 p-3 bg-gray-50 rounded-lg">
         <p className="font-semibold mb-1">💡 Tips:</p>
         <ul className="space-y-1">
-          <li>• Click "Speak" to hear the text read aloud</li>
+          <li>• Click &quot;Speak&quot; to hear the text read aloud</li>
           <li>• Select different voices for variety</li>
           <li>• Use pause/resume to control playback</li>
           <li>• Different browsers have different voice options</li>

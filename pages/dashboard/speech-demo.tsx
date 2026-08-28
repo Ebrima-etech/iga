@@ -95,7 +95,7 @@ export default function SpeechDemoPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="font-semibold text-blue-900 mb-2">✓ How It Works</p>
-            <p className="text-sm text-blue-700">Uses your browser's built-in Web Speech API to convert spoken words to text in real-time.</p>
+            <p className="text-sm text-blue-700">Uses your browser&apos;s built-in Web Speech API to convert spoken words to text in real-time.</p>
           </div>
 
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">

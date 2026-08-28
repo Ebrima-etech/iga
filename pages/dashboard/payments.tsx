@@ -22,6 +22,7 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     filterPayments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, statusFilter, bankFilter, payments]);
 
   const fetchPayments = async () => {
