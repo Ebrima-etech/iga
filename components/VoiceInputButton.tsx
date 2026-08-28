@@ -66,12 +66,17 @@ export default function VoiceInputButton({
       // Use the returned transcript immediately (don't wait for state update)
       onTranscript(finalText);
 
-      toast.success(`✓ Added to ${fieldName}`, {
-        icon: '📝',
-        duration: 2000,
+      toast.success(`✓ Text added to ${fieldName}`, {
+        icon: '✍️',
+        duration: 1500,
       });
 
       console.log('✅ Voice input captured and passed:', finalText);
+
+      // Clear the voice UI after a short delay so user can see the input field
+      setTimeout(() => {
+        clearTranscript();
+      }, 800);
     } else {
       console.warn('❌ No text to capture');
       toast.error('No speech detected. Please try again.', {
