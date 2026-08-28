@@ -26,10 +26,14 @@ const FETCH_INTERVAL = 5000; // Update every 5 seconds
  */
 export async function fetchRealtimeRates(): Promise<Record<CurrencyCode, number>> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const response = await fetch(
       'https://api.exchangerate.host/latest?base=GMD&symbols=USD,GBP,EUR',
-      { timeout: 5000 }
+      { signal: controller.signal }
     );
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       console.warn(`API returned status ${response.status}, using fallback rates`);

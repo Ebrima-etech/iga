@@ -122,13 +122,22 @@ export default function SettingsPage() {
         savedAt: new Date().toISOString(),
       };
 
-      // Save to localStorage (frontend-only system)
+      // Save to localStorage (persistent frontend storage)
       if (typeof window !== 'undefined') {
         localStorage.setItem('currencySettings', JSON.stringify(currencySettings));
       }
 
+      // Try to save to backend as well
+      try {
+        await api.post('/settings/currency/', currencySettings);
+        toast.success('✓ Currency rates saved to database and locally!');
+      } catch (backendError) {
+        // Fallback: success if saved locally even if backend fails
+        console.warn('Backend save failed, but settings saved locally:', backendError);
+        toast.success('✓ Currency rates saved locally! (offline mode)');
+      }
+
       setEditingRates(false);
-      toast.success('✓ Currency rates saved locally!');
     } catch (error) {
       console.error('Failed to save currency rates:', error);
       toast.error('Failed to save currency rates');
