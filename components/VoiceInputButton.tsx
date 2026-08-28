@@ -169,10 +169,10 @@ export default function VoiceInputButton({
             <p className="text-xs font-semibold text-gray-900 mb-2">📍 How to Fix:</p>
             <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside">
               <li>Click the <strong>lock icon</strong> in the address bar</li>
-              <li>Find <strong>"Microphone"</strong> in the popup</li>
-              <li>Change it to <strong>"Allow"</strong></li>
+              <li>Find <strong>&quot;Microphone&quot;</strong> in the popup</li>
+              <li>Change it to <strong>&quot;Allow&quot;</strong></li>
               <li><strong>Refresh</strong> this page (F5)</li>
-              <li>Click <strong>"Enable Microphone"</strong> button again</li>
+              <li>Click <strong>&quot;Enable Microphone&quot;</strong> button again</li>
             </ol>
           </div>
 
