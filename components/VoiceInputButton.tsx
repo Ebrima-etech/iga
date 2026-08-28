@@ -53,39 +53,43 @@ export default function VoiceInputButton({
   };
 
   const handleStop = () => {
-    console.log('🛑 handleStop called, calling stopListening()');
-    const finalText = stopListening();
-
-    console.log('📝 finalText from stopListening():', finalText);
-    console.log('📝 typeof finalText:', typeof finalText);
-    console.log('📝 fieldName:', fieldName);
-    console.log('📝 onTranscript callback:', onTranscript);
-
-    if (finalText && finalText.trim()) {
-      console.log('✅ Text is valid, calling onTranscript with:', finalText);
-      console.log('✅ onTranscript function:', onTranscript.toString());
-      // Use the returned transcript immediately (don't wait for state update)
-      const result = onTranscript(finalText);
-      console.log('✅ onTranscript returned:', result);
+    if (transcript && transcript.trim()) {
+      console.log('✅ handleStop: calling onTranscript with:', transcript);
+      onTranscript(transcript);
 
       toast.success(`✓ Text added to ${fieldName}`, {
         icon: '✍️',
         duration: 1500,
       });
 
-      console.log('✅ Voice input captured and passed:', finalText);
-
       // Clear the voice UI after a short delay so user can see the input field
       setTimeout(() => {
         clearTranscript();
       }, 800);
     } else {
-      console.warn('❌ No text to capture');
       toast.error('No speech detected. Please try again.', {
         duration: 2000,
       });
     }
   };
+
+  // Auto-submit when speech ends (transcript becomes available and not listening)
+  useEffect(() => {
+    if (!isListening && transcript && transcript.trim() && !error) {
+      console.log('🎤 Speech ended, auto-submitting transcript:', transcript);
+      onTranscript(transcript);
+
+      toast.success(`✓ Text added to ${fieldName}`, {
+        icon: '✍️',
+        duration: 1500,
+      });
+
+      // Clear after a delay
+      setTimeout(() => {
+        clearTranscript();
+      }, 800);
+    }
+  }, [isListening, transcript, error, fieldName, onTranscript]);
 
   const handleClear = () => {
     clearTranscript();
