@@ -6,6 +6,7 @@ import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
 import Card from '@/components/Common/Card';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
+import VoiceInputButton from '@/components/VoiceInputButton';
 import { BiArrowBack, BiPlus, BiX } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -177,26 +178,38 @@ export default function BankDetailPage() {
               </div>
               <form onSubmit={handleAddAdmin} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                  <input
-                    type="text"
-                    value={adminFormData.username}
-                    onChange={(e) => setAdminFormData({ ...adminFormData, username: e.target.value })}
-                    placeholder="Admin username"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                  <div className="flex gap-2 items-start">
+                    <input
+                      type="text"
+                      value={adminFormData.username}
+                      onChange={(e) => setAdminFormData({ ...adminFormData, username: e.target.value })}
+                      placeholder="Admin username"
+                      required
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    <VoiceInputButton
+                      onTranscript={(text) => setAdminFormData({ ...adminFormData, username: text })}
+                      fieldName="Username"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={adminFormData.email}
-                    onChange={(e) => setAdminFormData({ ...adminFormData, email: e.target.value })}
-                    placeholder="admin@bank.com"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <div className="flex gap-2 items-start">
+                    <input
+                      type="email"
+                      value={adminFormData.email}
+                      onChange={(e) => setAdminFormData({ ...adminFormData, email: e.target.value })}
+                      placeholder="admin@bank.com"
+                      required
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    <VoiceInputButton
+                      onTranscript={(text) => setAdminFormData({ ...adminFormData, email: text })}
+                      fieldName="Email"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>

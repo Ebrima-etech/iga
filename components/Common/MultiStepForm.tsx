@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Card from './Card';
 import ProfessionalButton from './ProfessionalButton';
 import FormField from './FormField';
+import VoiceInputButton from '../VoiceInputButton';
 import { BiChevronLeft, BiChevronRight, BiSave } from 'react-icons/bi';
 
 interface Step {
@@ -19,6 +20,7 @@ interface FormFieldConfig {
   placeholder?: string;
   options?: { label: string; value: string }[];
   validation?: (value: any) => string | null;
+  voiceInput?: boolean;
 }
 
 interface MultiStepFormProps {
@@ -29,6 +31,8 @@ interface MultiStepFormProps {
   title?: string;
   showProgressBar?: boolean;
   inline?: boolean;
+  voiceEnabled?: boolean;
+  language?: string;
 }
 
 export default function MultiStepForm({
@@ -39,6 +43,8 @@ export default function MultiStepForm({
   title,
   showProgressBar = true,
   inline = false,
+  voiceEnabled = true,
+  language = 'en-US',
 }: MultiStepFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Record<string, any>>(draftData);
@@ -191,21 +197,39 @@ export default function MultiStepForm({
                 ))}
               </select>
             ) : field.type === 'textarea' ? (
-              <textarea
-                value={formData[field.name] || ''}
-                onChange={(e) => handleInputChange(field.name, e.target.value)}
-                placeholder={field.placeholder}
-                rows={4}
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition resize-none"
-              />
+              <div className="space-y-2">
+                <textarea
+                  value={formData[field.name] || ''}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                  placeholder={field.placeholder}
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition resize-none"
+                />
+                {voiceEnabled && (field.voiceInput !== false) && (
+                  <VoiceInputButton
+                    onTranscript={(text) => handleInputChange(field.name, text)}
+                    language={language}
+                    fieldName={field.label}
+                  />
+                )}
+              </div>
             ) : (
-              <input
-                type={field.type}
-                value={formData[field.name] || ''}
-                onChange={(e) => handleInputChange(field.name, e.target.value)}
-                placeholder={field.placeholder}
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition"
-              />
+              <div className="flex gap-2 items-start">
+                <input
+                  type={field.type}
+                  value={formData[field.name] || ''}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                  placeholder={field.placeholder}
+                  className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition"
+                />
+                {voiceEnabled && (field.voiceInput !== false) && ['text', 'email', 'number'].includes(field.type) && (
+                  <VoiceInputButton
+                    onTranscript={(text) => handleInputChange(field.name, text)}
+                    language={language}
+                    fieldName={field.label}
+                  />
+                )}
+              </div>
             )}
           </FormField>
         ))}

@@ -6,6 +6,7 @@ import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
 import Card from '@/components/Common/Card';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
+import VoiceInputButton from '@/components/VoiceInputButton';
 import { BiPlus, BiTrash, BiX, BiChevronRight } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -97,15 +98,21 @@ export default function BanksManagementPage() {
             </div>
             <form onSubmit={handleCreateBank} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
-                <input
-                  type="text"
-                  value={bankFormData.name}
-                  onChange={(e) => setBankFormData({ name: e.target.value })}
-                  placeholder="e.g., First Bank"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+                <div className="flex gap-2 items-start">
+                  <input
+                    type="text"
+                    value={bankFormData.name}
+                    onChange={(e) => setBankFormData({ name: e.target.value })}
+                    placeholder="e.g., First Bank"
+                    required
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <VoiceInputButton
+                    onTranscript={(text) => setBankFormData({ name: text })}
+                    fieldName="Bank Name"
+                  />
+                </div>
               </div>
               <div className="flex gap-3">
                 <ProfessionalButton type="submit" variant="primary">

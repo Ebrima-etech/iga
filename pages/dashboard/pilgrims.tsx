@@ -26,6 +26,7 @@ const pilgrimFormSteps = [
         type: 'text' as const,
         required: true,
         placeholder: 'John',
+        voiceInput: true,
       },
       {
         name: 'last_name',
@@ -33,6 +34,7 @@ const pilgrimFormSteps = [
         type: 'text' as const,
         required: true,
         placeholder: 'Doe',
+        voiceInput: true,
       },
       {
         name: 'email',
@@ -40,6 +42,7 @@ const pilgrimFormSteps = [
         type: 'email' as const,
         required: true,
         placeholder: 'john@example.com',
+        voiceInput: true,
       },
       {
         name: 'phone',
@@ -47,6 +50,7 @@ const pilgrimFormSteps = [
         type: 'text' as const,
         required: true,
         placeholder: '+220-123-4567',
+        voiceInput: true,
       },
       {
         name: 'date_of_birth',
@@ -77,6 +81,7 @@ const pilgrimFormSteps = [
         type: 'text' as const,
         required: true,
         placeholder: 'A12345678',
+        voiceInput: true,
       },
       {
         name: 'nationality',
@@ -84,6 +89,7 @@ const pilgrimFormSteps = [
         type: 'text' as const,
         required: true,
         placeholder: 'Gambian',
+        voiceInput: true,
       },
     ],
   },
@@ -98,6 +104,7 @@ const pilgrimFormSteps = [
         type: 'text' as const,
         required: true,
         placeholder: '123 Main Street',
+        voiceInput: true,
       },
       {
         name: 'city',
@@ -105,17 +112,20 @@ const pilgrimFormSteps = [
         type: 'text' as const,
         required: true,
         placeholder: 'Banjul',
+        voiceInput: true,
       },
       {
         name: 'state',
         label: 'State/Province',
         type: 'text' as const,
         placeholder: 'Western Region',
+        voiceInput: true,
       },
       {
         name: 'postal_code',
         label: 'Postal Code',
         type: 'text' as const,
+        voiceInput: true,
       },
       {
         name: 'country',
@@ -123,6 +133,7 @@ const pilgrimFormSteps = [
         type: 'text' as const,
         required: true,
         placeholder: 'Gambia',
+        voiceInput: true,
       },
     ],
   },
@@ -137,12 +148,14 @@ const pilgrimFormSteps = [
         type: 'number' as const,
         required: true,
         placeholder: '5000',
+        voiceInput: true,
       },
       {
         name: 'registration_id',
         label: 'Registration ID (Auto-generated if blank)',
         type: 'text' as const,
         placeholder: 'Leave blank for auto-generation',
+        voiceInput: true,
       },
     ],
   },
@@ -355,6 +368,8 @@ export default function PilgrimsPage() {
                 draftData={draftData}
                 title="Pilgrim Registration"
                 inline={true}
+                voiceEnabled={true}
+                language="en-US"
               />
             </Card>
           </div>
