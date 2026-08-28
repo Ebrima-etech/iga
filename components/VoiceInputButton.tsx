@@ -32,6 +32,33 @@ export default function VoiceInputButton({
 
   const [showError, setShowError] = useState(!!error);
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const [cancelDetected, setCancelDetected] = useState(false);
+
+  // Detect voice command "cancel" in interim transcript
+  useEffect(() => {
+    if (isListening && (interimTranscript || transcript)) {
+      const text = (interimTranscript || transcript).toLowerCase().trim();
+      // Match "cancel" as a complete word (word boundaries)
+      const cancelRegex = /\bcancel\b/;
+
+      if (cancelRegex.test(text) && !cancelDetected) {
+        console.log('🎙️ Voice command detected: CANCEL');
+        setCancelDetected(true);
+
+        toast.success('🎙️ Cancelling via voice command...', {
+          icon: '🛑',
+          duration: 1200,
+        });
+
+        // Stop listening and clear transcript
+        setTimeout(() => {
+          stopListening();
+          clearTranscript();
+          setCancelDetected(false);
+        }, 800);
+      }
+    }
+  }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected]);
 
   // Auto-submit when speech ends (transcript becomes available and not listening)
   useEffect(() => {
@@ -264,17 +291,23 @@ export default function VoiceInputButton({
         </button>
       ) : (
         // Recording state - animated recording UI
-        <div className="flex-1 bg-red-50 border-2 border-red-200 rounded-xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom duration-300">
+        <div className={`flex-1 rounded-xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom duration-300 transition-all ${
+          cancelDetected
+            ? 'bg-orange-100 border-2 border-orange-400'
+            : 'bg-red-50 border-2 border-red-200'
+        }`}>
           <div className="flex items-center gap-3 mb-3">
             {/* Animated recording pulse */}
             <div className="relative flex items-center justify-center">
-              <div className="absolute w-4 h-4 bg-red-500 rounded-full animate-ping"></div>
-              <div className="w-4 h-4 bg-red-600 rounded-full"></div>
+              <div className={`absolute w-4 h-4 rounded-full animate-ping ${cancelDetected ? 'bg-orange-500' : 'bg-red-500'}`}></div>
+              <div className={`w-4 h-4 rounded-full ${cancelDetected ? 'bg-orange-600' : 'bg-red-600'}`}></div>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-red-700">🎤 Recording...</p>
-              <p className="text-xs text-red-600 mt-0.5">
-                Click below to stop and confirm, or cancel to discard
+              <p className={`text-sm font-bold ${cancelDetected ? 'text-orange-700' : 'text-red-700'}`}>
+                {cancelDetected ? '🛑 Cancelling...' : '🎤 Recording...'}
+              </p>
+              <p className={`text-xs mt-0.5 ${cancelDetected ? 'text-orange-600' : 'text-red-600'}`}>
+                {cancelDetected ? 'Voice command detected: Cancel' : 'Say "cancel" to stop, or use the buttons below'}
               </p>
             </div>
           </div>
