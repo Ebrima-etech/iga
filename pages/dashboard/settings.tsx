@@ -188,16 +188,15 @@ export default function SettingsPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      <div className="min-h-screen bg-white p-8">
         {/* Page Header */}
-        <PageHeader
-          title="Settings"
-          description="Manage your profile, currency preferences, and system configuration"
-        />
+        <div className="mb-8 pb-6 border-b border-gray-200">
+          <h1 className="text-3xl font-semibold text-gray-900">Settings</h1>
+          <p className="text-gray-600 mt-1">Manage profile, currency, and system preferences</p>
+        </div>
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Tabs Navigation */}
-          <div className="mb-8 border-b border-gray-200">
+        {/* Tabs Navigation */}
+        <div className="mb-8 border-b border-gray-200">
             <div className="flex gap-8">
               <button
                 onClick={() => setActiveTab('profile')}
@@ -554,7 +553,6 @@ export default function SettingsPage() {
               </div>
             </Card>
           )}
-        </div>
       </div>
     </Layout>
   );
