@@ -61,8 +61,9 @@ export default function VoiceInputButton({
   }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected]);
 
   // Auto-submit when speech ends (transcript becomes available and not listening)
+  // BUT skip if cancel was just detected
   useEffect(() => {
-    if (!isListening && transcript && transcript.trim() && !error) {
+    if (!isListening && transcript && transcript.trim() && !error && !cancelDetected) {
       console.log('🎤 Speech ended, auto-submitting transcript:', transcript);
       onTranscript(transcript);
 
@@ -71,7 +72,7 @@ export default function VoiceInputButton({
         clearTranscript();
       }, 800);
     }
-  }, [isListening, transcript, error, fieldName, onTranscript, clearTranscript]);
+  }, [isListening, transcript, error, fieldName, onTranscript, clearTranscript, cancelDetected]);
 
   if (!isSupported) {
     return (
