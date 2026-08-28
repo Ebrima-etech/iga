@@ -52,6 +52,11 @@ export default function MultiStepForm({
   const [loading, setLoading] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
 
+  // Log formData changes to debug
+  useEffect(() => {
+    console.log('📊 formData state changed:', formData);
+  }, [formData]);
+
   const step = steps[currentStep];
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === steps.length - 1;
