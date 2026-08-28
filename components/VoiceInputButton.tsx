@@ -41,6 +41,11 @@ export default function VoiceInputButton({
     if (spellingMode && isListening && (interimTranscript || transcript)) {
       const text = (interimTranscript || transcript).toLowerCase().trim();
 
+      // Skip if text contains "spell" command itself (wait for next input)
+      if (text.includes('spell')) {
+        return;
+      }
+
       // Check for special commands
       if (text === 'done' || text === 'finished') {
         console.log('🎤 Spelling complete, submitting:', transcript + spelledText);
@@ -88,12 +93,12 @@ export default function VoiceInputButton({
 
       // Detect "spell" command (switch to spelling mode)
       if (spellRegex.test(text) && !spellingMode) {
-        console.log('🎙️ Voice command detected: SPELL');
+        console.log('🎙️ Voice command detected: SPELL - switching to spelling mode');
         setSpellingMode(true);
         setSpelledText('');
-        clearTranscript();
+        // Don't clear transcript - keep listening for spelling
 
-        toast.success('🎙️ Entering spelling mode...', {
+        toast.success('🎙️ Entering spelling mode - continue speaking...', {
           icon: '🔤',
           duration: 1200,
         });
