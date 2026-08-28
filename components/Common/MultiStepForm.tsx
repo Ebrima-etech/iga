@@ -57,7 +57,13 @@ export default function MultiStepForm({
   const isLastStep = currentStep === steps.length - 1;
 
   const handleInputChange = (name: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    console.log('📝 handleInputChange called with:', { name, value });
+    console.log('📝 Current formData before update:', formData);
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+      console.log('📝 formData updated to:', updated);
+      return updated;
+    });
     // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors((prev) => {

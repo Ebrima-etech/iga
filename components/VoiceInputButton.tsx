@@ -63,8 +63,10 @@ export default function VoiceInputButton({
 
     if (finalText && finalText.trim()) {
       console.log('✅ Text is valid, calling onTranscript with:', finalText);
+      console.log('✅ onTranscript function:', onTranscript.toString());
       // Use the returned transcript immediately (don't wait for state update)
-      onTranscript(finalText);
+      const result = onTranscript(finalText);
+      console.log('✅ onTranscript returned:', result);
 
       toast.success(`✓ Text added to ${fieldName}`, {
         icon: '✍️',
