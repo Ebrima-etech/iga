@@ -35,6 +35,7 @@ export default function VoiceInputButton({
   const [cancelDetected, setCancelDetected] = useState(false);
   const [spellingMode, setSpellingMode] = useState(false);
   const [spelledText, setSpelledText] = useState('');
+  const [skipNextSubmit, setSkipNextSubmit] = useState(false);
 
   // Detect spelling commands (letter by letter input)
   useEffect(() => {
@@ -100,6 +101,7 @@ export default function VoiceInputButton({
 
         setSpellingMode(true);
         setSpelledText(beforeSpell ? beforeSpell + ' ' : '');
+        setSkipNextSubmit(true); // Prevent auto-submit on this transcript
 
         toast.success('🎙️ Entering spelling mode - continue speaking...', {
           icon: '🔤',
@@ -111,6 +113,7 @@ export default function VoiceInputButton({
           stopListening();
           clearTranscript();
           startListening();
+          setSkipNextSubmit(false); // Re-enable submit after restart
         }, 300);
 
         return;
@@ -139,11 +142,16 @@ export default function VoiceInputButton({
   }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected, spellingMode]);
 
   // Auto-submit when speech ends (transcript becomes available and not listening)
-  // BUT skip if cancel was detected, in spelling mode, or "spell" word is in transcript
+  // BUT skip if cancel was detected, in spelling mode, "spell" word is in transcript, or skipNextSubmit is true
   useEffect(() => {
-    const containsSpellCommand = transcript.toLowerCase().includes('spell');
+    if (!isListening && transcript && transcript.trim() && !error && !cancelDetected && !spellingMode && !skipNextSubmit) {
+      // Double-check: don't submit if transcript is ONLY "spell" or contains it
+      const text = transcript.toLowerCase().trim();
+      if (text === 'spell' || text.includes('spell')) {
+        console.log('🎙️ Skipping submit: transcript contains spell command');
+        return;
+      }
 
-    if (!isListening && transcript && transcript.trim() && !error && !cancelDetected && !spellingMode && !containsSpellCommand) {
       console.log('🎤 Speech ended, auto-submitting transcript:', transcript);
       onTranscript(transcript);
 
@@ -152,7 +160,7 @@ export default function VoiceInputButton({
         clearTranscript();
       }, 800);
     }
-  }, [isListening, transcript, error, fieldName, onTranscript, clearTranscript, cancelDetected, spellingMode]);
+  }, [isListening, transcript, error, fieldName, onTranscript, clearTranscript, cancelDetected, spellingMode, skipNextSubmit]);
 
   if (!isSupported) {
     return (
