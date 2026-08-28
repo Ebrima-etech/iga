@@ -3,7 +3,7 @@
 import { useSpeechInput } from '@/hooks/useSpeechInput';
 import { BiMicrophone, BiX, BiCheckCircle } from 'react-icons/bi';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface VoiceInputButtonProps {
   onTranscript: (text: string) => void;
@@ -32,6 +32,24 @@ export default function VoiceInputButton({
 
   const [showError, setShowError] = useState(!!error);
   const [permissionDenied, setPermissionDenied] = useState(false);
+
+  // Auto-submit when speech ends (transcript becomes available and not listening)
+  useEffect(() => {
+    if (!isListening && transcript && transcript.trim() && !error) {
+      console.log('🎤 Speech ended, auto-submitting transcript:', transcript);
+      onTranscript(transcript);
+
+      toast.success(`✓ Text added to ${fieldName}`, {
+        icon: '✍️',
+        duration: 1500,
+      });
+
+      // Clear after a delay
+      setTimeout(() => {
+        clearTranscript();
+      }, 800);
+    }
+  }, [isListening, transcript, error, fieldName, onTranscript, clearTranscript]);
 
   if (!isSupported) {
     return (
@@ -72,24 +90,6 @@ export default function VoiceInputButton({
       });
     }
   };
-
-  // Auto-submit when speech ends (transcript becomes available and not listening)
-  useEffect(() => {
-    if (!isListening && transcript && transcript.trim() && !error) {
-      console.log('🎤 Speech ended, auto-submitting transcript:', transcript);
-      onTranscript(transcript);
-
-      toast.success(`✓ Text added to ${fieldName}`, {
-        icon: '✍️',
-        duration: 1500,
-      });
-
-      // Clear after a delay
-      setTimeout(() => {
-        clearTranscript();
-      }, 800);
-    }
-  }, [isListening, transcript, error, fieldName, onTranscript]);
 
   const handleClear = () => {
     clearTranscript();
