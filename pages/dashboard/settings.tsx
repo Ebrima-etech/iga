@@ -8,10 +8,11 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Badge from '@/components/Common/Badge';
 import FormField from '@/components/Common/FormField';
 import Input from '@/components/Common/Input';
-import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave } from 'react-icons/bi';
+import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import { User, CurrencyCode } from '@/types';
 import api from '@/lib/api';
+import { setCurrencyMode, startRealtimeUpdates, stopRealtimeUpdates, getCurrencyMode } from '@/lib/realtimeCurrency';
 
 type SettingsTab = 'profile' | 'currency' | 'system';
 
@@ -38,6 +39,7 @@ export default function SettingsPage() {
   // Currency states
   const [defaultCurrency, setDefaultCurrency] = useState<CurrencyCode>('USD');
   const [editingRates, setEditingRates] = useState(false);
+  const [currencyMode, setCurrencyModeState] = useState<'manual' | 'realtime'>('manual');
   const [currencies, setCurrencies] = useState<CurrencyData[]>([
     { code: 'GMD', name: 'Gambian Dalasi', symbol: 'D', rate: 1 },
     { code: 'USD', name: 'US Dollar', symbol: '$', rate: 0.017 },
@@ -47,6 +49,8 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetchUserData();
+    const mode = getCurrencyMode();
+    setCurrencyModeState(mode);
   }, []);
 
   const fetchUserData = async () => {
@@ -93,12 +97,26 @@ export default function SettingsPage() {
           acc[c.code] = c;
           return acc;
         }, {} as Record<CurrencyCode, CurrencyData>),
+        mode: currencyMode,
       };
       await api.post('/settings/currency/', currencySettings);
       setEditingRates(false);
       toast.success('Currency rates updated successfully!');
     } catch (error) {
       toast.error('Failed to update currency rates');
+    }
+  };
+
+  const handleToggleCurrencyMode = (mode: 'manual' | 'realtime') => {
+    setCurrencyModeState(mode);
+    setCurrencyMode(mode);
+
+    if (mode === 'realtime') {
+      startRealtimeUpdates();
+      toast.success('✓ Real-time mode activated - rates updating live!');
+    } else {
+      stopRealtimeUpdates();
+      toast.success('✓ Manual mode activated - using admin rates');
     }
   };
 
@@ -318,6 +336,41 @@ export default function SettingsPage() {
                     ))}
                   </select>
                   <p className="text-xs text-indigo-700 mt-2">Set the default currency for all transactions</p>
+                </div>
+
+                      {/* Mode Selector */}
+                <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => handleToggleCurrencyMode('manual')}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      currencyMode === 'manual'
+                        ? 'border-indigo-600 bg-indigo-50'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <p className="font-semibold text-gray-900 mb-1">📋 Manual Mode</p>
+                    <p className="text-sm text-gray-600">Use admin configured rates</p>
+                  </button>
+
+                  <button
+                    onClick={() => handleToggleCurrencyMode('realtime')}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      currencyMode === 'realtime'
+                        ? 'border-green-600 bg-green-50'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-semibold text-gray-900">📡 Real-Time API</p>
+                      {currencyMode === 'realtime' && (
+                        <div className="flex items-center gap-1 px-2 py-0.5 bg-green-200 rounded-full">
+                          <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                          <span className="text-xs font-medium text-green-700">Live</span>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600">Updates every 5 seconds</p>
+                  </button>
                 </div>
 
                 {/* Currency Rates Table */}
