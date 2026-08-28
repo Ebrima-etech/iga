@@ -93,9 +93,9 @@ export default function BanksManagementPage() {
 
       // Create bank admin role
       await api.post('/user-roles/', {
-        user: userResponse.data.id,
+        user_id: userResponse.data.id,
         role: 'bank_admin',
-        bank: adminFormData.bank_id,
+        bank: parseInt(adminFormData.bank_id),
         is_active: true,
       });
 
