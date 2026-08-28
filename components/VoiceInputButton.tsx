@@ -69,34 +69,71 @@ export default function VoiceInputButton({
     setPermissionDenied(false);
   };
 
-  const handlePermissionRequest = () => {
-    setPermissionDenied(false);
-    handleStart();
+  const handlePermissionRequest = async () => {
+    try {
+      // Request microphone permission explicitly
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Stop the stream immediately - we just needed permission
+      stream.getTracks().forEach(track => track.stop());
+
+      setPermissionDenied(false);
+      setShowError(false);
+
+      // Now start listening
+      setTimeout(() => {
+        startListening();
+      }, 500);
+
+      toast.success('🎤 Microphone enabled! Ready to record.', {
+        duration: 2000,
+      });
+    } catch (err: any) {
+      if (err.name === 'NotAllowedError') {
+        toast.error('❌ Permission denied. Please enable microphone in browser settings.', {
+          duration: 3000,
+        });
+      } else if (err.name === 'NotFoundError') {
+        toast.error('🎧 No microphone found. Please connect one.', {
+          duration: 3000,
+        });
+      } else {
+        toast.error('Failed to access microphone', {
+          duration: 2000,
+        });
+      }
+      console.error('Microphone permission error:', err);
+    }
   };
 
   // Handle not-allowed error
   if (error && error.includes('not-allowed')) {
     return (
       <div className="w-full max-w-sm">
-        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-orange-300 rounded-lg p-4 shadow-md">
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-orange-400 rounded-xl p-4 shadow-lg animate-pulse">
           <div className="flex items-start gap-3">
-            <div className="text-2xl">🎤</div>
+            <div className="text-3xl animate-bounce">🎤</div>
             <div className="flex-1">
-              <p className="font-bold text-gray-900 mb-2">Microphone Permission Needed</p>
-              <p className="text-sm text-gray-700 mb-4">
-                Click below to allow microphone access for voice input
+              <p className="font-bold text-gray-900 mb-1">Microphone Permission Required</p>
+              <p className="text-xs text-gray-600 mb-3">
+                Click the button below to enable microphone access. Your browser will ask for permission.
               </p>
-              <button
-                type="button"
-                onClick={handlePermissionRequest}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition transform hover:scale-105 active:scale-95"
-              >
-                Enable Microphone
-              </button>
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={handlePermissionRequest}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition transform hover:scale-105 active:scale-95 shadow-md"
+                >
+                  🎤 Enable Microphone
+                </button>
+                <p className="text-xs text-gray-600 text-center">
+                  Look for a permission popup at the top of your browser
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={handleClear}
-                className="ml-2 text-gray-600 hover:text-gray-800 text-sm underline"
+                className="w-full mt-2 text-gray-600 hover:text-gray-800 text-xs underline"
               >
                 Dismiss
               </button>
