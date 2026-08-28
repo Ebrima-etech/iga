@@ -393,6 +393,7 @@ export default function VoiceInputButton({
             </button>
           </div>
         </div>
+        </div>
       )}
 
       {/* Display completed transcript - Overlay */}
