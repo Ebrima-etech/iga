@@ -264,8 +264,8 @@ export default function VoiceInputButton({
         </button>
       ) : (
         // Recording state - animated recording UI
-        <div className="flex-1 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-300 rounded-xl p-3 shadow-lg animate-in fade-in slide-in-from-bottom duration-300">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="flex-1 bg-red-50 border-2 border-red-200 rounded-xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom duration-300">
+          <div className="flex items-center gap-3 mb-3">
             {/* Animated recording pulse */}
             <div className="relative flex items-center justify-center">
               <div className="absolute w-4 h-4 bg-red-500 rounded-full animate-ping"></div>
@@ -274,17 +274,9 @@ export default function VoiceInputButton({
             <div className="flex-1">
               <p className="text-sm font-bold text-red-700">🎤 Recording...</p>
               <p className="text-xs text-red-600 mt-0.5">
-                Listening to {fieldName}
+                Click below to stop and confirm, or cancel to discard
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleStop}
-              className="bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-lg transition transform hover:scale-110 active:scale-95 shadow-md"
-              title="Stop recording"
-            >
-              <BiCheckCircle size={18} />
-            </button>
           </div>
 
           {/* Animated waveform */}
@@ -309,7 +301,7 @@ export default function VoiceInputButton({
 
           {/* Interim text while listening */}
           {(interimTranscript || transcript) && (
-            <p className="text-sm text-gray-800 bg-white rounded-lg px-2 py-1.5 text-center">
+            <p className="text-sm text-gray-800 bg-white rounded-lg px-2 py-1.5 text-center mb-3">
               <span className="text-gray-700">
                 {transcript || interimTranscript}
               </span>
@@ -320,6 +312,29 @@ export default function VoiceInputButton({
               )}
             </p>
           )}
+
+          {/* Recording Control Buttons */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleStop}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg transition font-medium text-sm"
+              title="Stop recording and use the captured text"
+            >
+              ✓ Stop & Use
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                stopListening();
+                clearTranscript();
+              }}
+              className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-2.5 rounded-lg transition font-medium text-sm"
+              title="Cancel recording and discard the text"
+            >
+              ✕ Cancel
+            </button>
+          </div>
         </div>
       )}
 
