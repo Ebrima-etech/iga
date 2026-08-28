@@ -33,32 +33,49 @@ export default function VoiceInputButton({
   const [showError, setShowError] = useState(!!error);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [cancelDetected, setCancelDetected] = useState(false);
+  const [spellingMode, setSpellingMode] = useState(false);
+  const [spelledText, setSpelledText] = useState('');
 
-  // Detect voice command "cancel" in interim transcript
+  // Detect spelling commands (letter by letter input)
   useEffect(() => {
-    if (isListening && (interimTranscript || transcript)) {
+    if (spellingMode && isListening && (interimTranscript || transcript)) {
       const text = (interimTranscript || transcript).toLowerCase().trim();
-      // Match "cancel" as a complete word (word boundaries)
-      const cancelRegex = /\bcancel\b/;
 
-      if (cancelRegex.test(text) && !cancelDetected) {
-        console.log('🎙️ Voice command detected: CANCEL');
-        setCancelDetected(true);
+      // Check for special commands
+      if (text === 'done' || text === 'finished') {
+        console.log('🎤 Spelling complete, submitting:', transcript + spelledText);
+        onTranscript(transcript + spelledText);
+        setSpelledText('');
+        setSpellingMode(false);
+        clearTranscript();
+        stopListening();
+        return;
+      }
 
-        toast.success('🎙️ Cancelling via voice command...', {
-          icon: '🛑',
-          duration: 1200,
-        });
+      if (text === 'space' || text === 'spa') {
+        setSpelledText(prev => prev + ' ');
+        clearTranscript();
+        return;
+      }
 
-        // Stop listening and clear transcript
-        setTimeout(() => {
-          stopListening();
+      if (text === 'backspace' || text === 'back' || text === 'delete') {
+        setSpelledText(prev => prev.slice(0, -1));
+        clearTranscript();
+        return;
+      }
+
+      // Extract single letters/words
+      const words = text.split(/\s+/);
+      if (words.length > 0) {
+        const lastWord = words[words.length - 1];
+        // If it's a single letter or short word, add it
+        if (lastWord.length <= 1 || lastWord.match(/^[a-z]$/i)) {
+          setSpelledText(prev => prev + lastWord);
           clearTranscript();
-          setCancelDetected(false);
-        }, 800);
+        }
       }
     }
-  }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected]);
+  }, [spellingMode, isListening, interimTranscript, transcript, clearTranscript, stopListening, onTranscript, transcript]);
 
   // Auto-submit when speech ends (transcript becomes available and not listening)
   // BUT skip if cancel was just detected
@@ -324,15 +341,27 @@ export default function VoiceInputButton({
           <div className="flex items-center gap-3 mb-3">
             {/* Animated recording pulse */}
             <div className="relative flex items-center justify-center">
-              <div className={`absolute w-4 h-4 rounded-full animate-ping ${cancelDetected ? 'bg-orange-500' : 'bg-red-500'}`}></div>
-              <div className={`w-4 h-4 rounded-full ${cancelDetected ? 'bg-orange-600' : 'bg-red-600'}`}></div>
+              <div className={`absolute w-4 h-4 rounded-full animate-ping ${
+                cancelDetected ? 'bg-orange-500' : spellingMode ? 'bg-blue-500' : 'bg-red-500'
+              }`}></div>
+              <div className={`w-4 h-4 rounded-full ${
+                cancelDetected ? 'bg-orange-600' : spellingMode ? 'bg-blue-600' : 'bg-red-600'
+              }`}></div>
             </div>
             <div className="flex-1">
-              <p className={`text-sm font-bold ${cancelDetected ? 'text-orange-700' : 'text-red-700'}`}>
-                {cancelDetected ? '🛑 Cancelling...' : '🎤 Recording...'}
+              <p className={`text-sm font-bold ${
+                cancelDetected ? 'text-orange-700' : spellingMode ? 'text-blue-700' : 'text-red-700'
+              }`}>
+                {cancelDetected ? '🛑 Cancelling...' : spellingMode ? '🔤 Spelling Mode...' : '🎤 Recording...'}
               </p>
-              <p className={`text-xs mt-0.5 ${cancelDetected ? 'text-orange-600' : 'text-red-600'}`}>
-                {cancelDetected ? 'Voice command detected: Cancel' : 'Say "cancel" to stop, or use the buttons below'}
+              <p className={`text-xs mt-0.5 ${
+                cancelDetected ? 'text-orange-600' : spellingMode ? 'text-blue-600' : 'text-red-600'
+              }`}>
+                {cancelDetected
+                  ? 'Voice command detected: Cancel'
+                  : spellingMode
+                  ? 'Spell letter by letter • Say "space" for space • Say "done" to finish'
+                  : 'Say "cancel" to stop, or use the buttons below'}
               </p>
             </div>
           </div>
@@ -358,34 +387,60 @@ export default function VoiceInputButton({
           </div>
 
           {/* Interim text while listening */}
-          {(interimTranscript || transcript) && (
-            <p className="text-sm text-gray-800 bg-white rounded-lg px-2 py-1.5 text-center mb-3">
-              <span className="text-gray-700">
-                {transcript || interimTranscript}
-              </span>
-              {interimTranscript && !transcript && (
+          {spellingMode ? (
+            <p className="text-sm text-gray-800 bg-white rounded-lg px-2 py-1.5 text-center mb-3 font-mono">
+              <span className="text-blue-700 font-bold">{transcript}{spelledText}</span>
+              {interimTranscript && (
                 <span className="text-gray-400 italic ml-1 animate-pulse">
                   {interimTranscript}
                 </span>
               )}
             </p>
+          ) : (
+            (interimTranscript || transcript) && (
+              <p className="text-sm text-gray-800 bg-white rounded-lg px-2 py-1.5 text-center mb-3">
+                <span className="text-gray-700">
+                  {transcript || interimTranscript}
+                </span>
+                {interimTranscript && !transcript && (
+                  <span className="text-gray-400 italic ml-1 animate-pulse">
+                    {interimTranscript}
+                  </span>
+                )}
+              </p>
+            )
           )}
 
           {/* Recording Control Buttons */}
           <div className="flex gap-2">
+            {!spellingMode && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSpellingMode(true);
+                  setSpelledText('');
+                }}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg transition font-medium text-sm"
+                title="Switch to spelling mode - spell letter by letter"
+              >
+                🔤 Spell
+              </button>
+            )}
             <button
               type="button"
               onClick={handleStop}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg transition font-medium text-sm"
-              title="Stop recording and use the captured text"
+              className={`flex-1 ${spellingMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-green-600 hover:bg-green-700'} text-white px-3 py-2.5 rounded-lg transition font-medium text-sm`}
+              title={spellingMode ? "Finish spelling and submit" : "Stop recording and use the captured text"}
             >
-              ✓ Stop & Use
+              {spellingMode ? '✓ Done Spelling' : '✓ Stop & Use'}
             </button>
             <button
               type="button"
               onClick={() => {
                 stopListening();
                 clearTranscript();
+                setSpellingMode(false);
+                setSpelledText('');
               }}
               className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-2.5 rounded-lg transition font-medium text-sm"
               title="Cancel recording and discard the text"
