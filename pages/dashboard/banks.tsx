@@ -72,58 +72,67 @@ export default function BanksManagementPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-white p-8">
-        <PageHeader
-          title="Banks Management"
-          description="Create and manage bank accounts"
-          action={
-            <ProfessionalButton
-              variant="primary"
-              size="md"
-              icon={<BiPlus size={20} />}
-              onClick={() => setShowBankForm(!showBankForm)}
-            >
-              Add Bank
-            </ProfessionalButton>
-          }
-        />
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
+          <div>
+            <h1 className="text-3xl font-semibold text-gray-900">Banks</h1>
+            <p className="text-gray-600 mt-1">Create and manage bank accounts for payments</p>
+          </div>
+          <ProfessionalButton
+            variant="primary"
+            size="md"
+            icon={<BiPlus size={18} />}
+            onClick={() => setShowBankForm(!showBankForm)}
+          >
+            Add Bank
+          </ProfessionalButton>
+        </div>
 
         {/* Create Bank Form */}
         {showBankForm && (
-          <Card padding="lg" shadow="md" className="mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Create New Bank</h2>
-              <button onClick={() => setShowBankForm(false)}>
-                <BiX size={24} className="text-gray-400 hover:text-gray-600" />
+          <div className="mb-6 p-6 bg-gray-50 rounded-lg border border-gray-200 animate-slideInUp">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Create New Bank</h2>
+                <p className="text-gray-600 text-sm mt-1">Add a new bank account for processing payments</p>
+              </div>
+              <button
+                onClick={() => setShowBankForm(false)}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-white rounded transition"
+              >
+                <BiX size={24} />
               </button>
             </div>
-            <form onSubmit={handleCreateBank} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
-                <div className="flex gap-2 items-start">
-                  <input
-                    type="text"
-                    value={bankFormData.name}
-                    onChange={(e) => setBankFormData({ name: e.target.value })}
-                    placeholder="e.g., First Bank"
-                    required
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <VoiceInputButton
-                    onTranscript={(text) => setBankFormData({ name: text })}
-                    fieldName="Bank Name"
-                  />
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <form onSubmit={handleCreateBank} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+                  <div className="flex gap-2 items-start">
+                    <input
+                      type="text"
+                      value={bankFormData.name}
+                      onChange={(e) => setBankFormData({ name: e.target.value })}
+                      placeholder="e.g., First Bank"
+                      required
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-sm"
+                    />
+                    <VoiceInputButton
+                      onTranscript={(text) => setBankFormData({ name: text })}
+                      fieldName="Bank Name"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-3">
-                <ProfessionalButton type="submit" variant="primary">
-                  Create Bank
-                </ProfessionalButton>
-                <ProfessionalButton type="button" variant="secondary" onClick={() => setShowBankForm(false)}>
-                  Cancel
-                </ProfessionalButton>
-              </div>
-            </form>
-          </Card>
+                <div className="flex gap-3 pt-4">
+                  <ProfessionalButton type="submit" variant="primary">
+                    Create Bank
+                  </ProfessionalButton>
+                  <ProfessionalButton type="button" variant="secondary" onClick={() => setShowBankForm(false)}>
+                    Cancel
+                  </ProfessionalButton>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
 
         {/* Banks Grid */}
