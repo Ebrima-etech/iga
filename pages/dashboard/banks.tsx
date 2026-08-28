@@ -289,12 +289,15 @@ export default function BanksManagementPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Bank Admins</h2>
             {bankAdmins.length > 0 ? (
               <div className="space-y-3">
-                {bankAdmins.map((admin) => (
+                {bankAdmins.map((admin: any) => (
                   <Card key={admin.id} padding="md">
-                    <p className="font-semibold text-gray-900">@{admin.username}</p>
-                    <p className="text-sm text-gray-600">{admin.email}</p>
+                    <p className="font-semibold text-gray-900">@{admin.user?.username || 'N/A'}</p>
+                    <p className="text-sm text-gray-600">{admin.user?.email || 'N/A'}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Bank: {admin.bank_name || 'N/A'}
+                      Bank: {admin.bank?.name || 'N/A'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Role: {admin.role}
                     </p>
                   </Card>
                 ))}
