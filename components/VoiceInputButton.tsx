@@ -53,11 +53,20 @@ export default function VoiceInputButton({
   };
 
   const handleStop = () => {
-    stopListening();
-    if (transcript) {
-      onTranscript(transcript);
+    const finalText = stopListening();
+
+    if (finalText && finalText.trim()) {
+      // Use the returned transcript immediately (don't wait for state update)
+      onTranscript(finalText);
+
       toast.success(`✓ Added to ${fieldName}`, {
         icon: '📝',
+        duration: 2000,
+      });
+
+      console.log('Voice input captured:', finalText);
+    } else {
+      toast.error('No speech detected. Please try again.', {
         duration: 2000,
       });
     }

@@ -62,12 +62,13 @@ export function useSpeechInput(language: string = 'en-US'): UseSpeechInputReturn
   }, [service]);
 
   const stopListening = useCallback(() => {
-    if (!service) return;
+    if (!service) return '';
 
     const finalTranscript = service.stop();
     setTranscript(finalTranscript);
     setInterimTranscript('');
     setIsListening(false);
+    return finalTranscript; // Return immediately so caller can use it
   }, [service]);
 
   const clearTranscript = useCallback(() => {
