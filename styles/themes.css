@@ -1,0 +1,466 @@
+/* ===========================
+   PROFESSIONAL THEME (Default - Hajj Gold)
+   =========================== */
+:root,
+[data-theme="professional"] {
+  /* Colors - Warm Gold/Amber theme for Hajj operations */
+  --color-primary-50: #fffbeb;
+  --color-primary-100: #fef3c7;
+  --color-primary-200: #fde68a;
+  --color-primary-300: #fcd34d;
+  --color-primary-400: #fbbf24;
+  --color-primary-500: #f59e0b;
+  --color-primary-600: #d97706;
+  --color-primary-700: #b45309;
+  --color-primary-800: #92400e;
+  --color-primary-900: #78350f;
+
+  --color-secondary: #d97706;
+  --color-accent: #b45309;
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #d97706;
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #faf8f3;
+  --bg-tertiary: #f5f0e8;
+
+  --text-primary: #1f1b0f;
+  --text-secondary: #6b5e4f;
+  --text-tertiary: #9a8e7f;
+
+  --border-color: #e5d9ca;
+  --hover-bg: #f5f0e8;
+  --focus-color: #d97706;
+
+  /* Typography */
+  --font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-glow: none;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+
+  /* Component Styles */
+  --button-radius: 8px;
+  --button-padding: 10px 16px;
+  --button-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --button-transition: 200ms ease-in-out;
+
+  --card-radius: 12px;
+  --card-padding: 24px;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --card-border: 1px solid #e5e7eb;
+
+  --input-radius: 8px;
+  --input-padding: 10px 12px;
+  --input-border: 1px solid #e5d9ca;
+  --input-focus: 0 0 0 3px rgba(217, 119, 6, 0.15);
+
+  --header-height: 64px;
+  --header-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --header-padding: 0 24px;
+
+  --sidebar-width: 256px;
+  --sidebar-padding: 24px;
+  --sidebar-item-spacing: 8px;
+  --sidebar-item-padding: 12px 16px;
+  --sidebar-item-radius: 8px;
+}
+
+/* Dark theme variant for Professional theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-primary-50: #78350f;
+    --color-primary-100: #92400e;
+    --color-primary-200: #b45309;
+    --color-primary-300: #d97706;
+    --color-primary-400: #f59e0b;
+    --color-primary-500: #fbbf24;
+    --color-primary-600: #fcd34d;
+    --color-primary-700: #fde68a;
+    --color-primary-800: #fef3c7;
+    --color-primary-900: #fffbeb;
+
+    --bg-primary: #0f0f0f;
+    --bg-secondary: #1a1a1a;
+    --bg-tertiary: #2a2a2a;
+
+    --text-primary: #f5f0e8;
+    --text-secondary: #b8a896;
+    --text-tertiary: #8b7a6b;
+
+    --border-color: #3a3229;
+    --hover-bg: #2a2a2a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-primary-50: #78350f;
+  --color-primary-100: #92400e;
+  --color-primary-200: #b45309;
+  --color-primary-300: #d97706;
+  --color-primary-400: #f59e0b;
+  --color-primary-500: #fbbf24;
+  --color-primary-600: #fcd34d;
+  --color-primary-700: #fde68a;
+  --color-primary-800: #fef3c7;
+  --color-primary-900: #fffbeb;
+
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2a2a2a;
+
+  --text-primary: #f5f0e8;
+  --text-secondary: #b8a896;
+  --text-tertiary: #8b7a6b;
+
+  --border-color: #3a3229;
+  --hover-bg: #2a2a2a;
+}
+
+/* ===========================
+   GEN Z THEME (Modern, Trendy)
+   =========================== */
+[data-theme="gen-z"] {
+  /* Colors */
+  --color-primary-50: #faf5ff;
+  --color-primary-100: #f3e8ff;
+  --color-primary-200: #e9d5ff;
+  --color-primary-300: #d8b4fe;
+  --color-primary-400: #c084fc;
+  --color-primary-500: #a855f7;
+  --color-primary-600: #9333ea;
+  --color-primary-700: #7e22ce;
+  --color-primary-800: #6b21a8;
+  --color-primary-900: #581c87;
+
+  --color-secondary: #ec4899;
+  --color-accent: #84cc16;
+  --color-success: #10b981;
+  --color-error: #f43f5e;
+  --color-warning: #f59e0b;
+  --color-info: #06b6d4;
+
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+
+  --border-color: #475569;
+  --hover-bg: #1e293b;
+  --focus-color: #a855f7;
+
+  /* Typography */
+  --font-family: 'Inter', 'Poppins', system-ui, sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-lg: 17px;
+  --font-size-xl: 19px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
+  /* Spacing */
+  --spacing-xs: 6px;
+  --spacing-sm: 12px;
+  --spacing-md: 18px;
+  --spacing-lg: 28px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 56px;
+
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 4px 20px rgba(168, 85, 247, 0.15);
+  --shadow-md: 0 8px 32px rgba(168, 85, 247, 0.2);
+  --shadow-lg: 0 12px 48px rgba(168, 85, 247, 0.25);
+  --shadow-xl: 0 20px 64px rgba(168, 85, 247, 0.3);
+  --shadow-glow: 0 0 20px rgba(168, 85, 247, 0.4);
+
+  /* Transitions */
+  --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Component Styles */
+  --button-radius: 16px;
+  --button-padding: 12px 24px;
+  --button-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+  --button-transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  --card-radius: 20px;
+  --card-padding: 28px;
+  --card-shadow: 0 8px 32px rgba(168, 85, 247, 0.15);
+  --card-border: none;
+
+  --input-radius: 12px;
+  --input-padding: 12px 16px;
+  --input-border: none;
+  --input-focus: 0 0 0 3px rgba(168, 85, 247, 0.3);
+
+  --header-height: 70px;
+  --header-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  --header-padding: 0 32px;
+
+  --sidebar-width: 280px;
+  --sidebar-padding: 28px;
+  --sidebar-item-spacing: 12px;
+  --sidebar-item-padding: 14px 18px;
+  --sidebar-item-radius: 14px;
+}
+
+/* ===========================
+   GEN ALPHA THEME (Bold, Neon)
+   =========================== */
+[data-theme="gen-alpha"] {
+  /* Colors */
+  --color-primary-50: #fffacd;
+  --color-primary-100: #ffff99;
+  --color-primary-200: #ffff66;
+  --color-primary-300: #ffff33;
+  --color-primary-400: #ffff00;
+  --color-primary-500: #facc15;
+  --color-primary-600: #eab308;
+  --color-primary-700: #ca8a04;
+  --color-primary-800: #a16207;
+  --color-primary-900: #713f12;
+
+  --color-secondary: #ff00ff;
+  --color-accent: #00ffff;
+  --color-success: #00ff00;
+  --color-error: #ff0055;
+  --color-warning: #ffaa00;
+  --color-info: #00aaff;
+
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #1a1a1a;
+
+  --text-primary: #ffffff;
+  --text-secondary: #ffff00;
+  --text-tertiary: #cccccc;
+
+  --border-color: #ffff00;
+  --hover-bg: #1a1a1a;
+  --focus-color: #facc15;
+
+  /* Typography */
+  --font-family: 'Space Mono', 'Courier New', monospace;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 36px;
+
+  /* Spacing */
+  --spacing-xs: 2px;
+  --spacing-sm: 4px;
+  --spacing-md: 8px;
+  --spacing-lg: 16px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 64px;
+
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-sm: 0px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --radius-xl: 8px;
+  --radius-full: 0px;
+
+  /* Shadows */
+  --shadow-sm: 2px 2px 0px #ffff00;
+  --shadow-md: 4px 4px 0px #ffff00;
+  --shadow-lg: 8px 8px 0px #ffff00;
+  --shadow-xl: 12px 12px 0px #ffff00;
+  --shadow-glow: 0 0 10px #ffff00, 0 0 20px #ff00ff;
+
+  /* Transitions */
+  --transition-fast: 50ms linear;
+  --transition-normal: 100ms linear;
+  --transition-slow: 200ms linear;
+
+  /* Component Styles */
+  --button-radius: 0px;
+  --button-padding: 10px 20px;
+  --button-shadow: 3px 3px 0px #ffff00;
+  --button-transition: 50ms linear;
+
+  --card-radius: 0px;
+  --card-padding: 20px;
+  --card-shadow: 4px 4px 0px #ffff00;
+  --card-border: 3px solid #ffff00;
+
+  --input-radius: 0px;
+  --input-padding: 10px 12px;
+  --input-border: 2px solid #ffff00;
+  --input-focus: 0 0 0 3px #ffff00;
+
+  --header-height: 68px;
+  --header-shadow: 0 4px 0px #ffff00;
+  --header-padding: 0 20px;
+
+  --sidebar-width: 260px;
+  --sidebar-padding: 20px;
+  --sidebar-item-spacing: 4px;
+  --sidebar-item-padding: 10px 12px;
+  --sidebar-item-radius: 0px;
+}
+
+/* ===========================
+   CYBERPUNK THEME (Futuristic)
+   =========================== */
+[data-theme="cyberpunk"] {
+  /* Colors */
+  --color-primary-50: #ffe0f3;
+  --color-primary-100: #ffc0e8;
+  --color-primary-200: #ff80d0;
+  --color-primary-300: #ff40b9;
+  --color-primary-400: #ff20b2;
+  --color-primary-500: #ff006e;
+  --color-primary-600: #d90055;
+  --color-primary-700: #a6003d;
+  --color-primary-800: #730027;
+  --color-primary-900: #40001a;
+
+  --color-secondary: #00d9ff;
+  --color-accent: #b000ff;
+  --color-success: #00ff88;
+  --color-error: #ff0066;
+  --color-warning: #ffaa00;
+  --color-info: #00d9ff;
+
+  --bg-primary: #0d0221;
+  --bg-secondary: #1a0033;
+  --bg-tertiary: #330066;
+
+  --text-primary: #ff006e;
+  --text-secondary: #00d9ff;
+  --text-tertiary: #cccccc;
+
+  --border-color: #ff006e;
+  --hover-bg: #1a0033;
+  --focus-color: #ff006e;
+
+  /* Typography */
+  --font-family: 'JetBrains Mono', 'Courier New', monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
+  /* Spacing */
+  --spacing-xs: 5px;
+  --spacing-sm: 10px;
+  --spacing-md: 15px;
+  --spacing-lg: 25px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 60px;
+
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 0 10px rgba(255, 0, 110, 0.4), inset 0 0 10px rgba(0, 217, 255, 0.1);
+  --shadow-md: 0 0 20px rgba(255, 0, 110, 0.5), inset 0 0 20px rgba(0, 217, 255, 0.2);
+  --shadow-lg: 0 0 30px rgba(255, 0, 110, 0.6), inset 0 0 30px rgba(0, 217, 255, 0.3);
+  --shadow-xl: 0 0 40px rgba(255, 0, 110, 0.7), inset 0 0 40px rgba(0, 217, 255, 0.4);
+  --shadow-glow: 0 0 20px #ff006e, 0 0 40px #00d9ff, 0 0 60px #b000ff;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-normal: 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-slow: 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Component Styles */
+  --button-radius: 4px;
+  --button-padding: 11px 22px;
+  --button-shadow: 0 0 15px rgba(255, 0, 110, 0.5);
+  --button-transition: 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --card-radius: 6px;
+  --card-padding: 25px;
+  --card-shadow: 0 0 20px rgba(255, 0, 110, 0.3), inset 0 0 20px rgba(0, 217, 255, 0.1);
+  --card-border: 1px solid #ff006e;
+
+  --input-radius: 4px;
+  --input-padding: 11px 14px;
+  --input-border: 1px solid #ff006e;
+  --input-focus: 0 0 10px rgba(255, 0, 110, 0.6);
+
+  --header-height: 66px;
+  --header-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
+  --header-padding: 0 28px;
+
+  --sidebar-width: 275px;
+  --sidebar-padding: 25px;
+  --sidebar-item-spacing: 10px;
+  --sidebar-item-padding: 12px 16px;
+  --sidebar-item-radius: 4px;
+}
+
+/* Smooth theme transitions */
+* {
+  transition: background-color var(--transition-normal), color var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+/* Prevent transition on interactive elements during hover/focus */
+button,
+a,
+input,
+textarea,
+select {
+  transition: background-color var(--button-transition), color var(--transition-normal), box-shadow var(--transition-normal);
+}
