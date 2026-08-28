@@ -9,7 +9,7 @@ interface UseSpeechInputReturn {
   error: string | null;
   confidence: number;
   startListening: () => void;
-  stopListening: () => void;
+  stopListening: () => string;
   clearTranscript: () => void;
   setLanguage: (lang: string) => void;
 }
