@@ -98,3 +98,28 @@ export interface PaymentByBank {
   count: number;
   amount: string;
 }
+
+export type CurrencyCode = 'GMD' | 'USD' | 'GBP' | 'EUR';
+
+export interface Currency {
+  code: CurrencyCode;
+  name: string;
+  symbol: string;
+  rate: number; // Exchange rate relative to base currency (GMD)
+}
+
+export interface CurrencySettings {
+  default_currency: CurrencyCode;
+  base_currency: CurrencyCode;
+  currencies: Record<CurrencyCode, Currency>;
+  last_updated: string;
+}
+
+export interface SystemSettings {
+  id: number;
+  currency_settings: CurrencySettings;
+  organization_name: string;
+  logo_url?: string;
+  theme_color?: string;
+  updated_at: string;
+}

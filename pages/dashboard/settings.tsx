@@ -1,65 +1,115 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import ProfessionalButton from '@/components/Common/ProfessionalButton';
+import PageHeader from '@/components/Dashboard/PageHeader';
 import Card from '@/components/Common/Card';
+import ProfessionalButton from '@/components/Common/ProfessionalButton';
+import Badge from '@/components/Common/Badge';
 import FormField from '@/components/Common/FormField';
 import Input from '@/components/Common/Input';
-import PageHeader from '@/components/Dashboard/PageHeader';
-import { getMe } from '@/lib/auth';
-import { User } from '@/types';
+import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave } from 'react-icons/bi';
 import toast from 'react-hot-toast';
-import { BiUser, BiEnvelope, BiLock } from 'react-icons/bi';
+import { User, CurrencyCode } from '@/types';
+import api from '@/lib/api';
+
+type SettingsTab = 'profile' | 'currency' | 'system';
+
+interface CurrencyData {
+  code: CurrencyCode;
+  name: string;
+  symbol: string;
+  rate: number;
+}
 
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
+
+  // Profile states
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState({
     first_name: '',
     last_name: '',
+    email: '',
   });
 
+  // Currency states
+  const [defaultCurrency, setDefaultCurrency] = useState<CurrencyCode>('USD');
+  const [editingRates, setEditingRates] = useState(false);
+  const [currencies, setCurrencies] = useState<CurrencyData[]>([
+    { code: 'GMD', name: 'Gambian Dalasi', symbol: 'D', rate: 1 },
+    { code: 'USD', name: 'US Dollar', symbol: '$', rate: 0.017 },
+    { code: 'GBP', name: 'British Pound', symbol: '£', rate: 0.013 },
+    { code: 'EUR', name: 'Euro', symbol: '€', rate: 0.016 },
+  ]);
+
   useEffect(() => {
-    fetchUser();
+    fetchUserData();
   }, []);
 
-  const fetchUser = async () => {
+  const fetchUserData = async () => {
     try {
-      const userData = await getMe();
-      setUser(userData);
-      setFormData({
-        username: userData.username,
-        email: userData.email,
-        first_name: userData.first_name,
-        last_name: userData.last_name,
+      setLoading(true);
+      const response = await api.get('/auth/me/');
+      setUser(response.data);
+      setProfileData({
+        first_name: response.data.first_name,
+        last_name: response.data.last_name,
+        email: response.data.email,
       });
     } catch (error) {
       console.error('Failed to fetch user:', error);
-      toast.error('Failed to load user settings');
+      toast.error('Failed to load user data');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleProfileUpdate = async () => {
+    try {
+      await api.put(`/users/${user?.id}/`, profileData);
+      setUser({ ...user, ...profileData } as User);
+      setEditingProfile(false);
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update profile');
+    }
   };
 
-  const handleSaveSettings = async () => {
+  const handleCurrencyUpdate = (index: number, field: 'rate' | 'name', value: any) => {
+    const updated = [...currencies];
+    updated[index] = { ...updated[index], [field]: value };
+    setCurrencies(updated);
+  };
+
+  const handleSaveCurrencyRates = async () => {
     try {
-      toast.success('Settings saved successfully!');
+      const currencySettings = {
+        default_currency: defaultCurrency,
+        base_currency: 'GMD' as CurrencyCode,
+        currencies: currencies.reduce((acc, c) => {
+          acc[c.code] = c;
+          return acc;
+        }, {} as Record<CurrencyCode, CurrencyData>),
+      };
+      await api.post('/settings/currency/', currencySettings);
+      setEditingRates(false);
+      toast.success('Currency rates updated successfully!');
     } catch (error) {
-      toast.error('Failed to save settings');
+      toast.error('Failed to update currency rates');
     }
   };
 
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center py-12">
-          <p className="text-gray-500">Loading settings...</p>
+        <div className="min-h-screen bg-white p-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-12 bg-gray-200 rounded-lg"></div>
+            <div className="h-64 bg-gray-200 rounded-lg"></div>
+          </div>
         </div>
       </Layout>
     );
@@ -67,159 +117,334 @@ export default function SettingsPage() {
 
   return (
     <Layout>
-      <div className="p-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
         {/* Page Header */}
         <PageHeader
           title="Settings"
-          description="Manage your account and preferences"
+          description="Manage your profile, currency preferences, and system configuration"
         />
 
-        {/* Settings Grid */}
-        <div className="max-w-2xl space-y-8">
-          {/* Account Information */}
-          <Card padding="lg" shadow="md">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Account Information</h2>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Tabs Navigation */}
+          <div className="mb-8 border-b border-gray-200">
+            <div className="flex gap-8">
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`pb-4 px-2 font-medium text-sm transition-all ${
+                  activeTab === 'profile'
+                    ? 'border-b-2 border-indigo-600 text-indigo-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <BiUser size={18} />
+                  Profile
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('currency')}
+                className={`pb-4 px-2 font-medium text-sm transition-all ${
+                  activeTab === 'currency'
+                    ? 'border-b-2 border-indigo-600 text-indigo-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <BiGlobe size={18} />
+                  Currency
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('system')}
+                className={`pb-4 px-2 font-medium text-sm transition-all ${
+                  activeTab === 'system'
+                    ? 'border-b-2 border-indigo-600 text-indigo-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <BiCog size={18} />
+                  System
+                </div>
+              </button>
+            </div>
+          </div>
 
+          {/* Profile Tab */}
+          {activeTab === 'profile' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Profile Card */}
+              <Card padding="lg" className="lg:col-span-2">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
+                  <ProfessionalButton
+                    variant={editingProfile ? 'danger' : 'primary'}
+                    size="sm"
+                    icon={editingProfile ? <BiX size={16} /> : <BiPencil size={16} />}
+                    onClick={() => setEditingProfile(!editingProfile)}
+                  >
+                    {editingProfile ? 'Cancel' : 'Edit'}
+                  </ProfessionalButton>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField label="First Name">
+                      <Input
+                        value={profileData.first_name}
+                        onChange={(e) => setProfileData({ ...profileData, first_name: e.target.value })}
+                        disabled={!editingProfile}
+                        placeholder="John"
+                      />
+                    </FormField>
+                    <FormField label="Last Name">
+                      <Input
+                        value={profileData.last_name}
+                        onChange={(e) => setProfileData({ ...profileData, last_name: e.target.value })}
+                        disabled={!editingProfile}
+                        placeholder="Doe"
+                      />
+                    </FormField>
+                  </div>
+
+                  <FormField label="Email Address">
+                    <Input
+                      type="email"
+                      value={profileData.email}
+                      onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                      disabled={!editingProfile}
+                      placeholder="john@example.com"
+                    />
+                  </FormField>
+
+                  <FormField label="Username">
+                    <Input
+                      value={user?.username || ''}
+                      disabled={true}
+                      placeholder="Username"
+                      className="bg-gray-50"
+                    />
+                  </FormField>
+
+                  {editingProfile && (
+                    <div className="pt-4 flex gap-3 justify-end">
+                      <ProfessionalButton
+                        variant="secondary"
+                        size="md"
+                        onClick={() => {
+                          setEditingProfile(false);
+                          setProfileData({
+                            first_name: user?.first_name || '',
+                            last_name: user?.last_name || '',
+                            email: user?.email || '',
+                          });
+                        }}
+                      >
+                        Cancel
+                      </ProfessionalButton>
+                      <ProfessionalButton
+                        variant="primary"
+                        size="md"
+                        icon={<BiSave size={16} />}
+                        onClick={handleProfileUpdate}
+                      >
+                        Save Changes
+                      </ProfessionalButton>
+                    </div>
+                  )}
+                </div>
+              </Card>
+
+              {/* Profile Status */}
+              <Card padding="lg">
+                <h3 className="text-lg font-bold text-gray-900 mb-6">Account Status</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Account Status</p>
+                      <p className="text-xs text-gray-600 mt-1">Active and verified</p>
+                    </div>
+                    <BiCheckCircle className="text-green-600" size={24} />
+                  </div>
+
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p className="text-sm font-medium text-gray-700">Role</p>
+                    <Badge variant="info" className="mt-2">
+                      Administrator
+                    </Badge>
+                  </div>
+
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-sm font-medium text-gray-700">Member Since</p>
+                    <p className="text-sm text-gray-600 mt-2">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* Currency Tab */}
+          {activeTab === 'currency' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <FormField label="First Name">
-                  <Input
-                    icon={<BiUser size={20} />}
-                    type="text"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleInputChange}
-                    placeholder="First name"
-                  />
-                </FormField>
+              {/* Default Currency */}
+              <Card padding="lg">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Currency Settings</h2>
+                  <ProfessionalButton
+                    variant={editingRates ? 'danger' : 'primary'}
+                    size="sm"
+                    icon={editingRates ? <BiX size={16} /> : <BiPencil size={16} />}
+                    onClick={() => setEditingRates(!editingRates)}
+                  >
+                    {editingRates ? 'Cancel' : 'Edit Rates'}
+                  </ProfessionalButton>
+                </div>
 
-                <FormField label="Last Name">
-                  <Input
-                    icon={<BiUser size={20} />}
-                    type="text"
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleInputChange}
-                    placeholder="Last name"
-                  />
-                </FormField>
+                <div className="mb-8 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Default Currency</p>
+                  <select
+                    value={defaultCurrency}
+                    onChange={(e) => setDefaultCurrency(e.target.value as CurrencyCode)}
+                    disabled={!editingRates}
+                    className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                  >
+                    {currencies.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.name} ({c.symbol})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-indigo-700 mt-2">Set the default currency for all transactions</p>
+                </div>
+
+                {/* Currency Rates Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200 bg-gray-50">
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Currency</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Code</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Symbol</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Rate to GMD</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currencies.map((currency, idx) => (
+                        <tr key={currency.code} className="border-b border-gray-100 hover:bg-gray-50 transition">
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{currency.name}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            <Badge variant={defaultCurrency === currency.code ? 'info' : 'default'}>
+                              {currency.code}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{currency.symbol}</td>
+                          <td className="px-6 py-4">
+                            {editingRates ? (
+                              <input
+                                type="number"
+                                step="0.0001"
+                                value={currency.rate}
+                                onChange={(e) =>
+                                  handleCurrencyUpdate(idx, 'rate', parseFloat(e.target.value))
+                                }
+                                className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              />
+                            ) : (
+                              <span className="text-sm font-semibold text-gray-900">{currency.rate.toFixed(6)}</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {editingRates && (
+                  <div className="mt-8 pt-6 border-t border-gray-200 flex gap-3 justify-end">
+                    <ProfessionalButton
+                      variant="secondary"
+                      size="md"
+                      onClick={() => setEditingRates(false)}
+                    >
+                      Cancel
+                    </ProfessionalButton>
+                    <ProfessionalButton
+                      variant="primary"
+                      size="md"
+                      icon={<BiSave size={16} />}
+                      onClick={handleSaveCurrencyRates}
+                    >
+                      Save Rates
+                    </ProfessionalButton>
+                  </div>
+                )}
+              </Card>
+
+              {/* Currency Info */}
+              <Card padding="lg">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">About Currency</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  All currency rates are relative to the Gambian Dalasi (GMD) as the base currency.
+                  Update these rates regularly to ensure accurate payment conversions across the system.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p className="text-sm font-medium text-gray-700">Base Currency</p>
+                    <p className="text-lg font-bold text-indigo-600 mt-2">GMD</p>
+                  </div>
+                  <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <p className="text-sm font-medium text-gray-700">Default Currency</p>
+                    <p className="text-lg font-bold text-green-600 mt-2">{defaultCurrency}</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* System Tab */}
+          {activeTab === 'system' && (
+            <Card padding="lg">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">System Configuration</h2>
+              <div className="space-y-6">
+                <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                  <p className="text-sm font-medium text-amber-900">System Version</p>
+                  <p className="text-lg font-bold text-amber-700 mt-2">v1.0.0</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p className="text-sm font-medium text-gray-700">API Status</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <BiCheckCircle className="text-green-600" size={18} />
+                      <span className="text-sm font-medium text-green-700">Connected</span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <p className="text-sm font-medium text-gray-700">Database Status</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <BiCheckCircle className="text-green-600" size={18} />
+                      <span className="text-sm font-medium text-green-700">Healthy</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-700 mb-3">System Information</p>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex justify-between">
+                      <span>Organization</span>
+                      <span className="font-medium text-gray-900">GIA Hajj Operations</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Region</span>
+                      <span className="font-medium text-gray-900">Gambia</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-
-              <FormField label="Username" description="Your login username (cannot be changed)">
-                <Input
-                  icon={<BiUser size={20} />}
-                  type="text"
-                  value={formData.username}
-                  disabled
-                  placeholder="Username"
-                />
-              </FormField>
-
-              <FormField label="Email Address">
-                <Input
-                  icon={<BiEnvelope size={20} />}
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="you@example.com"
-                />
-              </FormField>
-
-              <div className="flex gap-3 pt-4">
-                <ProfessionalButton variant="primary" onClick={handleSaveSettings}>
-                  Save Changes
-                </ProfessionalButton>
-                <ProfessionalButton variant="secondary">
-                  Cancel
-                </ProfessionalButton>
-              </div>
-            </div>
-          </Card>
-
-          {/* Security Settings */}
-          <Card padding="lg" shadow="md">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Security</h2>
-
-            <div className="space-y-6">
-              <FormField label="Current Password">
-                <Input
-                  icon={<BiLock size={20} />}
-                  type="password"
-                  placeholder="Enter current password"
-                />
-              </FormField>
-
-              <FormField label="New Password">
-                <Input
-                  icon={<BiLock size={20} />}
-                  type="password"
-                  placeholder="Enter new password"
-                />
-              </FormField>
-
-              <FormField label="Confirm Password">
-                <Input
-                  icon={<BiLock size={20} />}
-                  type="password"
-                  placeholder="Confirm new password"
-                />
-              </FormField>
-
-              <div className="flex gap-3 pt-4">
-                <ProfessionalButton variant="primary">
-                  Update Password
-                </ProfessionalButton>
-                <ProfessionalButton variant="secondary">
-                  Cancel
-                </ProfessionalButton>
-              </div>
-            </div>
-          </Card>
-
-          {/* System Settings */}
-          <Card padding="lg" shadow="md">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Preferences</h2>
-
-            <div className="space-y-4">
-              <label className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer">
-                <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
-                <span className="ml-3">
-                  <p className="font-medium text-gray-900">Email Notifications</p>
-                  <p className="text-sm text-gray-600">Receive email updates for important events</p>
-                </span>
-              </label>
-
-              <label className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer">
-                <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" />
-                <span className="ml-3">
-                  <p className="font-medium text-gray-900">Two-Factor Authentication</p>
-                  <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
-                </span>
-              </label>
-
-              <label className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer">
-                <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
-                <span className="ml-3">
-                  <p className="font-medium text-gray-900">Activity Logging</p>
-                  <p className="text-sm text-gray-600">Keep a record of all your activities</p>
-                </span>
-              </label>
-            </div>
-          </Card>
-
-          {/* About Section */}
-          <Card padding="lg" shadow="sm">
-            <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
-              <h3 className="font-semibold text-blue-900 mb-1">About This Application</h3>
-              <p className="text-sm text-blue-800">
-                GIA Hajj Operations Management System v1.0
-              </p>
-              <p className="text-sm text-blue-800 mt-2">
-                © 2026 Gambia International Airlines. All rights reserved.
-              </p>
-            </div>
-          </Card>
+            </Card>
+          )}
         </div>
       </div>
     </Layout>
