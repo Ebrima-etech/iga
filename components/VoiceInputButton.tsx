@@ -39,11 +39,6 @@ export default function VoiceInputButton({
       console.log('🎤 Speech ended, auto-submitting transcript:', transcript);
       onTranscript(transcript);
 
-      toast.success(`✓ Text added to ${fieldName}`, {
-        icon: '✍️',
-        duration: 1500,
-      });
-
       // Clear after a delay
       setTimeout(() => {
         clearTranscript();
@@ -74,11 +69,6 @@ export default function VoiceInputButton({
     if (transcript && transcript.trim()) {
       console.log('✅ handleStop: calling onTranscript with:', transcript);
       onTranscript(transcript);
-
-      toast.success(`✓ Text added to ${fieldName}`, {
-        icon: '✍️',
-        duration: 1500,
-      });
 
       // Clear the voice UI after a short delay so user can see the input field
       setTimeout(() => {
