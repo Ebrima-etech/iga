@@ -8,7 +8,7 @@ import PageHeader from '@/components/Dashboard/PageHeader';
 import { getMe } from '@/lib/auth';
 import { User } from '@/types';
 import toast from 'react-hot-toast';
-import { BiUser, BiMail, BiLock } from 'react-icons/bi';
+import { BiUser, BiEnvelope, BiLock } from 'react-icons/bi';
 
 export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -117,7 +117,7 @@ export default function SettingsPage() {
 
               <FormField label="Email Address">
                 <Input
-                  icon={<BiMail size={20} />}
+                  icon={<BiEnvelope size={20} />}
                   type="email"
                   name="email"
                   value={formData.email}

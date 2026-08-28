@@ -6,11 +6,11 @@ export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error?: Error & { digest?: string };
+  reset?: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    if (error) console.error(error);
   }, [error]);
 
   return (
@@ -29,23 +29,25 @@ export default function Error({
     >
       <h1 style={{ fontSize: '2rem', marginBottom: '10px' }}>Something went wrong!</h1>
       <p style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-secondary)' }}>
-        {error.message || 'An unexpected error occurred'}
+        {error?.message || 'An unexpected error occurred'}
       </p>
-      <button
-        onClick={() => reset()}
-        style={{
-          padding: 'var(--button-padding)',
-          borderRadius: 'var(--button-radius)',
-          backgroundColor: 'var(--color-primary-600)',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '1rem',
-          fontWeight: 'var(--font-weight-semibold)',
-        }}
-      >
-        Try again
-      </button>
+      {reset && (
+        <button
+          onClick={() => reset()}
+          style={{
+            padding: 'var(--button-padding)',
+            borderRadius: 'var(--button-radius)',
+            backgroundColor: 'var(--color-primary-600)',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            fontWeight: 'var(--font-weight-semibold)',
+          }}
+        >
+          Try again
+        </button>
+      )}
     </div>
   );
 }
