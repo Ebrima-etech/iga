@@ -105,6 +105,14 @@ export default function VoiceInputButton({
           icon: '🔤',
           duration: 1200,
         });
+
+        // Restart listening to keep recording open for spelling
+        setTimeout(() => {
+          stopListening();
+          clearTranscript();
+          startListening();
+        }, 300);
+
         return;
       }
 
