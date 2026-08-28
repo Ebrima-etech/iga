@@ -111,36 +111,52 @@ export default function SettingsPage() {
 
   const handleSaveCurrencyRates = async () => {
     try {
-      const currencySettings = {
+      const currencyData = currencies.map(c => ({
+        code: c.code,
+        name: c.name,
+        symbol: c.symbol,
+        rate: c.rate,
+      }));
+
+      // Prepare payload for Django backend
+      const payload = {
         default_currency: defaultCurrency,
         base_currency: 'GMD' as CurrencyCode,
-        currencies: currencies.reduce((acc, c) => {
-          acc[c.code] = c;
-          return acc;
-        }, {} as Record<CurrencyCode, CurrencyData>),
+        currencies: currencyData,
         mode: currencyMode,
-        savedAt: new Date().toISOString(),
       };
 
-      // Save to localStorage (persistent frontend storage)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('currencySettings', JSON.stringify(currencySettings));
-      }
-
-      // Try to save to backend as well
+      // Save to Django backend (PRIMARY - mandatory)
       try {
-        await api.post('/settings/currency/', currencySettings);
-        toast.success('✓ Currency rates saved to database and locally!');
-      } catch (backendError) {
-        // Fallback: success if saved locally even if backend fails
-        console.warn('Backend save failed, but settings saved locally:', backendError);
-        toast.success('✓ Currency rates saved locally! (offline mode)');
-      }
+        await api.post('/settings/currency/', payload);
+        console.log('✓ Manual rates saved to Django backend');
 
-      setEditingRates(false);
-    } catch (error) {
-      console.error('Failed to save currency rates:', error);
-      toast.error('Failed to save currency rates');
+        // Also save to localStorage as backup
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('currencySettings', JSON.stringify(payload));
+        }
+
+        setEditingRates(false);
+        toast.success('✓ Manual currency rates saved to database!');
+      } catch (backendError: any) {
+        console.error('Failed to save to backend:', backendError);
+
+        // Show detailed error message
+        const errorMsg = backendError.response?.data?.detail ||
+                        backendError.message ||
+                        'Unknown error occurred';
+
+        toast.error(`Failed to save rates to database: ${errorMsg}`);
+
+        // Still save to localStorage as temporary backup
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('currencySettings', JSON.stringify(payload));
+          console.warn('Saved to localStorage as backup (backend unavailable)');
+        }
+      }
+    } catch (error: any) {
+      console.error('Error in handleSaveCurrencyRates:', error);
+      toast.error('Failed to prepare currency data for saving');
     }
   };
 
