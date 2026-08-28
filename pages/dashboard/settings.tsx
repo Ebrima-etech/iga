@@ -49,9 +49,30 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetchUserData();
+    loadCurrencySettings();
     const mode = getCurrencyMode();
     setCurrencyModeState(mode);
   }, []);
+
+  const loadCurrencySettings = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('currencySettings');
+        if (saved) {
+          const settings = JSON.parse(saved);
+          if (settings.default_currency) {
+            setDefaultCurrency(settings.default_currency);
+          }
+          if (settings.currencies) {
+            const currencyArray = Object.values(settings.currencies) as CurrencyData[];
+            setCurrencies(currencyArray);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load currency settings from localStorage:', error);
+    }
+  };
 
   const fetchUserData = async () => {
     try {
@@ -98,12 +119,19 @@ export default function SettingsPage() {
           return acc;
         }, {} as Record<CurrencyCode, CurrencyData>),
         mode: currencyMode,
+        savedAt: new Date().toISOString(),
       };
-      await api.post('/settings/currency/', currencySettings);
+
+      // Save to localStorage (frontend-only system)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currencySettings', JSON.stringify(currencySettings));
+      }
+
       setEditingRates(false);
-      toast.success('Currency rates updated successfully!');
+      toast.success('✓ Currency rates saved locally!');
     } catch (error) {
-      toast.error('Failed to update currency rates');
+      console.error('Failed to save currency rates:', error);
+      toast.error('Failed to save currency rates');
     }
   };
 

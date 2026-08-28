@@ -22,41 +22,53 @@ const LISTENERS = new Set<(update: CurrencyRateUpdate) => void>();
 const FETCH_INTERVAL = 5000; // Update every 5 seconds
 
 /**
- * Fetch real-time rates from API
+ * Fetch real-time rates from API with fallback
  */
 export async function fetchRealtimeRates(): Promise<Record<CurrencyCode, number>> {
   try {
     const response = await fetch(
-      'https://api.exchangerate.host/latest?base=GMD&symbols=USD,GBP,EUR'
+      'https://api.exchangerate.host/latest?base=GMD&symbols=USD,GBP,EUR',
+      { timeout: 5000 }
     );
 
     if (!response.ok) {
-      throw new Error(`API returned status ${response.status}`);
+      console.warn(`API returned status ${response.status}, using fallback rates`);
+      return currentRates;
     }
 
     const data = await response.json();
 
-    // Check if success flag is present and true
+    // If success flag is explicitly false, use fallback
     if (data.success === false) {
-      throw new Error('API returned success: false');
+      console.warn('API returned success: false (possibly rate limited), using fallback rates');
+      return currentRates;
     }
 
-    // Verify rates exist
-    if (!data.rates || typeof data.rates !== 'object') {
-      console.warn('API response structure:', data);
-      throw new Error('No rates in response or rates is not an object');
+    // Verify rates exist and are valid
+    if (!data.rates || typeof data.rates !== 'object' || Object.keys(data.rates).length === 0) {
+      console.warn('No valid rates in API response, using fallback rates');
+      return currentRates;
     }
 
-    // Extract rates, fallback to current rates if missing
-    return {
+    // Extract rates with validation
+    const newRates = {
       GMD: 1,
-      USD: data.rates.USD ?? currentRates.USD,
-      GBP: data.rates.GBP ?? currentRates.GBP,
-      EUR: data.rates.EUR ?? currentRates.EUR,
+      USD: typeof data.rates.USD === 'number' ? data.rates.USD : currentRates.USD,
+      GBP: typeof data.rates.GBP === 'number' ? data.rates.GBP : currentRates.GBP,
+      EUR: typeof data.rates.EUR === 'number' ? data.rates.EUR : currentRates.EUR,
     };
+
+    // Validate rates are reasonable (not zero or negative)
+    if (newRates.USD > 0 && newRates.GBP > 0 && newRates.EUR > 0) {
+      console.log('✓ Real-time rates fetched successfully', newRates);
+      return newRates;
+    } else {
+      console.warn('Invalid rate values received, using fallback rates');
+      return currentRates;
+    }
   } catch (error) {
-    console.error('Failed to fetch realtime rates:', error);
-    // Return current rates as fallback
+    console.warn('Failed to fetch realtime rates, using fallback:', error);
+    // Return current rates as fallback - never fail
     return currentRates;
   }
 }
