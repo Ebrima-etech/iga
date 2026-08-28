@@ -77,10 +77,55 @@ export default function VoiceInputButton({
     }
   }, [spellingMode, isListening, interimTranscript, transcript, clearTranscript, stopListening, onTranscript, transcript]);
 
-  // Auto-submit when speech ends (transcript becomes available and not listening)
-  // BUT skip if cancel was just detected
+  // Detect voice commands: "cancel" and "spell" (for non-spelling mode)
   useEffect(() => {
-    if (!isListening && transcript && transcript.trim() && !error && !cancelDetected) {
+    if (isListening && (interimTranscript || transcript)) {
+      const text = (interimTranscript || transcript).toLowerCase().trim();
+
+      // Match as complete words (word boundaries)
+      const cancelRegex = /\bcancel\b/;
+      const spellRegex = /\bspell\b/;
+
+      // Detect "spell" command (switch to spelling mode)
+      if (spellRegex.test(text) && !spellingMode) {
+        console.log('🎙️ Voice command detected: SPELL');
+        setSpellingMode(true);
+        setSpelledText('');
+        clearTranscript();
+
+        toast.success('🎙️ Entering spelling mode...', {
+          icon: '🔤',
+          duration: 1200,
+        });
+        return;
+      }
+
+      // Detect "cancel" command
+      if (cancelRegex.test(text) && !cancelDetected) {
+        console.log('🎙️ Voice command detected: CANCEL');
+        setCancelDetected(true);
+
+        toast.success('🎙️ Cancelling via voice command...', {
+          icon: '🛑',
+          duration: 1200,
+        });
+
+        // Stop listening and clear transcript
+        setTimeout(() => {
+          stopListening();
+          clearTranscript();
+          setCancelDetected(false);
+          setSpellingMode(false);
+          setSpelledText('');
+        }, 800);
+      }
+    }
+  }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected, spellingMode]);
+
+  // Auto-submit when speech ends (transcript becomes available and not listening)
+  // BUT skip if cancel was just detected or in spelling mode
+  useEffect(() => {
+    if (!isListening && transcript && transcript.trim() && !error && !cancelDetected && !spellingMode) {
       console.log('🎤 Speech ended, auto-submitting transcript:', transcript);
       onTranscript(transcript);
 
@@ -89,7 +134,7 @@ export default function VoiceInputButton({
         clearTranscript();
       }, 800);
     }
-  }, [isListening, transcript, error, fieldName, onTranscript, clearTranscript, cancelDetected]);
+  }, [isListening, transcript, error, fieldName, onTranscript, clearTranscript, cancelDetected, spellingMode]);
 
   if (!isSupported) {
     return (
