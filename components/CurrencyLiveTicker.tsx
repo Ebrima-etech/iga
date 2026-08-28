@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { CurrencyCode } from '@/types';
 import { useLiveRates } from '@/hooks/useLiveRates';
 import Card from './Common/Card';
-import Badge from './Common/Badge';
 import { BiTrendingUp, BiCircle } from 'react-icons/bi';
 
 interface RatePair {
-  code: string;
+  code: CurrencyCode;
   name: string;
   symbol: string;
   rate: number;
@@ -24,7 +24,7 @@ export default function CurrencyLiveTicker() {
 
   useEffect(() => {
     const updated = ratePairs.map((pair) => {
-      const newRate = liveRates.rates[pair.code as any] || pair.rate;
+      const newRate = liveRates.rates[pair.code] || pair.rate;
       const change = pair.rate ? ((newRate - pair.rate) / pair.rate) * 100 : 0;
 
       return {
@@ -35,6 +35,7 @@ export default function CurrencyLiveTicker() {
     });
 
     setRatePairs(updated);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveRates.rates]);
 
   const timeAgo = new Date(liveRates.lastUpdate);
