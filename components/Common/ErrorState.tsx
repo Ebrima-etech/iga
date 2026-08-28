@@ -1,5 +1,5 @@
 import React from 'react';
-import { BiAlertCircle, BiRefresh } from 'react-icons/bi';
+import { BiError, BiRefresh } from 'react-icons/bi';
 import Card from './Card';
 import ProfessionalButton from './ProfessionalButton';
 
@@ -28,7 +28,7 @@ export default function ErrorState({
     <Card>
       <div className="flex flex-col items-center justify-center py-16 px-8">
         <div className={`mb-6 ${variantStyles[variant]}`}>
-          <BiAlertCircle size={48} />
+          <BiError size={48} />
         </div>
 
         <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">{title}</h3>
