@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { BiBarChartAlt2, BiUser, BiWallet, BiLineChart, BiMicrophone, BiCog, BiMenu } from 'react-icons/bi';
+import { BiBarChartAlt2, BiUser, BiWallet, BiLineChart, BiMicrophone, BiCog, BiMenu, BiBuilding } from 'react-icons/bi';
 
 interface NavItem {
   label: string;
@@ -13,6 +13,7 @@ const getNavItems = (): NavItem[] => [
   { label: 'Dashboard', href: '/dashboard', icon: <BiBarChartAlt2 size={20} /> },
   { label: 'Pilgrims', href: '/dashboard/pilgrims', icon: <BiUser size={20} /> },
   { label: 'Payments', href: '/dashboard/payments', icon: <BiWallet size={20} /> },
+  { label: 'Banks', href: '/dashboard/banks', icon: <BiBuilding size={20} /> },
   { label: 'Reports', href: '/dashboard/reports', icon: <BiLineChart size={20} /> },
   { label: 'Speech (Pilot)', href: '/dashboard/speech-demo', icon: <BiMicrophone size={20} /> },
   { label: 'Settings', href: '/dashboard/settings', icon: <BiCog size={20} /> },
