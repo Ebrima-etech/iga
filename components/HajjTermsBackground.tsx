@@ -5,6 +5,15 @@ export default function HajjTermsBackground() {
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
+        <linearGradient id="hajjTermsFade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="white" stopOpacity="0" />
+          <stop offset="30%" stopColor="white" stopOpacity="0" />
+          <stop offset="46%" stopColor="white" stopOpacity="1" />
+          <stop offset="100%" stopColor="white" stopOpacity="1" />
+        </linearGradient>
+        <mask id="hajjTermsMask">
+          <rect width="100%" height="100%" fill="url(#hajjTermsFade)" />
+        </mask>
         <pattern id="hajjTerms" width="620" height="460" patternUnits="userSpaceOnUse">
           <g fill="none" stroke="#f2d98a" strokeWidth="1.4" opacity="0.14">
             {/* TAWAF — circular arrow */}
@@ -112,7 +121,7 @@ export default function HajjTermsBackground() {
           </g>
         </pattern>
       </defs>
-      <rect width="100%" height="100%" fill="url(#hajjTerms)" />
+      <rect width="100%" height="100%" fill="url(#hajjTerms)" mask="url(#hajjTermsMask)" />
     </svg>
   );
 }

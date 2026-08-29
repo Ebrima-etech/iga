@@ -137,11 +137,6 @@ export default function LoginPage() {
                 </div>
               </div>
             </div>
-
-            {/* Footer */}
-            <div className="mt-8 text-center text-xs text-emerald-200/40">
-              <p>© 2026 Gambia International Airlines</p>
-            </div>
           </div>
         </div>
       </div>
@@ -192,6 +187,11 @@ export default function LoginPage() {
             />
           ))}
         </div>
+      </div>
+
+      {/* Footer, centered on the sand across the full page width */}
+      <div className="absolute bottom-3 left-0 w-full z-10 text-center pointer-events-none">
+        <p className="text-xs font-medium text-emerald-950/70">© 2026 Gambia International Airlines</p>
       </div>
 
       <style jsx>{`
