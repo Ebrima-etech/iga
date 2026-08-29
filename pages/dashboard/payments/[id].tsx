@@ -4,11 +4,30 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import Loading from '@/components/Common/Loading';
-import { Payment } from '@/types';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { BiChevronLeft, BiPlus } from 'react-icons/bi';
+
+interface BankPaymentSubmission {
+  id: string | number;
+  reference_number: string;
+  pilgrim_first_name: string;
+  pilgrim_last_name: string;
+  pilgrim_gender: string;
+  pilgrim_phone: string;
+  pilgrim_email: string;
+  payer_name: string;
+  payer_contact: string;
+  payer_relationship: string;
+  amount: number;
+  bank: number;
+  bank_name: string;
+  payment_date: string;
+  status: string;
+  description: string;
+  created_pilgrim_id?: number;
+}
 
 export default function PaymentDetailPage() {
   const router = useRouter();
@@ -16,7 +35,7 @@ export default function PaymentDetailPage() {
 
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
-  const [payment, setPayment] = useState<Payment | null>(null);
+  const [payment, setPayment] = useState<BankPaymentSubmission | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -106,7 +125,7 @@ export default function PaymentDetailPage() {
     );
   }
 
-  const hasPilgrim = payment.created_pilgrim_id || (payment.pilgrim_id && payment.pilgrim_id !== '');
+  const hasPilgrim = payment?.created_pilgrim_id || false;
   const isFirstDeposit = !hasPilgrim;
 
   return (
