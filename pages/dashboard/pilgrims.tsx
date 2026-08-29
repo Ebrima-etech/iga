@@ -153,6 +153,12 @@ const pilgrimFormSteps = [
       },
     ],
   },
+  {
+    id: 'review',
+    title: 'Review Information',
+    description: 'Please review all the information before submitting',
+    fields: [],
+  },
 ];
 
 export default function PilgrimsPage() {

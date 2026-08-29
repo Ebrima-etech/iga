@@ -85,6 +85,11 @@ export default function MultiStepForm({
     const newErrors: Record<string, string> = {};
     let isValid = true;
 
+    // Skip validation for review step
+    if (step.id === 'review') {
+      return true;
+    }
+
     step.fields.forEach((field) => {
       const value = formData[field.name];
 
@@ -187,66 +192,148 @@ export default function MultiStepForm({
         </div>
       )}
 
-      {/* Form Fields */}
-      <div className={inline ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-6'}>
-        {step.fields.map((field) => (
-          <FormField
-            key={field.name}
-            label={field.label}
-            required={field.required}
-            error={errors[field.name]}
-          >
-            {field.type === 'select' ? (
-              <select
-                value={formData[field.name] || ''}
-                onChange={(e) => handleInputChange(field.name, e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition"
-              >
-                <option value="">Select {field.label}</option>
-                {field.options?.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            ) : field.type === 'textarea' ? (
-              <div className="space-y-2">
-                <textarea
+      {/* Review Step */}
+      {step.id === 'review' ? (
+        <div className="space-y-8">
+          {/* Personal Information Section */}
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { label: 'First Name', name: 'first_name' },
+                { label: 'Last Name', name: 'last_name' },
+                { label: 'Email Address', name: 'email' },
+                { label: 'Phone Number', name: 'phone' },
+                { label: 'Date of Birth', name: 'date_of_birth' },
+                { label: 'Gender', name: 'gender' },
+              ].map((item) => (
+                <div key={item.name} className="bg-white p-4 rounded-lg border border-gray-100">
+                  <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">{item.label}</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {formData[item.name]
+                      ? item.name === 'gender'
+                        ? formData[item.name] === 'M' ? 'Male' : 'Female'
+                        : formData[item.name]
+                      : '—'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Passport Information Section */}
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Passport Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { label: 'Passport Number', name: 'passport_number' },
+                { label: 'Nationality', name: 'nationality' },
+              ].map((item) => (
+                <div key={item.name} className="bg-white p-4 rounded-lg border border-gray-100">
+                  <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">{item.label}</p>
+                  <p className="text-sm font-semibold text-gray-900">{formData[item.name] || '—'}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Address Information Section */}
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Address Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { label: 'Street Address', name: 'address' },
+                { label: 'City', name: 'city' },
+                { label: 'State/Province', name: 'state' },
+                { label: 'Postal Code', name: 'postal_code' },
+                { label: 'Country', name: 'country' },
+              ].map((item) => (
+                <div key={item.name} className="bg-white p-4 rounded-lg border border-gray-100">
+                  <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">{item.label}</p>
+                  <p className="text-sm font-semibold text-gray-900">{formData[item.name] || '—'}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Payment Information Section */}
+          <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Information</h3>
+            <div className="bg-white p-4 rounded-lg border border-blue-100">
+              <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">Total Amount Due</p>
+              <p className="text-2xl font-bold text-blue-600 font-mono">${formData.total_amount_due || '0.00'}</p>
+            </div>
+          </div>
+
+          {/* Information Notice */}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-sm text-green-800">
+              ✓ Please review all the information above. Click <strong>Submit</strong> to complete the pilgrim registration, or <strong>Previous</strong> to make changes.
+            </p>
+          </div>
+        </div>
+      ) : (
+        /* Regular Form Fields */
+        <div className={inline ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-6'}>
+          {step.fields.map((field) => (
+            <FormField
+              key={field.name}
+              label={field.label}
+              required={field.required}
+              error={errors[field.name]}
+            >
+              {field.type === 'select' ? (
+                <select
                   value={formData[field.name] || ''}
                   onChange={(e) => handleInputChange(field.name, e.target.value)}
-                  placeholder={field.placeholder}
-                  rows={4}
-                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition resize-none"
-                />
-                {voiceEnabled && (field.voiceInput !== false) && (
-                  <VoiceInputButton
-                    onTranscript={(text) => handleInputChange(field.name, text)}
-                    language={language}
-                    fieldName={field.label}
+                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition"
+                >
+                  <option value="">Select {field.label}</option>
+                  {field.options?.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : field.type === 'textarea' ? (
+                <div className="space-y-2">
+                  <textarea
+                    value={formData[field.name] || ''}
+                    onChange={(e) => handleInputChange(field.name, e.target.value)}
+                    placeholder={field.placeholder}
+                    rows={4}
+                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition resize-none"
                   />
-                )}
-              </div>
-            ) : (
-              <div className="flex gap-2 items-start">
-                <input
-                  type={field.type}
-                  value={formData[field.name] || ''}
-                  onChange={(e) => handleInputChange(field.name, e.target.value)}
-                  placeholder={field.placeholder}
-                  className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition"
-                />
-                {voiceEnabled && (field.voiceInput !== false) && ['text', 'email', 'number'].includes(field.type) && (
-                  <VoiceInputButton
-                    onTranscript={(text) => handleInputChange(field.name, text)}
-                    language={language}
-                    fieldName={field.label}
+                  {voiceEnabled && (field.voiceInput !== false) && (
+                    <VoiceInputButton
+                      onTranscript={(text) => handleInputChange(field.name, text)}
+                      language={language}
+                      fieldName={field.label}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="flex gap-2 items-start">
+                  <input
+                    type={field.type}
+                    value={formData[field.name] || ''}
+                    onChange={(e) => handleInputChange(field.name, e.target.value)}
+                    placeholder={field.placeholder}
+                    className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 outline-none transition"
                   />
-                )}
-              </div>
-            )}
-          </FormField>
-        ))}
-      </div>
+                  {voiceEnabled && (field.voiceInput !== false) && ['text', 'email', 'number'].includes(field.type) && (
+                    <VoiceInputButton
+                      onTranscript={(text) => handleInputChange(field.name, text)}
+                      language={language}
+                      fieldName={field.label}
+                    />
+                  )}
+                </div>
+              )}
+            </FormField>
+          ))}
+        </div>
+      )}
 
       {/* Navigation Buttons */}
       <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
