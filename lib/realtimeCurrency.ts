@@ -19,7 +19,7 @@ let currentRates: Record<CurrencyCode, number> = {
 };
 
 const LISTENERS = new Set<(update: CurrencyRateUpdate) => void>();
-const FETCH_INTERVAL = 5000; // Update every 5 seconds
+const FETCH_INTERVAL = 30 * 60 * 1000; // Update every 30 minutes (1,800,000ms)
 
 /**
  * Fetch real-time rates from API with fallback
@@ -119,7 +119,7 @@ export function startRealtimeUpdates() {
     notifyListeners('realtime', 'exchangerate.host');
   });
 
-  // Then update every 5 seconds
+  // Then update every 30 minutes
   updateInterval = setInterval(async () => {
     try {
       const rates = await fetchRealtimeRates();
