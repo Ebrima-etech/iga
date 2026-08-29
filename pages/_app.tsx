@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Toaster } from 'react-hot-toast';
 import ThemeProvider from '@/components/Providers/ThemeProvider';
+import CurrencyProvider from '@/components/Providers/CurrencyProvider';
 import { isLoggedIn } from '@/lib/auth';
 import '@/styles/globals.css';
 
@@ -19,8 +20,10 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <ThemeProvider>
-      <Toaster position="top-right" />
-      <Component {...pageProps} />
+      <CurrencyProvider>
+        <Toaster position="top-right" />
+        <Component {...pageProps} />
+      </CurrencyProvider>
     </ThemeProvider>
   );
 }

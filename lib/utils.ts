@@ -1,5 +1,36 @@
-export const formatCurrency = (amount: number | string): string => {
+export const formatCurrency = (amount: number | string, currency?: string): string => {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+
+  // If currency is explicitly provided, use it
+  if (currency) {
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+      }).format(num);
+    } catch (e) {
+      // Fallback if currency code is invalid
+    }
+  }
+
+  // Try to get from currency store if available
+  if (typeof window !== 'undefined') {
+    try {
+      // Lazy import to avoid circular dependency
+      const { useCurrencyStore } = require('@/lib/stores/currencyStore');
+      const store = useCurrencyStore.getState();
+      if (store && store.defaultCurrency) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: store.defaultCurrency,
+        }).format(num);
+      }
+    } catch (e) {
+      // Store not available, continue to fallback
+    }
+  }
+
+  // Final fallback to USD
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',

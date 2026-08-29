@@ -12,6 +12,7 @@ import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh
 import toast from 'react-hot-toast';
 import { User, CurrencyCode } from '@/types';
 import api from '@/lib/api';
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import { setCurrencyMode, startRealtimeUpdates, stopRealtimeUpdates, getCurrencyMode } from '@/lib/realtimeCurrency';
 
 type SettingsTab = 'profile' | 'currency' | 'system';
@@ -54,23 +55,45 @@ export default function SettingsPage() {
     setCurrencyModeState(mode);
   }, []);
 
-  const loadCurrencySettings = () => {
+  const loadCurrencySettings = async () => {
     try {
-      if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('currencySettings');
-        if (saved) {
-          const settings = JSON.parse(saved);
-          if (settings.default_currency) {
-            setDefaultCurrency(settings.default_currency);
-          }
-          if (settings.currencies) {
-            const currencyArray = Object.values(settings.currencies) as CurrencyData[];
-            setCurrencies(currencyArray);
+      const currencyStore = useCurrencyStore.getState();
+
+      // First try to fetch from backend
+      try {
+        const response = await api.get('/settings/currency/');
+        const settings = response.data;
+
+        if (settings.default_currency) {
+          setDefaultCurrency(settings.default_currency as CurrencyCode);
+          currencyStore.setDefaultCurrency(settings.default_currency as CurrencyCode);
+        }
+        if (settings.currencies && Array.isArray(settings.currencies)) {
+          setCurrencies(settings.currencies);
+          currencyStore.setCurrencies(settings.currencies);
+        }
+        console.log('✓ Loaded currency settings from backend');
+      } catch (backendError) {
+        console.warn('Backend currency load failed, falling back to localStorage:', backendError);
+
+        // Fall back to localStorage
+        if (typeof window !== 'undefined') {
+          const saved = localStorage.getItem('currencySettings');
+          if (saved) {
+            const settings = JSON.parse(saved);
+            if (settings.default_currency) {
+              setDefaultCurrency(settings.default_currency);
+              currencyStore.setDefaultCurrency(settings.default_currency);
+            }
+            if (settings.currencies) {
+              setCurrencies(settings.currencies);
+              currencyStore.setCurrencies(settings.currencies);
+            }
           }
         }
       }
     } catch (error) {
-      console.warn('Failed to load currency settings from localStorage:', error);
+      console.error('Failed to load currency settings:', error);
     }
   };
 
@@ -131,13 +154,26 @@ export default function SettingsPage() {
         await api.post('/settings/currency/', payload);
         console.log('✓ Manual rates saved to Django backend');
 
+        // Update Zustand store immediately so UI reflects changes
+        const currencyStore = useCurrencyStore.getState();
+        currencyStore.updateCurrencySettings(
+          defaultCurrency,
+          'GMD' as CurrencyCode,
+          currencyData
+        );
+
         // Also save to localStorage as backup
         if (typeof window !== 'undefined') {
           localStorage.setItem('currencySettings', JSON.stringify(payload));
         }
 
         setEditingRates(false);
-        toast.success('✓ Manual currency rates saved to database!');
+        toast.success('✓ Currency settings saved! Changes applied across the system.');
+
+        // Reload page to reflect changes everywhere
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } catch (backendError: any) {
         console.error('Failed to save to backend:', backendError);
 
@@ -148,10 +184,17 @@ export default function SettingsPage() {
 
         toast.error(`Failed to save rates to database: ${errorMsg}`);
 
-        // Still save to localStorage as temporary backup
+        // Still update store and localStorage as temporary fallback
+        const currencyStore = useCurrencyStore.getState();
+        currencyStore.updateCurrencySettings(
+          defaultCurrency,
+          'GMD' as CurrencyCode,
+          currencyData
+        );
+
         if (typeof window !== 'undefined') {
           localStorage.setItem('currencySettings', JSON.stringify(payload));
-          console.warn('Saved to localStorage as backup (backend unavailable)');
+          console.warn('Saved to store and localStorage as backup (backend unavailable)');
         }
       }
     } catch (error: any) {
