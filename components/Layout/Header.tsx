@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { getMe } from '@/lib/auth';
 import { User } from '@/types';
 import { BiSearch, BiHelpCircle } from 'react-icons/bi';
+import { FaMicrophone } from 'react-icons/fa';
 import SearchModal from '@/components/Dashboard/SearchModal';
 
 const pageTitles: Record<string, string> = {
@@ -17,7 +18,11 @@ const pageTitles: Record<string, string> = {
   '/dashboard/bank-submissions': 'Bank Submissions',
 };
 
-export default function Header() {
+interface HeaderProps {
+  onVoiceAssistantToggle?: () => void;
+}
+
+export default function Header({ onVoiceAssistantToggle }: HeaderProps) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -71,6 +76,15 @@ export default function Header() {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             All Systems OK
           </span>
+          {!router.pathname.startsWith('/bank') && (
+            <button
+              onClick={onVoiceAssistantToggle}
+              className="p-2 rounded-md text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+              title="Voice Assistant"
+            >
+              <FaMicrophone size={18} />
+            </button>
+          )}
           <button className="p-2 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
             <BiHelpCircle size={18} />
           </button>

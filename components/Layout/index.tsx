@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import VoiceAssistant from '../Common/VoiceAssistant';
@@ -7,16 +8,18 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const [voiceAssistantOpen, setVoiceAssistantOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-white">
       <Sidebar />
       <div className="md:ml-64 flex flex-col min-h-screen">
-        <Header />
+        <Header onVoiceAssistantToggle={() => setVoiceAssistantOpen(!voiceAssistantOpen)} />
         <main className="flex-1 pb-20 md:pb-0">
           <div className="max-w-[1400px] mx-auto">{children}</div>
         </main>
       </div>
-      <VoiceAssistant />
+      <VoiceAssistant isOpen={voiceAssistantOpen} onOpenChange={setVoiceAssistantOpen} />
     </div>
   );
 }

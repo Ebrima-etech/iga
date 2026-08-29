@@ -7,9 +7,22 @@ import { detectIntent, startSpeechRecognition, speak, stopSpeaking } from '@/lib
 import { useRouter } from 'next/router';
 import api from '@/lib/api';
 
-export default function VoiceAssistant() {
+interface VoiceAssistantProps {
+  isOpen?: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
+}
+
+export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }: VoiceAssistantProps) {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = (value: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(value);
+    } else {
+      setInternalIsOpen(value);
+    }
+  };
   const [isListening, setIsListening] = useState(false);
   const [isAwaitingWakeWord, setIsAwaitingWakeWord] = useState(true);
   const [transcript, setTranscript] = useState('');
@@ -292,17 +305,7 @@ export default function VoiceAssistant() {
   };
 
   return (
-    <div className="fixed bottom-2 right-2 z-50">
-      {/* Main button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-lg rounded-full flex items-center justify-center text-white shadow-lg transition-all transform hover:scale-110"
-        title="Voice assistant"
-      >
-        <FaMicrophone size={16} />
-      </button>
-
-      {/* Floating panel */}
+    <div>
       {isOpen && (
         <div className="absolute bottom-20 right-0 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 space-y-4">
           {/* Header */}
