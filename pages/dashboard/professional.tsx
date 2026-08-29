@@ -30,12 +30,14 @@ import {
 export default function ProfessionalDashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    totalPilgrims: 2450,
-    totalPayments: 1200000,
-    paymentRate: 94,
-    activeBanks: 5,
+    totalPilgrims: 0,
+    totalPayments: 0,
+    paymentRate: 0,
+    activeBanks: 0,
   });
   const [payments, setPayments] = useState<any[]>([]);
+  const [pilgrims, setPilgrims] = useState<any[]>([]);
+  const [banks, setBanks] = useState<any[]>([]);
 
   useEffect(() => {
     loadDashboardData();
@@ -44,10 +46,33 @@ export default function ProfessionalDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const [paymentsRes] = await Promise.all([
+      const [paymentsRes, pilgrimsRes, banksRes] = await Promise.all([
         api.get('/payments/'),
+        api.get('/pilgrims/'),
+        api.get('/banks/'),
       ]);
-      setPayments(paymentsRes.data.results || paymentsRes.data || []);
+
+      const paymentsData = paymentsRes.data.results || paymentsRes.data || [];
+      const pilgrimsData = pilgrimsRes.data.results || pilgrimsRes.data || [];
+      const banksData = banksRes.data.results || banksRes.data || [];
+
+      setPayments(paymentsData);
+      setPilgrims(pilgrimsData);
+      setBanks(banksData);
+
+      // Calculate real stats
+      const totalPilgrims = pilgrimsData.length;
+      const totalPayments = paymentsData.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
+      const confirmedPayments = paymentsData.filter((p: any) => p.status === 'confirmed').length;
+      const paymentRate = totalPilgrims > 0 ? Math.round((confirmedPayments / totalPilgrims) * 100) : 0;
+      const activeBanks = banksData.filter((b: any) => b.is_active).length;
+
+      setStats({
+        totalPilgrims,
+        totalPayments,
+        paymentRate,
+        activeBanks,
+      });
     } catch (error) {
       console.error('Error loading dashboard:', error);
       toast.error('Failed to load dashboard data');
@@ -60,52 +85,47 @@ export default function ProfessionalDashboard() {
     {
       label: 'Total Pilgrims',
       value: stats.totalPilgrims.toLocaleString(),
-      caption: '+12% vs last month',
+      caption: `${stats.totalPilgrims} registered`,
       icon: <BiUser size={15} />,
     },
     {
       label: 'Total Payments',
-      value: `$${(stats.totalPayments / 1000000).toFixed(1)}M`,
-      caption: '+8% vs last month',
+      value: `$${(stats.totalPayments / 1000000).toFixed(2)}M`,
+      caption: `${payments.length} transactions`,
       icon: <BiWallet size={15} />,
     },
     {
       label: 'Payment Rate',
       value: `${stats.paymentRate}%`,
-      caption: '+3% vs last month',
+      caption: `${payments.filter((p: any) => p.status === 'confirmed').length} confirmed`,
       icon: <BiTrendingUp size={15} />,
     },
     {
       label: 'Banks Connected',
       value: stats.activeBanks.toString(),
-      caption: 'All active',
+      caption: `${stats.activeBanks} active`,
       icon: <BiBarChartAlt2 size={15} />,
     },
   ];
 
-  // Chart data
-  const pilgrimTrendData = [
-    { week: 'Week 1', pilgrims: 450 },
-    { week: 'Week 2', pilgrims: 620 },
-    { week: 'Week 3', pilgrims: 580 },
-    { week: 'Week 4', pilgrims: 890 },
-    { week: 'Week 5', pilgrims: 1050 },
-    { week: 'Week 6', pilgrims: 1200 },
-  ];
+  // Calculate real chart data
+  const pilgrimTrendData = pilgrims.slice(0, 6).map((p, i) => ({
+    week: `Pilgrim ${i + 1}`,
+    pilgrims: i + 1,
+  }));
 
   const paymentStatusData = [
-    { name: 'Confirmed', value: 2150, color: '#22c55e' },
-    { name: 'Pending', value: 250, color: '#eab308' },
-    { name: 'Failed', value: 50, color: '#ef4444' },
-  ];
+    { name: 'Confirmed', value: payments.filter((p: any) => p.status === 'confirmed').length, color: '#22c55e' },
+    { name: 'Pending', value: payments.filter((p: any) => p.status === 'pending').length, color: '#eab308' },
+    { name: 'Failed', value: payments.filter((p: any) => p.status === 'failed').length, color: '#ef4444' },
+  ].filter(item => item.value > 0);
 
-  const bankComparisonData = [
-    { bank: 'Bank A', amount: 450000 },
-    { bank: 'Bank B', amount: 380000 },
-    { bank: 'Bank C', amount: 220000 },
-    { bank: 'Bank D', amount: 95000 },
-    { bank: 'Bank E', amount: 55000 },
-  ];
+  const bankComparisonData = banks.map((bank: any) => ({
+    bank: bank.name,
+    amount: payments
+      .filter((p: any) => p.bank === bank.id)
+      .reduce((sum: number, p: any) => sum + (p.amount || 0), 0),
+  })).filter(item => item.amount > 0).sort((a, b) => b.amount - a.amount).slice(0, 5);
 
   const paymentColumns = [
     {
@@ -294,35 +314,49 @@ export default function ProfessionalDashboard() {
             <Card padding="lg" shadow="none">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Summary</h3>
               <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-sm text-gray-600">Confirmed</span>
-                    <span className="font-mono font-semibold text-gray-900">2,150</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '88%' }}></div>
-                  </div>
-                </div>
+                {(() => {
+                  const confirmed = payments.filter((p: any) => p.status === 'confirmed').length;
+                  const pending = payments.filter((p: any) => p.status === 'pending').length;
+                  const failed = payments.filter((p: any) => p.status === 'failed').length;
+                  const total = confirmed + pending + failed;
+                  const confirmedWidth = total > 0 ? Math.round((confirmed / total) * 100) : 0;
+                  const pendingWidth = total > 0 ? Math.round((pending / total) * 100) : 0;
+                  const failedWidth = total > 0 ? Math.round((failed / total) * 100) : 0;
 
-                <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-sm text-gray-600">Pending</span>
-                    <span className="font-mono font-semibold text-gray-900">250</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: '10%' }}></div>
-                  </div>
-                </div>
+                  return (
+                    <>
+                      <div>
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className="text-sm text-gray-600">Confirmed</span>
+                          <span className="font-mono font-semibold text-gray-900">{confirmed}</span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                          <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${confirmedWidth}%` }}></div>
+                        </div>
+                      </div>
 
-                <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-sm text-gray-600">Failed</span>
-                    <span className="font-mono font-semibold text-gray-900">50</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div className="bg-red-500 h-1.5 rounded-full" style={{ width: '2%' }}></div>
-                  </div>
-                </div>
+                      <div>
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className="text-sm text-gray-600">Pending</span>
+                          <span className="font-mono font-semibold text-gray-900">{pending}</span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                          <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${pendingWidth}%` }}></div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className="text-sm text-gray-600">Failed</span>
+                          <span className="font-mono font-semibold text-gray-900">{failed}</span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                          <div className="bg-red-500 h-1.5 rounded-full" style={{ width: `${failedWidth}%` }}></div>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </Card>
 
@@ -330,21 +364,20 @@ export default function ProfessionalDashboard() {
             <Card padding="lg" shadow="none">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Banks</h3>
               <div className="space-y-1">
-                {[
-                  { name: 'Bank A', amount: '$450K' },
-                  { name: 'Bank B', amount: '$380K' },
-                  { name: 'Bank C', amount: '$220K' },
-                ].map((bank, idx) => (
+                {bankComparisonData.map((bank: any, idx: number) => (
                   <div key={idx} className="flex items-center justify-between py-2 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
                     <div className="flex items-center gap-2.5">
                       <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center text-white text-[10px] font-semibold">
-                        {bank.name.charAt(bank.name.length - 1)}
+                        {idx + 1}
                       </div>
-                      <span className="text-sm text-gray-900">{bank.name}</span>
+                      <span className="text-sm text-gray-900">{bank.bank}</span>
                     </div>
-                    <span className="text-sm font-mono font-medium text-gray-700">{bank.amount}</span>
+                    <span className="text-sm font-mono font-medium text-gray-700">${(bank.amount / 1000).toFixed(0)}K</span>
                   </div>
                 ))}
+                {bankComparisonData.length === 0 && (
+                  <p className="text-sm text-gray-500 py-4">No payment data yet</p>
+                )}
               </div>
             </Card>
 
@@ -354,19 +387,19 @@ export default function ProfessionalDashboard() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">API Status</span>
-                  <Badge variant="success" size="sm">
-                    Online
+                  <Badge variant={!loading ? 'success' : 'warning'} size="sm">
+                    {!loading ? 'Online' : 'Loading'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Database</span>
-                  <Badge variant="success" size="sm">
-                    Healthy
+                  <span className="text-sm text-gray-600">Data Loaded</span>
+                  <Badge variant={payments.length > 0 && pilgrims.length > 0 ? 'success' : 'warning'} size="sm">
+                    {payments.length > 0 && pilgrims.length > 0 ? 'Yes' : 'Syncing'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Response Time</span>
-                  <span className="text-sm font-mono font-medium text-gray-900">45ms</span>
+                  <span className="text-sm text-gray-600">Last Updated</span>
+                  <span className="text-sm font-mono font-medium text-gray-900">{new Date().toLocaleTimeString()}</span>
                 </div>
               </div>
             </Card>
