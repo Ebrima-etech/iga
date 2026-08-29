@@ -37,12 +37,12 @@ export function Skeleton({
       }}
     >
       {engrave && (
-        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-          <span className="text-xs font-bold text-gray-900 uppercase tracking-widest">{engrave}</span>
+        <div className="absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none">
+          <span className="text-sm font-bold text-gray-800 uppercase tracking-wider">{engrave}</span>
         </div>
       )}
       {icon && (
-        <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center opacity-40 pointer-events-none text-gray-700">
           {icon}
         </div>
       )}
@@ -112,7 +112,7 @@ export function ChartSkeleton() {
 export function KabaaTableSkeleton({ rows = 5, columnCount = 6 }) {
   const showKaaba = Math.random() > 0.5;
   const kabaIcon = (
-    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+    <svg className="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 2L8 6H4V18C4 19.1 4.9 20 6 20H18C19.1 20 20 19.1 20 18V6H16L12 2ZM12 4L14 6H10L12 4Z" />
     </svg>
   );
