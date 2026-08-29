@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import Card from '@/components/Common/Card';
-import { StatCardSkeleton } from '@/components/Common/Skeleton';
+import { StatCardSkeleton, ChartSkeleton, Skeleton } from '@/components/Common/Skeleton';
 import { BiDownload, BiRefresh, BiUser, BiWallet, BiCheckCircle, BiTrendingUp, BiBarChartAlt2, BiBuilding, BiTime, BiGlobe } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -168,6 +168,51 @@ export default function AnalyticsPage() {
       <Layout>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
           <div className="max-w-7xl mx-auto space-y-8">
+            {/* Header Skeleton */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="space-y-3">
+                <Skeleton height={40} width="300px" engrave="HAJJ 2026" />
+                <Skeleton height={16} width="400px" engrave="HAJJ 2026" />
+              </div>
+              <div className="flex gap-3">
+                <Skeleton height={40} width={140} />
+                <Skeleton height={40} width={140} />
+                <Skeleton height={40} width={140} />
+              </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array(4).fill(0).map((_, i) => (
+                <StatCardSkeleton key={i} />
+              ))}
+            </div>
+
+            {/* Charts Row 1 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {Array(2).fill(0).map((_, i) => (
+                <ChartSkeleton key={i} />
+              ))}
+            </div>
+
+            {/* Charts Row 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {Array(2).fill(0).map((_, i) => (
+                <ChartSkeleton key={i} />
+              ))}
+            </div>
+
+            {/* Charts Row 3 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {Array(2).fill(0).map((_, i) => (
+                <ChartSkeleton key={i} />
+              ))}
+            </div>
+
+            {/* Country Distribution Skeleton */}
+            <ChartSkeleton />
+
+            {/* Additional Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {Array(4).fill(0).map((_, i) => (
                 <StatCardSkeleton key={i} />
