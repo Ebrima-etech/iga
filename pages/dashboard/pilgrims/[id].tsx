@@ -35,11 +35,21 @@ export default function PilgrimDetailPage() {
         api.get(`/payments/?pilgrim=${id}`),
       ]);
 
+      console.log('Pilgrim data:', pilgrimRes.data);
+      console.log('Payments response:', paymentsRes.data);
+
       setPilgrim(pilgrimRes.data);
-      const paymentsList = paymentsRes.data.results || paymentsRes.data || [];
-      setPayments(paymentsList.sort((a: Payment, b: Payment) =>
-        new Date(b.payment_date).getTime() - new Date(a.payment_date).getTime()
-      ));
+      const paymentsList = Array.isArray(paymentsRes.data)
+        ? paymentsRes.data
+        : paymentsRes.data.results || [];
+
+      console.log('Filtered payments:', paymentsList);
+
+      setPayments(
+        paymentsList.sort((a: Payment, b: Payment) =>
+          new Date(b.payment_date).getTime() - new Date(a.payment_date).getTime()
+        )
+      );
     } catch (error) {
       console.error('Failed to fetch pilgrim details:', error);
       toast.error('Failed to load pilgrim details');
