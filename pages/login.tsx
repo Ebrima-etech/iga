@@ -38,8 +38,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex">
       <HajjVisualPanel />
 
-      <div className="relative flex-1 flex flex-col bg-white overflow-hidden">
+      <div className="relative flex-1 flex flex-col bg-gradient-to-br from-emerald-50 via-white to-amber-50/40 overflow-hidden">
         <HajjTermsBackground />
+
+        {/* Soft seam blending into the dark visual panel */}
+        <div className="hidden lg:block absolute top-0 left-0 h-full w-32 bg-gradient-to-r from-emerald-900/10 to-transparent pointer-events-none" />
 
         {/* Mobile-only compact Hajj banner */}
         <div className="lg:hidden bg-gradient-to-r from-emerald-950 to-emerald-900 px-6 py-6 flex items-center gap-4">
@@ -56,16 +59,17 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center p-4">
+        <div className="relative z-10 flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm">
             {/* Header (desktop) */}
-            <div className="hidden lg:block text-center mb-10">
+            <div className="hidden lg:block text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-1">GIA Hajj</h1>
               <p className="text-sm text-gray-600">Operations Management System</p>
+              <div className="mt-4 h-px w-16 bg-amber-400/50 mx-auto" />
             </div>
 
             {/* Card */}
-            <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm mt-8 lg:mt-0">
+            <div className="bg-white/90 backdrop-blur-sm border border-emerald-100 rounded-lg p-8 shadow-sm shadow-emerald-900/5 mt-8 lg:mt-0">
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">Sign in</h2>
                 <p className="text-sm text-gray-600">to access your dashboard</p>
@@ -100,16 +104,16 @@ export default function LoginPage() {
                   />
                 </FormField>
 
-                <ProfessionalButton type="submit" variant="primary" fullWidth loading={loading}>
+                <ProfessionalButton type="submit" variant="success" fullWidth loading={loading}>
                   Sign in
                 </ProfessionalButton>
               </form>
 
               {/* Divider */}
-              <div className="my-6 border-t border-gray-200"></div>
+              <div className="my-6 border-t border-emerald-100"></div>
 
               {/* Demo Credentials */}
-              <div className="text-xs text-gray-600">
+              <div className="text-xs text-gray-600 bg-emerald-50/60 border border-emerald-100 rounded-md p-3">
                 <p className="font-medium text-gray-900 mb-2">Demo Credentials</p>
                 <div className="space-y-1 font-mono text-gray-600">
                   <div>admin / admin123</div>
