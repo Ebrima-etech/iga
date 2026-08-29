@@ -152,7 +152,7 @@ export default function PaymentsPage() {
               />
               <TableFilter
                 label="Bank"
-                value={tableState.filters.bank || ''}
+                value={String(tableState.filters.bank || '')}
                 options={banks.map((b) => ({ label: b.name, value: b.id }))}
                 onChange={(value) => tableState.handleFilter('bank', value)}
               />
@@ -244,7 +244,7 @@ export default function PaymentsPage() {
                                     ? 'success'
                                     : payment.status === 'pending'
                                     ? 'warning'
-                                    : 'danger'
+                                    : 'error'
                                 }
                                 size="sm"
                               >

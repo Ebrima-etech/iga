@@ -409,13 +409,13 @@ export default function PilgrimsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <TableFilter
                 label="Status"
-                value={tableState.filters.status || ''}
+                value={String(tableState.filters.status || '')}
                 options={pilgrimStatusFilters}
                 onChange={(value) => tableState.handleFilter('status', value)}
               />
               <TableFilter
                 label="Gender"
-                value={tableState.filters.gender || ''}
+                value={String(tableState.filters.gender || '')}
                 options={genderFilters}
                 onChange={(value) => tableState.handleFilter('gender', value)}
               />
