@@ -206,28 +206,33 @@ export default function LoginPage() {
           <div className="door-hinge door-hinge-left absolute inset-y-0 left-0" />
           <div className="door-hinge door-hinge-right absolute inset-y-0 right-0" />
 
-          {/* left door */}
-          <div
-            className={`door-panel door-left absolute inset-y-0 left-0 w-1/2 bg-gradient-to-br from-emerald-950 via-emerald-950 to-black ${doorsSwing ? 'door-left-swing' : ''}`}
-          >
-            <div
-              className="absolute inset-0"
-              style={{ background: 'radial-gradient(circle at 100% 50%, rgba(212,175,55,0.18), transparent 60%)' }}
-            />
-            {/* leading edge — the edge furthest from the hinge, this is what
-                visibly sweeps through the arc as the door swings open */}
-            <div className="door-leading-edge absolute inset-y-0 right-0" />
+          {/* left door — built as a real box (front face + a side edge folded
+              90deg to show thickness), not a single flat rotating plane */}
+          <div className={`door-panel door-left absolute inset-y-0 left-0 w-1/2 ${doorsSwing ? 'door-left-swing' : ''}`}>
+            <div className="door-face absolute inset-0 bg-gradient-to-br from-emerald-950 via-emerald-950 to-black">
+              <div
+                className="absolute inset-0"
+                style={{ background: 'radial-gradient(circle at 100% 50%, rgba(212,175,55,0.18), transparent 60%)' }}
+              />
+              <div className={`door-shade absolute inset-0 ${doorsSwing ? 'door-shade-on' : ''}`} style={{ background: 'linear-gradient(to right, transparent 60%, rgba(0,0,0,0.6))' }} />
+            </div>
+            <div className="door-edge door-edge-right absolute inset-y-0 right-0">
+              <div className="door-edge-highlight absolute inset-y-0 left-0" />
+            </div>
           </div>
 
           {/* right door */}
-          <div
-            className={`door-panel door-right absolute inset-y-0 right-0 w-1/2 bg-gradient-to-bl from-emerald-950 via-emerald-950 to-black ${doorsSwing ? 'door-right-swing' : ''}`}
-          >
-            <div
-              className="absolute inset-0"
-              style={{ background: 'radial-gradient(circle at 0% 50%, rgba(212,175,55,0.18), transparent 60%)' }}
-            />
-            <div className="door-leading-edge absolute inset-y-0 left-0" />
+          <div className={`door-panel door-right absolute inset-y-0 right-0 w-1/2 ${doorsSwing ? 'door-right-swing' : ''}`}>
+            <div className="door-face absolute inset-0 bg-gradient-to-bl from-emerald-950 via-emerald-950 to-black">
+              <div
+                className="absolute inset-0"
+                style={{ background: 'radial-gradient(circle at 0% 50%, rgba(212,175,55,0.18), transparent 60%)' }}
+              />
+              <div className={`door-shade absolute inset-0 ${doorsSwing ? 'door-shade-on' : ''}`} style={{ background: 'linear-gradient(to left, transparent 60%, rgba(0,0,0,0.6))' }} />
+            </div>
+            <div className="door-edge door-edge-left absolute inset-y-0 left-0">
+              <div className="door-edge-highlight absolute inset-y-0 right-0" />
+            </div>
           </div>
         </div>
       )}
@@ -248,23 +253,68 @@ export default function LoginPage() {
           perspective-origin: 50% 50%;
         }
 
+        /* .door-panel is the rigid box GROUP — it holds a front face plus a
+           side-edge face folded 90deg to form real thickness, and the two
+           move together as one solid object when the group rotates open */
         .door-panel {
           transition: transform 1.35s cubic-bezier(0.65, 0, 0.35, 1);
           transform-style: preserve-3d;
-          backface-visibility: hidden;
           will-change: transform;
-          box-shadow: 0 0 90px rgba(0, 0, 0, 0.65);
         }
         .door-left {
           transform-origin: 0% 50%;
-          transform: rotateY(0deg) translateZ(0);
+          transform: rotateY(0deg);
         }
         .door-right {
           transform-origin: 100% 50%;
-          transform: rotateY(0deg) translateZ(0);
+          transform: rotateY(0deg);
         }
-        .door-left-swing { transform: rotateY(-89deg) translateZ(-40px); }
-        .door-right-swing { transform: rotateY(89deg) translateZ(-40px); }
+        .door-left-swing { transform: rotateY(-89deg); }
+        .door-right-swing { transform: rotateY(89deg); }
+
+        .door-face {
+          backface-visibility: hidden;
+          box-shadow: 0 0 90px rgba(0, 0, 0, 0.65);
+        }
+
+        /* the side-edge face: a strip as wide as the door's "thickness",
+           folded a rigid 90deg around the boundary it shares with the
+           front face. It never transitions on its own — only the parent
+           .door-panel's rotation moves it, exactly like a real hinged
+           panel with the edge rigidly attached */
+        .door-edge {
+          width: 28px;
+        }
+        .door-edge-right {
+          transform-origin: 100% 50%;
+          transform: rotateY(-90deg);
+          background: linear-gradient(to left, #050807, #000);
+        }
+        .door-edge-left {
+          transform-origin: 0% 50%;
+          transform: rotateY(90deg);
+          background: linear-gradient(to right, #050807, #000);
+        }
+
+        /* bright seam where the edge meets the front face — the corner of
+           a real door catches light here, and it's what visibly sweeps
+           through the arc as the door swings, since it's rigidly part of
+           the rotating box rather than a flat overlay */
+        .door-edge-highlight {
+          width: 3px;
+          background: linear-gradient(to bottom, transparent, rgba(255, 223, 120, 0.9), transparent);
+          box-shadow: 0 0 24px 4px rgba(212, 175, 55, 0.7);
+        }
+
+        /* darkens the front face as it turns away, like it's rotating out
+           of the light — a cheap but effective extra depth cue */
+        .door-shade {
+          opacity: 0;
+          transition: opacity 1.35s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .door-shade-on {
+          opacity: 1;
+        }
 
         /* fixed frame posts at the outer edges — these never move, so the
            doors visibly rotate around them like real hinges */
@@ -276,14 +326,6 @@ export default function LoginPage() {
         }
         .door-hinge-left { left: 0; }
         .door-hinge-right { right: 0; }
-
-        /* bright edge at the side of each door furthest from its hinge —
-           this is the line the eye tracks as the door sweeps open */
-        .door-leading-edge {
-          width: 3px;
-          background: linear-gradient(to bottom, transparent, rgba(255, 223, 120, 0.9), transparent);
-          box-shadow: 0 0 24px 4px rgba(212, 175, 55, 0.7);
-        }
 
         .door-beam {
           background: linear-gradient(to bottom, transparent, rgba(255, 223, 120, 0.95), transparent);
