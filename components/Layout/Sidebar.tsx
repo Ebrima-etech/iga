@@ -9,7 +9,6 @@ import {
   BiUser,
   BiWallet,
   BiLineChart,
-  BiMicrophone,
   BiCog,
   BiMenu,
   BiBuilding,
@@ -52,7 +51,6 @@ const navSections: NavSection[] = [
   {
     label: 'System',
     items: [
-      { label: 'Speech (Pilot)', href: '/dashboard/speech-demo', icon: <BiMicrophone size={18} /> },
       { label: 'Settings', href: '/dashboard/settings', icon: <BiCog size={18} /> },
     ],
   },
