@@ -16,7 +16,7 @@ export function Skeleton({
   variant = 'rectangular',
 }: SkeletonProps) {
   const baseClass =
-    'bg-gradient-to-r from-amber-200 via-amber-100 to-amber-200 bg-[length:200%_100%] animate-shimmer';
+    'bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 bg-[length:200%_100%] animate-subtle-shimmer';
 
   const variantClass = {
     text: 'rounded-md h-4',

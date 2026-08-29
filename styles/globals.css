@@ -172,6 +172,15 @@
   }
 }
 
+@keyframes subtle-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
 .animate-spin {
   animation: spin 1s linear infinite;
 }
@@ -190,4 +199,8 @@
 
 .animate-shimmer {
   animation: shimmer 2s infinite;
+}
+
+.animate-subtle-shimmer {
+  animation: subtle-shimmer 2.5s ease-in-out infinite;
 }
