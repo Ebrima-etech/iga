@@ -33,6 +33,7 @@ interface MultiStepFormProps {
   inline?: boolean;
   voiceEnabled?: boolean;
   language?: string;
+  submitLabel?: string;
 }
 
 export default function MultiStepForm({
@@ -45,6 +46,7 @@ export default function MultiStepForm({
   inline = false,
   voiceEnabled = true,
   language = 'en-US',
+  submitLabel = 'Submit',
 }: MultiStepFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Record<string, any>>(draftData);
@@ -282,7 +284,7 @@ export default function MultiStepForm({
             fullWidth
             loading={loading}
           >
-            Submit
+            {submitLabel}
           </ProfessionalButton>
         ) : (
           <ProfessionalButton

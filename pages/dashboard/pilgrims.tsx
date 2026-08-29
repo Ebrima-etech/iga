@@ -378,16 +378,22 @@ export default function PilgrimsPage() {
           </div>
         )}
 
-        {/* Inline Form Section - Shows inline on Add Pilgrim click */}
+        {/* Inline Form Section - Shows inline on Add Pilgrim / Edit click */}
         {showInlineForm && (
           <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200 animate-slideInUp">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">Register New Pilgrim</h2>
-                <p className="text-gray-600 text-sm mt-1">Complete all steps to register a new pilgrim</p>
+                <h2 className="text-2xl font-semibold text-gray-900">
+                  {editingPilgrim ? `Edit Pilgrim — ${editingPilgrim.full_name}` : 'Register New Pilgrim'}
+                </h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  {editingPilgrim
+                    ? 'Update the details below and save your changes'
+                    : 'Complete all steps to register a new pilgrim'}
+                </p>
               </div>
               <button
-                onClick={() => setShowInlineForm(false)}
+                onClick={handleCloseForm}
                 className="text-gray-400 hover:text-gray-600 p-2 hover:bg-white rounded transition"
               >
                 <BiX size={24} />
@@ -395,14 +401,16 @@ export default function PilgrimsPage() {
             </div>
             <div className="bg-white rounded-lg p-6 border border-gray-200">
               <MultiStepForm
+                key={editingPilgrim ? `edit-${editingPilgrim.id}` : 'new'}
                 steps={pilgrimFormSteps}
                 onSubmit={handleFormSubmit}
-                onSaveDraft={handleSaveDraft}
+                onSaveDraft={editingPilgrim ? undefined : handleSaveDraft}
                 draftData={draftData}
                 title="Pilgrim Registration"
                 inline={true}
                 voiceEnabled={true}
                 language="en-US"
+                submitLabel={editingPilgrim ? 'Save Changes' : 'Submit'}
               />
             </div>
           </div>
