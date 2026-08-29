@@ -33,7 +33,7 @@ export default function LoginPage() {
       });
       setTimeout(() => {
         router.push('/dashboard');
-      }, 1300);
+      }, 1500);
     } catch (err) {
       const errorMessage =
         (err as any)?.response?.data?.detail || 'Login failed. Please check your credentials.';
@@ -185,7 +185,7 @@ export default function LoginPage() {
 
       {/* Door-opening transition on successful login */}
       {doorsOpen && (
-        <div className="fixed inset-0 z-[100]" style={{ perspective: '1800px' }}>
+        <div className="fixed inset-0 z-[100] door-stage">
           {/* what the doors reveal — matches the dashboard's own light theme
               so the eventual page navigation lands without a visual jump */}
           <div className="absolute inset-0 bg-white flex items-center justify-center">
@@ -200,24 +200,34 @@ export default function LoginPage() {
           {/* light beam growing at the seam as the doors separate */}
           <div className={`door-beam absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 ${doorsSwing ? 'door-beam-swing' : ''}`} />
 
+          {/* static hinge posts — anchored to the outer frame, never move,
+              so the doors read as rotating AROUND them rather than just
+              shrinking away */}
+          <div className="door-hinge door-hinge-left absolute inset-y-0 left-0" />
+          <div className="door-hinge door-hinge-right absolute inset-y-0 right-0" />
+
           {/* left door */}
           <div
-            className={`door-panel door-left absolute inset-y-0 left-0 w-1/2 bg-gradient-to-br from-emerald-950 via-emerald-950 to-black border-r border-amber-400/20 ${doorsSwing ? 'door-left-swing' : ''}`}
+            className={`door-panel door-left absolute inset-y-0 left-0 w-1/2 bg-gradient-to-br from-emerald-950 via-emerald-950 to-black ${doorsSwing ? 'door-left-swing' : ''}`}
           >
             <div
               className="absolute inset-0"
               style={{ background: 'radial-gradient(circle at 100% 50%, rgba(212,175,55,0.18), transparent 60%)' }}
             />
+            {/* leading edge — the edge furthest from the hinge, this is what
+                visibly sweeps through the arc as the door swings open */}
+            <div className="door-leading-edge absolute inset-y-0 right-0" />
           </div>
 
           {/* right door */}
           <div
-            className={`door-panel door-right absolute inset-y-0 right-0 w-1/2 bg-gradient-to-bl from-emerald-950 via-emerald-950 to-black border-l border-amber-400/20 ${doorsSwing ? 'door-right-swing' : ''}`}
+            className={`door-panel door-right absolute inset-y-0 right-0 w-1/2 bg-gradient-to-bl from-emerald-950 via-emerald-950 to-black ${doorsSwing ? 'door-right-swing' : ''}`}
           >
             <div
               className="absolute inset-0"
               style={{ background: 'radial-gradient(circle at 0% 50%, rgba(212,175,55,0.18), transparent 60%)' }}
             />
+            <div className="door-leading-edge absolute inset-y-0 left-0" />
           </div>
         </div>
       )}
@@ -233,21 +243,54 @@ export default function LoginPage() {
           100% { transform: translate(340%, -6px); opacity: 0; }
         }
 
-        .door-panel {
-          transition: transform 1.15s cubic-bezier(0.76, 0, 0.24, 1);
-          transform-style: preserve-3d;
-          will-change: transform;
+        .door-stage {
+          perspective: 900px;
+          perspective-origin: 50% 50%;
         }
-        .door-left { transform-origin: left center; transform: rotateY(0deg); }
-        .door-right { transform-origin: right center; transform: rotateY(0deg); }
-        .door-left-swing { transform: rotateY(-100deg); }
-        .door-right-swing { transform: rotateY(100deg); }
+
+        .door-panel {
+          transition: transform 1.35s cubic-bezier(0.65, 0, 0.35, 1);
+          transform-style: preserve-3d;
+          backface-visibility: hidden;
+          will-change: transform;
+          box-shadow: 0 0 90px rgba(0, 0, 0, 0.65);
+        }
+        .door-left {
+          transform-origin: 0% 50%;
+          transform: rotateY(0deg) translateZ(0);
+        }
+        .door-right {
+          transform-origin: 100% 50%;
+          transform: rotateY(0deg) translateZ(0);
+        }
+        .door-left-swing { transform: rotateY(-89deg) translateZ(-40px); }
+        .door-right-swing { transform: rotateY(89deg) translateZ(-40px); }
+
+        /* fixed frame posts at the outer edges — these never move, so the
+           doors visibly rotate around them like real hinges */
+        .door-hinge {
+          width: 10px;
+          z-index: 2;
+          background: linear-gradient(to bottom, #d4af37, #7a5f18, #d4af37);
+          box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        .door-hinge-left { left: 0; }
+        .door-hinge-right { right: 0; }
+
+        /* bright edge at the side of each door furthest from its hinge —
+           this is the line the eye tracks as the door sweeps open */
+        .door-leading-edge {
+          width: 3px;
+          background: linear-gradient(to bottom, transparent, rgba(255, 223, 120, 0.9), transparent);
+          box-shadow: 0 0 24px 4px rgba(212, 175, 55, 0.7);
+        }
 
         .door-beam {
           background: linear-gradient(to bottom, transparent, rgba(255, 223, 120, 0.95), transparent);
           box-shadow: 0 0 60px 16px rgba(212, 175, 55, 0.55);
           opacity: 0;
-          transition: opacity 0.4s ease 0.35s;
+          transition: opacity 0.5s ease 0.5s;
+          z-index: 1;
         }
         .door-beam-swing {
           opacity: 1;
