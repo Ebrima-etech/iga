@@ -59,41 +59,22 @@ export default function SettingsPage() {
     try {
       const currencyStore = useCurrencyStore.getState();
 
-      // First try to fetch from backend
-      try {
-        const response = await api.get('/settings/currency/');
-        const settings = response.data;
+      // Fetch from backend
+      const response = await api.get('/settings/currency/');
+      const settings = response.data;
 
-        if (settings.default_currency) {
-          setDefaultCurrency(settings.default_currency as CurrencyCode);
-          currencyStore.setDefaultCurrency(settings.default_currency as CurrencyCode);
-        }
-        if (settings.currencies && Array.isArray(settings.currencies)) {
-          setCurrencies(settings.currencies);
-          currencyStore.setCurrencies(settings.currencies);
-        }
-        console.log('✓ Loaded currency settings from backend');
-      } catch (backendError) {
-        console.warn('Backend currency load failed, falling back to localStorage:', backendError);
-
-        // Fall back to localStorage
-        if (typeof window !== 'undefined') {
-          const saved = localStorage.getItem('currencySettings');
-          if (saved) {
-            const settings = JSON.parse(saved);
-            if (settings.default_currency) {
-              setDefaultCurrency(settings.default_currency);
-              currencyStore.setDefaultCurrency(settings.default_currency);
-            }
-            if (settings.currencies) {
-              setCurrencies(settings.currencies);
-              currencyStore.setCurrencies(settings.currencies);
-            }
-          }
-        }
+      if (settings.default_currency) {
+        setDefaultCurrency(settings.default_currency as CurrencyCode);
+        currencyStore.setDefaultCurrency(settings.default_currency as CurrencyCode);
       }
+      if (settings.currencies && Array.isArray(settings.currencies)) {
+        setCurrencies(settings.currencies);
+        currencyStore.setCurrencies(settings.currencies);
+      }
+      console.log('✓ Loaded currency settings from backend');
     } catch (error) {
-      console.error('Failed to load currency settings:', error);
+      console.warn('Failed to load currency settings from backend:', error);
+      // Fall back to store defaults
     }
   };
 

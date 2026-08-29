@@ -13,24 +13,8 @@ export const formatCurrency = (amount: number | string, currency?: string): stri
     }
   }
 
-  // Try to get from currency store if available
-  if (typeof window !== 'undefined') {
-    try {
-      // Lazy import to avoid circular dependency
-      const { useCurrencyStore } = require('@/lib/stores/currencyStore');
-      const store = useCurrencyStore.getState();
-      if (store && store.defaultCurrency) {
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: store.defaultCurrency,
-        }).format(num);
-      }
-    } catch (e) {
-      // Store not available, continue to fallback
-    }
-  }
-
-  // Final fallback to USD
+  // Default to USD
+  // Currency selection will be applied at component level via CurrencyProvider
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
