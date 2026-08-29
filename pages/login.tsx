@@ -54,11 +54,20 @@ export default function LoginPage() {
         style={{ background: 'radial-gradient(circle at 28% 34%, rgba(212,175,55,0.14), transparent 55%)' }}
       />
 
+      {/* Hajj term engravings, now spanning the entire page */}
+      <HajjTermsBackground />
+
+      {/* Cinematic vignette — sits under the foreground scene/card since it
+          shares the same auto stacking order and comes first in the DOM,
+          so it only ever darkens empty background, never the content */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.35) 100%)' }}
+      />
+
       <HajjVisualPanel />
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
-        <HajjTermsBackground />
-
         {/* Mobile-only compact Hajj banner */}
         <div className="relative z-10 lg:hidden px-6 py-6 flex items-center gap-4 border-b border-emerald-900/60">
           <svg width="40" height="36" viewBox="0 0 220 200" fill="none" className="flex-shrink-0">
@@ -122,7 +131,7 @@ export default function LoginPage() {
       </div>
 
       {/* Footer, centered across the full page width */}
-      <div className="absolute bottom-3 left-0 w-full z-10 text-center pointer-events-none">
+      <div className="absolute bottom-3 left-0 w-full z-20 text-center pointer-events-none">
         <p className="text-xs font-medium text-white">© 2026 Gambia International Airlines</p>
       </div>
     </div>

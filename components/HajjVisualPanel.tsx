@@ -22,7 +22,7 @@ export default function HajjVisualPanel() {
 
       {/* Airplane flying across the sky */}
       <div className="absolute top-[9%] left-0 w-full pointer-events-none hajj-plane-track">
-        <svg width="110" height="64" viewBox="0 0 110 64" fill="none" className="text-amber-200/95">
+        <svg width="128" height="74" viewBox="0 0 110 64" fill="none" className="text-amber-200/95">
           <defs>
             <clipPath id="tailFlagClip">
               <path d="M10 34 L26 8 L33 8 L26 34 Z" />
@@ -65,7 +65,7 @@ export default function HajjVisualPanel() {
             GIA
           </text>
         </svg>
-        <svg width="150" height="5" viewBox="0 0 150 5" className="text-amber-100/25 -mt-1 -ml-24">
+        <svg width="175" height="6" viewBox="0 0 150 5" className="text-amber-100/25 -mt-1 -ml-28">
           <line x1="0" y1="2.5" x2="145" y2="2.5" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 4" />
         </svg>
       </div>
@@ -73,15 +73,15 @@ export default function HajjVisualPanel() {
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full px-12 text-center">
         {/* Crescent + star */}
-        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" className="mb-6 text-amber-300/80 hajj-pulse-slow">
+        <svg width="56" height="56" viewBox="0 0 44 44" fill="none" className="mb-6 text-amber-300/80 hajj-pulse-slow">
           <path d="M27 8a14 14 0 1 0 0 28 11 11 0 1 1 0-28Z" fill="currentColor" opacity="0.9" />
           <path d="M36 10l1.2 2.6L40 14l-2.8 1.4L36 18l-1.2-2.6L32 14l2.8-1.4L36 10Z" fill="currentColor" />
         </svg>
 
-        {/* Safa, Kaaba + Tawaf rings, Marwa */}
+        {/* Safa, Kaaba + Tawaf rings, Marwa — all grounded on the same baseline */}
         <div className="relative flex items-end justify-center">
           {/* Safa (left hill) */}
-          <svg width="70" height="90" viewBox="0 0 70 90" fill="none" className="relative -mr-4 mb-1">
+          <svg width="89" height="114" viewBox="0 0 70 90" fill="none" className="relative -mr-5">
             <path d="M0 90 L8 55 Q35 20 62 55 L70 90 Z" fill="#57534e" opacity="0.8" />
             <path d="M8 55 Q35 20 62 55" stroke="#a8a29e" strokeWidth="1" opacity="0.4" fill="none" />
             <text
@@ -102,15 +102,16 @@ export default function HajjVisualPanel() {
           </svg>
 
           {/* Sa'i walking path between the hills */}
-          <svg width="120" height="20" viewBox="0 0 120 20" className="absolute bottom-[18px] left-1/2 -translate-x-1/2 -z-10">
+          <svg width="152" height="25" viewBox="0 0 120 20" className="absolute bottom-[22px] left-1/2 -translate-x-1/2 -z-10">
             <path d="M5 10 Q60 -4 115 10" stroke="#d4af37" strokeWidth="1" strokeDasharray="1 5" opacity="0.35" fill="none" />
             <circle r="2" fill="#f2d98a" opacity="0.8">
               <animateMotion dur="6s" repeatCount="indefinite" path="M5 10 Q60 -4 115 10" />
             </circle>
           </svg>
 
-          {/* Kaaba illustration with Tawaf rings */}
-          <svg width="220" height="200" viewBox="0 0 220 200" fill="none">
+          {/* Kaaba illustration with Tawaf rings — viewBox cropped to the actual
+              content bottom (178) so it grounds flush with the hills, no gap */}
+          <svg width="280" height="229" viewBox="0 0 220 180" fill="none">
             <ellipse cx="110" cy="152" rx="95" ry="26" stroke="#d4af37" strokeOpacity="0.25" strokeWidth="1" strokeDasharray="2 6" className="hajj-ring" />
             <ellipse cx="110" cy="152" rx="72" ry="19" stroke="#d4af37" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="2 6" className="hajj-ring hajj-ring-delay1" />
             <ellipse cx="110" cy="152" rx="50" ry="13" stroke="#d4af37" strokeOpacity="0.45" strokeWidth="1" strokeDasharray="2 6" className="hajj-ring hajj-ring-delay2" />
@@ -130,7 +131,7 @@ export default function HajjVisualPanel() {
           </svg>
 
           {/* Marwa (right hill) */}
-          <svg width="70" height="90" viewBox="0 0 70 90" fill="none" className="relative -ml-4 mb-1">
+          <svg width="89" height="114" viewBox="0 0 70 90" fill="none" className="relative -ml-5">
             <path d="M0 90 L8 55 Q35 20 62 55 L70 90 Z" fill="#57534e" opacity="0.8" />
             <path d="M8 55 Q35 20 62 55" stroke="#a8a29e" strokeWidth="1" opacity="0.4" fill="none" />
             <text
