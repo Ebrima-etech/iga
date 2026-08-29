@@ -11,7 +11,7 @@ import { Pilgrim, Payment } from '@/types';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { BiArrowLeft, BiPhone, BiMailOpen, BiCalendar, BiMapPin, BiDollar, BiCheckCircle } from 'react-icons/bi';
+import { BiArrowLeft, BiPhone, BiMailOpen, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp } from 'react-icons/bi';
 
 export default function PilgrimDetailPage() {
   const router = useRouter();
@@ -188,6 +188,128 @@ export default function PilgrimDetailPage() {
             </p>
           </Card>
         </div>
+
+        {/* Transaction Timeline */}
+        {payments.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Payment Timeline</h2>
+            <div className="bg-white border border-gray-200 rounded-lg p-8">
+              {/* Progress visualization */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-medium text-gray-700">Payment Progress</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    {Math.round((totalPaid / pilgrim.total_amount_due) * 100)}%
+                  </p>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min((totalPaid / pilgrim.total_amount_due) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Timeline */}
+              <div className="space-y-6">
+                {payments
+                  .filter(p => p.status === 'confirmed')
+                  .map((payment, index) => (
+                    <div key={payment.id} className="flex gap-6">
+                      {/* Timeline dot and line */}
+                      <div className="flex flex-col items-center">
+                        <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                          {index + 1}
+                        </div>
+                        {index < payments.filter(p => p.status === 'confirmed').length - 1 && (
+                          <div className="w-1 h-12 bg-emerald-200 mt-2"></div>
+                        )}
+                      </div>
+
+                      {/* Transaction Details */}
+                      <div className="flex-1 pb-4">
+                        <div className="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200 rounded-lg p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <p className="font-semibold text-gray-900">Deposit #{index + 1}</p>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {new Date(payment.payment_date).toLocaleDateString('en-US', {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xl font-bold text-emerald-600 font-mono">
+                                {formatCurrency(payment.amount)}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">Reference: {payment.reference_number}</p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 pt-4 border-t border-emerald-200">
+                            <div>
+                              <p className="text-xs text-gray-600">Bank</p>
+                              <p className="font-medium text-gray-900">{payment.bank_name}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Payer</p>
+                              <p className="font-medium text-gray-900">{payment.payer_name || 'N/A'}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Relationship</p>
+                              <p className="font-medium text-gray-900">{payment.payer_relationship || '-'}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Running Total</p>
+                              <p className="font-mono font-medium text-emerald-600">
+                                {formatCurrency(
+                                  payments
+                                    .filter(p => p.status === 'confirmed')
+                                    .slice(0, index + 1)
+                                    .reduce((sum, p) => sum + p.amount, 0)
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Summary Stats */}
+              {payments.filter(p => p.status === 'confirmed').length > 0 && (
+                <div className="mt-8 pt-8 border-t border-gray-200">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Total Deposits</p>
+                      <p className="text-2xl font-bold text-gray-900 mt-2">
+                        {payments.filter(p => p.status === 'confirmed').length}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Average Deposit</p>
+                      <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">
+                        {formatCurrency(
+                          totalPaid / payments.filter(p => p.status === 'confirmed').length
+                        )}
+                      </p>
+                    </div>
+                    <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                      <p className="text-sm text-emerald-600 font-medium">Payment Status</p>
+                      <p className="text-2xl font-bold text-emerald-600 mt-2">
+                        {amountRemaining > 0 ? 'Pending' : 'Complete'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Payment History */}
         <div>
