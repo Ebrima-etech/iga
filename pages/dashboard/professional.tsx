@@ -30,6 +30,7 @@ import {
 
 export default function ProfessionalDashboard() {
   const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState('');
   const [stats, setStats] = useState({
     totalPilgrims: 0,
     totalPayments: 0,
@@ -42,6 +43,7 @@ export default function ProfessionalDashboard() {
 
   useEffect(() => {
     loadDashboardData();
+    setCurrentTime(new Date().toLocaleTimeString());
   }, []);
 
   const loadDashboardData = async () => {
@@ -424,7 +426,7 @@ export default function ProfessionalDashboard() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Last Updated</span>
-                  <span className="text-sm font-mono font-medium text-gray-900">{new Date().toLocaleTimeString()}</span>
+                  <span className="text-sm font-mono font-medium text-gray-900">{currentTime || '—'}</span>
                 </div>
               </div>
             </Card>
