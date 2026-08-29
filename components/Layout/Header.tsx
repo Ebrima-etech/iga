@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { getMe } from '@/lib/auth';
 import { User } from '@/types';
 import { BiSearch, BiHelpCircle } from 'react-icons/bi';
+import SearchModal from '@/components/Dashboard/SearchModal';
 
 const pageTitles: Record<string, string> = {
   '/dashboard': 'Overview',
@@ -13,17 +14,32 @@ const pageTitles: Record<string, string> = {
   '/dashboard/reports': 'Reports',
   '/dashboard/speech-demo': 'Speech (Pilot)',
   '/dashboard/settings': 'Settings',
+  '/dashboard/bank-submissions': 'Bank Submissions',
 };
 
 export default function Header() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const current = pageTitles[router.pathname] || 'Dashboard';
 
   useEffect(() => {
     getMe()
       .then(setUser)
       .catch(() => {});
+  }, []);
+
+  // Handle Ctrl+K keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
@@ -36,7 +52,10 @@ export default function Header() {
         </div>
 
         <div className="flex-1 max-w-sm hidden sm:block">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 text-gray-400 hover:border-gray-300 transition-colors cursor-pointer">
+          <div
+            onClick={() => setSearchOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 text-gray-400 hover:border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
+          >
             <BiSearch size={15} />
             <span className="text-sm flex-1">Search pilgrims, payments, banks...</span>
             <kbd className="text-[10px] font-mono font-semibold border border-gray-200 rounded px-1.5 py-0.5 text-gray-400">
@@ -44,6 +63,8 @@ export default function Header() {
             </kbd>
           </div>
         </div>
+
+        <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
