@@ -210,7 +210,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               </div>
             ) : query.trim() ? (
               <div className="px-4 py-8 text-center">
-                <p className="text-sm text-gray-500">No results found for "{query}"</p>
+                <p className="text-sm text-gray-500">No results found for &quot;{query}&quot;</p>
               </div>
             ) : (
               <div className="px-4 py-8 text-center text-sm text-gray-500">
