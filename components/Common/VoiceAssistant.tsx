@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { BiMicrophone, BiX, BiVolume2, BiVolumeX } from 'react-icons/bi';
+import { FaMicrophone, FaTimes, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { detectIntent, startSpeechRecognition, speak, stopSpeaking } from '@/lib/voiceAssistant';
 import { useRouter } from 'next/router';
@@ -178,7 +178,7 @@ export default function VoiceAssistant() {
         className="w-16 h-16 bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-lg rounded-full flex items-center justify-center text-white shadow-lg transition-all transform hover:scale-110"
         title="Open voice assistant"
       >
-        <BiMicrophone size={24} />
+        <FaMicrophone size={24} />
       </button>
 
       {/* Floating panel */}
@@ -191,7 +191,7 @@ export default function VoiceAssistant() {
               onClick={() => setIsOpen(false)}
               className="text-gray-400 hover:text-gray-600"
             >
-              <BiX size={20} />
+              <FaTimes size={20} />
             </button>
           </div>
 
@@ -240,7 +240,7 @@ export default function VoiceAssistant() {
             disabled={!isSpeaking}
             className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 disabled:opacity-50 text-gray-700 rounded-lg font-medium transition-colors text-sm flex items-center justify-center gap-2"
           >
-            {isSpeaking ? <BiVolumeX size={18} /> : <BiVolume2 size={18} />}
+            {isSpeaking ? <FaVolumeMute size={18} /> : <FaVolumeUp size={18} />}
             {isSpeaking ? 'Stop Speaking' : 'Volume On'}
           </button>
 

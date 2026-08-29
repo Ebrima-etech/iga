@@ -1,5 +1,18 @@
 import React from 'react';
 
+const KabaIcon = () => (
+  <svg className="w-12 h-12" viewBox="0 0 100 100" fill="currentColor">
+    {/* Kaaba structure */}
+    <rect x="20" y="30" width="60" height="50" fill="none" stroke="currentColor" strokeWidth="3" />
+    {/* Roof */}
+    <polygon points="20,30 50,10 80,30" fill="none" stroke="currentColor" strokeWidth="2" />
+    {/* Door */}
+    <rect x="42" y="50" width="16" height="25" fill="none" stroke="currentColor" strokeWidth="2" />
+    {/* Hateem (semi-circle area) */}
+    <path d="M 25 35 Q 25 25 35 25" fill="none" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);
+
 interface SkeletonProps {
   className?: string;
   width?: string | number;
@@ -111,11 +124,6 @@ export function ChartSkeleton() {
 
 export function KabaaTableSkeleton({ rows = 5, columnCount = 6 }) {
   const showKaaba = Math.random() > 0.5;
-  const kabaIcon = (
-    <svg className="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2L8 6H4V18C4 19.1 4.9 20 6 20H18C19.1 20 20 19.1 20 18V6H16L12 2ZM12 4L14 6H10L12 4Z" />
-    </svg>
-  );
 
   return (
     <div className="rounded-lg border border-amber-100 overflow-hidden">
@@ -139,7 +147,7 @@ export function KabaaTableSkeleton({ rows = 5, columnCount = 6 }) {
                     height={16}
                     width="80%"
                     variant="text"
-                    icon={showKaaba && colIdx === 0 && idx % 2 === 0 ? kabaIcon : undefined}
+                    icon={showKaaba && colIdx === 0 && idx % 2 === 0 ? <KabaIcon /> : undefined}
                   />
                 </td>
               ))}
