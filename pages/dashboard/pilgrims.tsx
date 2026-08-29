@@ -150,13 +150,6 @@ const pilgrimFormSteps = [
         placeholder: '5000',
         voiceInput: true,
       },
-      {
-        name: 'registration_id',
-        label: 'Registration ID (Auto-generated if blank)',
-        type: 'text' as const,
-        placeholder: 'Leave blank for auto-generation',
-        voiceInput: true,
-      },
     ],
   },
 ];
@@ -171,6 +164,7 @@ export default function PilgrimsPage() {
   const [showDraftList, setShowDraftList] = useState(false);
   const [draftData, setDraftData] = useState({});
   const [draftsList, setDraftsList] = useState<any[]>([]);
+  const [editingPilgrim, setEditingPilgrim] = useState<Pilgrim | null>(null);
 
   useEffect(() => {
     fetchPilgrims();
@@ -221,18 +215,56 @@ export default function PilgrimsPage() {
       const submitData = {
         ...formData,
         total_amount_due: parseFloat(formData.total_amount_due),
-        registration_id: formData.registration_id || `GH${Math.random().toString().slice(2, 8)}`,
       };
-      await api.post('/pilgrims/', submitData);
-      toast.success('Pilgrim registered successfully!');
-      setShowInlineForm(true); // Keep form open but reset data
-      deleteDraft('pilgrim_registration');
-      setDraftData({});
+
+      if (editingPilgrim) {
+        await api.put(`/pilgrims/${editingPilgrim.id}/`, submitData);
+        toast.success('Pilgrim updated successfully!');
+        setShowInlineForm(false);
+        setEditingPilgrim(null);
+        setDraftData({});
+      } else {
+        await api.post('/pilgrims/', submitData);
+        toast.success('Pilgrim registered successfully!');
+        setShowInlineForm(true); // Keep form open but reset data
+        deleteDraft('pilgrim_registration');
+        setDraftData({});
+      }
+
       fetchPilgrims();
       loadDrafts();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to register pilgrim');
+      toast.error(error.response?.data?.detail || `Failed to ${editingPilgrim ? 'update' : 'register'} pilgrim`);
     }
+  };
+
+  const handleEditClick = (pilgrim: Pilgrim) => {
+    setEditingPilgrim(pilgrim);
+    setDraftData({
+      first_name: pilgrim.first_name,
+      last_name: pilgrim.last_name,
+      email: pilgrim.email,
+      phone: pilgrim.phone,
+      date_of_birth: pilgrim.date_of_birth,
+      gender: pilgrim.gender,
+      passport_number: pilgrim.passport_number,
+      nationality: pilgrim.nationality,
+      address: pilgrim.address,
+      city: pilgrim.city,
+      state: pilgrim.state,
+      postal_code: pilgrim.postal_code,
+      country: pilgrim.country,
+      total_amount_due: pilgrim.total_amount_due,
+      registration_id: pilgrim.registration_id,
+    });
+    setShowDraftList(false);
+    setShowInlineForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowInlineForm(false);
+    setEditingPilgrim(null);
+    setDraftData({});
   };
 
   const handleSaveDraft = async (formData: Record<string, any>, currentStep: number) => {
@@ -242,6 +274,7 @@ export default function PilgrimsPage() {
   };
 
   const loadDraft = (draft: any) => {
+    setEditingPilgrim(null);
     setDraftData(draft.data);
     setShowInlineForm(true);
     setShowDraftList(false);
@@ -294,6 +327,7 @@ export default function PilgrimsPage() {
               size="md"
               icon={<BiPlus size={18} />}
               onClick={() => {
+                setEditingPilgrim(null);
                 setDraftData({});
                 setShowInlineForm(true);
               }}
@@ -417,6 +451,16 @@ export default function PilgrimsPage() {
               data={filteredPilgrims}
               loading={loading}
               emptyMessage="No pilgrims registered yet • Click 'Add Pilgrim' to register a new one"
+              actions={(row: Pilgrim) => (
+                <ProfessionalButton
+                  variant="ghost"
+                  size="sm"
+                  icon={<BiPencil size={14} />}
+                  onClick={() => handleEditClick(row)}
+                >
+                  Edit
+                </ProfessionalButton>
+              )}
             />
           </div>
         </div>
