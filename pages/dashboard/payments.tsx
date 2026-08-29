@@ -195,7 +195,11 @@ export default function PaymentsPage() {
                 <tbody className="divide-y divide-gray-100">
                 {filteredPayments.length > 0 ? (
                   filteredPayments.map((payment) => (
-                    <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={payment.id}
+                      onClick={() => router.push(`/dashboard/payments/${payment.id}`)}
+                      className="hover:bg-emerald-50 transition-colors cursor-pointer"
+                    >
                       <td className="px-4 py-3.5 font-mono text-xs text-gray-500">{payment.reference_number}</td>
                       <td className="px-4 py-3.5 text-sm text-gray-900 font-medium">{payment.pilgrim_name}</td>
                       <td className="px-4 py-3.5 text-sm text-gray-600">{payment.bank_name}</td>
