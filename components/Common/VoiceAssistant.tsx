@@ -242,14 +242,14 @@ export default function VoiceAssistant() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-50">
+    <div className="fixed bottom-2 right-2 z-50">
       {/* Main button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-16 h-16 bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-lg rounded-full flex items-center justify-center text-white shadow-lg transition-all transform hover:scale-110"
-        title="Open voice assistant"
+        className="w-10 h-10 bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-lg rounded-full flex items-center justify-center text-white shadow-lg transition-all transform hover:scale-110"
+        title="Voice assistant"
       >
-        <FaMicrophone size={24} />
+        <FaMicrophone size={16} />
       </button>
 
       {/* Floating panel */}
