@@ -77,13 +77,6 @@ export default function LoginPage() {
 
         <div className="relative z-10 flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm">
-            {/* Header (desktop) */}
-            <div className="hidden lg:block text-center mb-8">
-              <h1 className="text-3xl font-bold text-white mb-1">GIA Hajj</h1>
-              <p className="text-sm text-emerald-200/60">Operations Management System</p>
-              <div className="mt-4 h-px w-16 bg-amber-400/50 mx-auto" />
-            </div>
-
             {/* Card */}
             <div className="bg-white/95 backdrop-blur-sm border border-white/10 rounded-lg p-8 shadow-xl shadow-black/40 mt-8 lg:mt-0">
               <div className="mb-8">
@@ -124,95 +117,15 @@ export default function LoginPage() {
                   Sign in
                 </ProfessionalButton>
               </form>
-
-              {/* Divider */}
-              <div className="my-6 border-t border-emerald-100"></div>
-
-              {/* Demo Credentials */}
-              <div className="text-xs text-gray-600 bg-emerald-50/60 border border-emerald-100 rounded-md p-3">
-                <p className="font-medium text-gray-900 mb-2">Demo Credentials</p>
-                <div className="space-y-1 font-mono text-gray-600">
-                  <div>admin / admin123</div>
-                  <div>bank_admin / password123</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sand dunes spanning the full page width, with drifting particles */}
-      <div className="absolute bottom-0 left-0 w-full z-[5] pointer-events-none">
-        <svg viewBox="0 0 1600 90" preserveAspectRatio="none" className="w-full h-[90px]">
-          <path d="M0 40 Q400 5 800 30 T1600 20 V90 H0 Z" fill="#78350f" opacity="0.55" />
-          <path d="M0 55 Q440 25 900 50 T1600 42 V90 H0 Z" fill="#92400e" opacity="0.6" />
-          <path d="M0 70 Q500 50 1000 68 T1600 60 V90 H0 Z" fill="#b45309" opacity="0.5" />
-        </svg>
-
-        {/* Mosque skyline silhouette, sitting on the dunes */}
-        <svg
-          className="absolute bottom-6 left-0 w-full"
-          viewBox="0 0 1600 120"
-          preserveAspectRatio="none"
-          fill="#000000"
-          opacity="0.55"
-        >
-          <rect x="0" y="70" width="1600" height="50" />
-          <rect x="90" y="40" width="16" height="80" />
-          <circle cx="98" cy="36" r="7" />
-          <rect x="1450" y="40" width="16" height="80" />
-          <circle cx="1458" cy="36" r="7" />
-          <path d="M600 70 C600 20 1000 20 1000 70 Z" />
-          <rect x="770" y="10" width="10" height="60" />
-          <circle cx="775" cy="8" r="5" />
-        </svg>
-
-        {/* Drifting sand particles */}
-        <div className="absolute inset-0">
-          {[
-            { left: '5%', delay: '0s', dur: '7s' },
-            { left: '15%', delay: '1.5s', dur: '9s' },
-            { left: '28%', delay: '0.8s', dur: '8s' },
-            { left: '40%', delay: '2.2s', dur: '10s' },
-            { left: '52%', delay: '1s', dur: '7.5s' },
-            { left: '63%', delay: '3s', dur: '9s' },
-            { left: '74%', delay: '0.4s', dur: '8.5s' },
-            { left: '85%', delay: '2.6s', dur: '9.5s' },
-            { left: '95%', delay: '1.8s', dur: '7.8s' },
-          ].map((p, i) => (
-            <span
-              key={i}
-              className="hajj-sand-page"
-              style={{ left: p.left, animationDelay: p.delay, animationDuration: p.dur }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Footer, centered on the sand across the full page width */}
+      {/* Footer, centered across the full page width */}
       <div className="absolute bottom-3 left-0 w-full z-10 text-center pointer-events-none">
-        <p className="text-xs font-medium text-emerald-950/70">© 2026 Gambia International Airlines</p>
+        <p className="text-xs font-medium text-white">© 2026 Gambia International Airlines</p>
       </div>
-
-      <style jsx>{`
-        .hajj-sand-page {
-          position: absolute;
-          bottom: 10px;
-          width: 3px;
-          height: 3px;
-          border-radius: 9999px;
-          background: #f2d98a;
-          opacity: 0;
-          animation-name: hajjSandDriftPage;
-          animation-timing-function: ease-in;
-          animation-iteration-count: infinite;
-        }
-        @keyframes hajjSandDriftPage {
-          0% { transform: translateY(0) translateX(0); opacity: 0; }
-          15% { opacity: 0.6; }
-          100% { transform: translateY(-70px) translateX(10px); opacity: 0; }
-        }
-      `}</style>
     </div>
   );
 }
