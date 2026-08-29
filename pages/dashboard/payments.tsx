@@ -21,6 +21,7 @@ export default function PaymentsPage() {
   const [banks, setBanks] = useState<any[]>([]);
 
   useEffect(() => {
+    console.log('Payments page mounted, fetching data...');
     fetchPayments();
     fetchBanks();
   }, []);
@@ -32,11 +33,18 @@ export default function PaymentsPage() {
 
   const fetchPayments = async () => {
     try {
+      console.log('Fetching payments from API...');
       setLoading(true);
       const response = await api.get('/payments/');
+      console.log('Payments response:', response.data);
       setPayments(response.data.results || response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch payments:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
       toast.error('Failed to load payments');
     } finally {
       setLoading(false);
