@@ -32,7 +32,7 @@ export default function PilgrimDetailPage() {
       setLoading(true);
       const [pilgrimRes, paymentsRes] = await Promise.all([
         api.get(`/pilgrims/${id}/`),
-        api.get(`/payments/?pilgrim=${id}`),
+        api.get(`/bank-payment-submissions/?pilgrim=${id}`),
       ]);
 
       console.log('Pilgrim data:', pilgrimRes.data);
