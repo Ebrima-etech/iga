@@ -148,7 +148,7 @@ export default function RecordPaymentPage() {
       // Update form steps with pilgrim and bank options
       const updatedSteps = paymentFormSteps.map((step) => ({
         ...step,
-        fields: step.fields.map((field) => {
+        fields: step.fields.map((field: any) => {
           if (field.name === 'pilgrim') {
             return {
               ...field,
@@ -169,7 +169,7 @@ export default function RecordPaymentPage() {
           }
           return field;
         }),
-      }));
+      })) as typeof paymentFormSteps;
 
       setFormSteps(updatedSteps);
     } catch (error) {
