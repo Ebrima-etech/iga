@@ -285,10 +285,11 @@ export default function ProfessionalDashboard() {
         </div>
 
         {/* Bank Comparison Chart */}
-        {loading ? (
-          <ChartSkeleton className="mb-8" />
-        ) : (
-          <Card padding="lg" shadow="none" className="mb-8">
+        <div className="mb-8">
+          {loading ? (
+            <ChartSkeleton />
+          ) : (
+            <Card padding="lg" shadow="none">
             <h3 className="text-sm font-semibold text-gray-900 mb-4">Bank Payment Comparison</h3>
             <ResponsiveContainer width="100%" height={300}>
             <BarChart data={bankComparisonData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
@@ -304,9 +305,10 @@ export default function ProfessionalDashboard() {
               />
               <Bar dataKey="amount" fill="#111827" radius={[4, 4, 0, 0]} />
             </BarChart>
-          </ResponsiveContainer>
-          </Card>
-        )}
+            </ResponsiveContainer>
+            </Card>
+          )}
+        </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
