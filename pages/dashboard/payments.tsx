@@ -34,11 +34,27 @@ export default function PaymentsPage() {
 
   const fetchPayments = async () => {
     try {
-      console.log('Fetching payments from API...');
+      console.log('Fetching payments from bank submissions...');
       setLoading(true);
-      const response = await api.get('/payments/');
+      const response = await api.get('/bank-payment-submissions/');
       console.log('Payments response:', response.data);
-      setPayments(response.data.results || response.data);
+      // Map bank_payment_submission to Payment type for compatibility
+      const submissions = response.data.results || response.data;
+      const mappedPayments = submissions.map((sub: any) => ({
+        id: sub.id,
+        pilgrim_id: sub.pilgrim_id,
+        pilgrim_name: `${sub.pilgrim_first_name} ${sub.pilgrim_last_name}`.trim(),
+        bank: sub.bank,
+        bank_name: sub.bank_name,
+        amount: sub.amount,
+        reference_number: sub.reference_number,
+        status: sub.status,
+        payment_date: sub.payment_date,
+        payer_name: sub.payer_name,
+        payer_contact: sub.payer_contact,
+        payer_relationship: sub.payer_relationship,
+      }));
+      setPayments(mappedPayments);
     } catch (error: any) {
       console.error('Failed to fetch payments:', error);
       console.error('Error details:', {
