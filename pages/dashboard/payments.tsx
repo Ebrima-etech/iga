@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
+import PageHeader from '@/components/Dashboard/PageHeader';
 import Loading from '@/components/Common/Loading';
 import { Payment } from '@/types';
 import api from '@/lib/api';
@@ -78,26 +79,23 @@ export default function PaymentsPage() {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Payments</h1>
-          <p className="text-gray-600 mt-1">Track all payments from banks</p>
-        </div>
+      <div className="min-h-screen bg-white p-8">
+        <PageHeader title="Payments" description="Track all payments from banks" />
 
+        <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <p className="text-sm font-medium text-gray-600">Total Payments</p>
-            <p className="text-2xl font-bold text-gray-900 mt-2">{filteredPayments.length}</p>
+            <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">{filteredPayments.length}</p>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <p className="text-sm font-medium text-gray-600">Total Amount</p>
-            <p className="text-2xl font-bold text-gray-900 mt-2">{formatCurrency(totalAmount)}</p>
+            <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">{formatCurrency(totalAmount)}</p>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <p className="text-sm font-medium text-gray-600">Confirmed Amount</p>
-            <p className="text-2xl font-bold text-green-600 mt-2">{formatCurrency(confirmedAmount)}</p>
+            <p className="text-2xl font-bold text-emerald-600 mt-2 font-mono">{formatCurrency(confirmedAmount)}</p>
           </div>
         </div>
 
@@ -136,35 +134,35 @@ export default function PaymentsPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Reference</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Pilgrim</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Bank</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Reference</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Pilgrim</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Bank</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Amount</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-100">
                 {filteredPayments.length > 0 ? (
                   filteredPayments.map((payment) => (
-                    <tr key={payment.id} className="hover:bg-gray-50 transition">
-                      <td className="px-4 py-3 text-sm font-semibold text-primary-600">{payment.reference_number}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payment.pilgrim_name}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{payment.bank_name}</td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3.5 font-mono text-xs text-gray-500">{payment.reference_number}</td>
+                      <td className="px-4 py-3.5 text-sm text-gray-900 font-medium">{payment.pilgrim_name}</td>
+                      <td className="px-4 py-3.5 text-sm text-gray-600">{payment.bank_name}</td>
+                      <td className="px-4 py-3.5 text-sm font-mono font-medium text-gray-900">
                         {formatCurrency(payment.amount)}
                       </td>
-                      <td className="px-4 py-3 text-sm">
+                      <td className="px-4 py-3.5 text-sm">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
                           {payment.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{formatDate(payment.payment_date)}</td>
+                      <td className="px-4 py-3.5 text-sm text-gray-600">{formatDate(payment.payment_date)}</td>
                     </tr>
                   ))
                 ) : (
@@ -180,21 +178,22 @@ export default function PaymentsPage() {
         </div>
 
         {/* Stats by Status */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Status Summary</h2>
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Payment Status Summary</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {['pending', 'confirmed', 'failed', 'refunded'].map((status) => {
               const statusPayments = filteredPayments.filter((p) => p.status === status);
               const amount = statusPayments.reduce((sum, p) => sum + p.amount, 0);
               return (
-                <div key={status} className="p-4 bg-gray-50 rounded-lg">
+                <div key={status} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                   <p className="text-sm font-medium text-gray-600 capitalize">{status}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{statusPayments.length}</p>
-                  <p className="text-xs text-gray-500 mt-1">{formatCurrency(amount)}</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1 font-mono">{statusPayments.length}</p>
+                  <p className="text-xs text-gray-500 mt-1 font-mono">{formatCurrency(amount)}</p>
                 </div>
               );
             })}
           </div>
+        </div>
         </div>
       </div>
     </Layout>
