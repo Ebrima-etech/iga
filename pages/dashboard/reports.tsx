@@ -337,35 +337,22 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {/* Bank Selection */}
+          {/* Bank Selection Dropdown */}
           {bankData.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Bank-Specific Reports</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <button
-                  onClick={() => setSelectedBank('all')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    selectedBank === 'all'
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                  }`}
-                >
-                  All Banks
-                </button>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Select Bank for Detailed Report</label>
+              <select
+                value={selectedBank}
+                onChange={(e) => setSelectedBank(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              >
+                <option value="all">All Banks</option>
                 {bankData.map((bank) => (
-                  <button
-                    key={bank.id}
-                    onClick={() => setSelectedBank(bank.id)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      selectedBank === bank.id
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                    }`}
-                  >
+                  <option key={bank.id} value={bank.id}>
                     {bank.name}
-                  </button>
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
           )}
 
