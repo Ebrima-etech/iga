@@ -282,8 +282,9 @@ export default function PilgrimsPage() {
 
   const columns = [
     { key: 'registration_id', label: 'ID', width: '12%', render: (v: string) => <span className="font-mono text-xs text-gray-500">{v}</span> },
-    { key: 'full_name', label: 'Name', width: '35%', render: (v: string) => <span className="font-medium text-gray-900">{v}</span> },
-    { key: 'phone', label: 'Phone', width: '20%', render: (v: string) => <span className="text-gray-600 font-mono text-xs">{v}</span> },
+    { key: 'first_name', label: 'First Name', width: '18%', render: (v: string) => <span className="font-medium text-gray-900">{v}</span> },
+    { key: 'last_name', label: 'Last Name', width: '18%', render: (v: string) => <span className="font-medium text-gray-900">{v}</span> },
+    { key: 'phone', label: 'Phone', width: '18%', render: (v: string) => <span className="text-gray-600 font-mono text-xs">{v}</span> },
     {
       key: 'status',
       label: 'Status',
