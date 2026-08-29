@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
-import StatCard from '@/components/Dashboard/StatCard';
+import MetricsPanel from '@/components/Dashboard/MetricsPanel';
 import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
@@ -60,26 +60,26 @@ export default function ProfessionalDashboard() {
     {
       label: 'Total Pilgrims',
       value: stats.totalPilgrims.toLocaleString(),
-      trend: '+12%',
-      icon: <BiUser size={24} />,
+      caption: '+12% vs last month',
+      icon: <BiUser size={15} />,
     },
     {
       label: 'Total Payments',
       value: `$${(stats.totalPayments / 1000000).toFixed(1)}M`,
-      trend: '+8%',
-      icon: <BiWallet size={24} />,
+      caption: '+8% vs last month',
+      icon: <BiWallet size={15} />,
     },
     {
       label: 'Payment Rate',
       value: `${stats.paymentRate}%`,
-      trend: '+3%',
-      icon: <BiTrendingUp size={24} />,
+      caption: '+3% vs last month',
+      icon: <BiTrendingUp size={15} />,
     },
     {
       label: 'Banks Connected',
       value: stats.activeBanks.toString(),
-      trend: 'Active',
-      icon: <BiBarChartAlt2 size={24} />,
+      caption: 'All active',
+      icon: <BiBarChartAlt2 size={15} />,
     },
   ];
 
@@ -185,17 +185,9 @@ export default function ProfessionalDashboard() {
 
         <div className="p-8">
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {statCards.map((stat, idx) => (
-            <StatCard
-              key={idx}
-              label={stat.label}
-              value={stat.value}
-              trend={stat.trend}
-              icon={stat.icon}
-            />
-          ))}
+        {/* Stats Panel */}
+        <div className="mb-8">
+          <MetricsPanel title="Season overview" metrics={statCards} />
         </div>
 
         {/* Charts Grid */}
