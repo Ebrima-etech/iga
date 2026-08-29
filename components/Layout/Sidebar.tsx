@@ -173,9 +173,9 @@ export default function Sidebar() {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed bottom-6 right-6 md:hidden bg-black text-white p-4 rounded-full z-40 flex items-center justify-center shadow-lg"
+        className="fixed bottom-3 right-3 md:hidden bg-black text-white p-2 rounded-full z-40 flex items-center justify-center shadow-lg"
       >
-        <BiMenu size={22} />
+        <BiMenu size={18} />
       </button>
     </>
   );
