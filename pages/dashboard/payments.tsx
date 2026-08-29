@@ -121,6 +121,7 @@ export default function PaymentsPage() {
             size="md"
             icon={<BiPlus size={18} />}
             onClick={() => router.push('/dashboard/record-payment')}
+            className="hidden"
           >
             Record Payment
           </ProfessionalButton>

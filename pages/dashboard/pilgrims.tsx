@@ -340,6 +340,7 @@ export default function PilgrimsPage() {
                 setDraftData({});
                 setShowInlineForm(true);
               }}
+              className="hidden"
             >
               Add Pilgrim
             </ProfessionalButton>
