@@ -33,6 +33,7 @@ const navSections: NavSection[] = [
     label: 'Operations',
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: <BiBarChartAlt2 size={18} /> },
+      { label: 'Analytics', href: '/dashboard/analytics', icon: <BiLineChart size={18} /> },
       { label: 'Pilgrims', href: '/dashboard/pilgrims', icon: <BiUser size={18} /> },
       { label: 'Payments', href: '/dashboard/payments', icon: <BiWallet size={18} /> },
       { label: 'Banks', href: '/dashboard/banks', icon: <BiBuilding size={18} /> },
