@@ -5,73 +5,84 @@
 @layer base {
   :root {
     --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --bg-tertiary: #f1f5f9;
+    --bg-secondary: #fafbfc;
+    --bg-tertiary: #eaeef2;
 
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-tertiary: #94a3b8;
+    --text-primary: #0d1117;
+    --text-secondary: #57606a;
+    --text-tertiary: #738096;
 
-    --border-color: #e2e8f0;
-    --accent: #6366f1;
-    --accent-hover: #4f46e5;
+    --border-color: #d0d7e0;
+    --accent: #0969da;
+    --accent-hover: #0860ca;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg-primary: #0f172a;
-      --bg-secondary: #1e293b;
-      --bg-tertiary: #334155;
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
 
-      --text-primary: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --text-tertiary: #94a3b8;
+      --text-primary: #c9d1d9;
+      --text-secondary: #8b949e;
+      --text-tertiary: #6e7681;
 
-      --border-color: #334155;
-      --accent: #818cf8;
-      --accent-hover: #a5b4fc;
+      --border-color: #30363d;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
     }
   }
 
   :root[data-theme="dark"] {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #334155;
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #21262d;
 
-    --text-primary: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --text-tertiary: #94a3b8;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --text-tertiary: #6e7681;
 
-    --border-color: #334155;
-    --accent: #818cf8;
-    --accent-hover: #a5b4fc;
+    --border-color: #30363d;
+    --accent: #58a6ff;
+    --accent-hover: #79c0ff;
   }
 
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.5;
     transition: background-color 0.2s, color 0.2s;
+    letter-spacing: -0.0125em;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
   }
 
-  h1 { font-size: 2rem; font-weight: 700; }
-  h2 { font-size: 1.5rem; font-weight: 700; }
-  h3 { font-size: 1.25rem; }
-  h4 { font-size: 1.125rem; }
+  h1 { font-size: 32px; font-weight: 700; margin: 0; }
+  h2 { font-size: 24px; font-weight: 700; margin: 0; }
+  h3 { font-size: 20px; font-weight: 600; margin: 0; }
+  h4 { font-size: 16px; font-weight: 600; margin: 0; }
+  h5 { font-size: 14px; font-weight: 600; margin: 0; }
+  h6 { font-size: 12px; font-weight: 600; margin: 0; }
+
+  p {
+    margin: 0;
+  }
 
   a {
     color: var(--accent);
+    text-decoration: none;
     transition: color 0.2s;
   }
 
@@ -79,17 +90,33 @@
     color: var(--accent-hover);
   }
 
-  button:focus,
-  input:focus,
-  textarea:focus,
-  select:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  button {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--text-tertiary);
   }
 }
 
@@ -106,7 +133,18 @@
 @keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -119,9 +157,13 @@
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .animate-slideInUp {
-  animation: slideInUp 0.4s ease-out;
+  animation: slideInUp 0.3s ease-out;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
 }
