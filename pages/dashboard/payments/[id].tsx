@@ -23,6 +23,7 @@ export default function PaymentDetailPage() {
     if (id) {
       fetchPayment();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchPayment = async () => {
@@ -142,7 +143,7 @@ export default function PaymentDetailPage() {
         {isFirstDeposit && (
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <p className="text-sm text-amber-900">
-              <strong>⚠️ First Deposit:</strong> This payment is not yet linked to a pilgrim. Click "Create Pilgrim" to register them in the system.
+              <strong>⚠️ First Deposit:</strong> This payment is not yet linked to a pilgrim. Click &quot;Create Pilgrim&quot; to register them in the system.
             </p>
           </div>
         )}
