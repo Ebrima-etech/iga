@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
+import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
 import { Payment } from '@/types';
 import api from '@/lib/api';
 import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { BiPlus } from 'react-icons/bi';
 
 export default function PaymentsPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [filteredPayments, setFilteredPayments] = useState<Payment[]>([]);
@@ -80,7 +84,20 @@ export default function PaymentsPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-white p-8">
-        <PageHeader title="Payments" description="Track all payments from banks" />
+        <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
+          <div>
+            <h1 className="text-3xl font-semibold text-gray-900">Payments</h1>
+            <p className="text-gray-600 mt-1">Track all payments from banks</p>
+          </div>
+          <ProfessionalButton
+            variant="primary"
+            size="md"
+            icon={<BiPlus size={18} />}
+            onClick={() => router.push('/dashboard/record-payment')}
+          >
+            Record Payment
+          </ProfessionalButton>
+        </div>
 
         <div className="space-y-6">
         {/* Summary Cards */}
