@@ -134,33 +134,36 @@ export default function BankDetailPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-white p-8">
-        <div className="mb-8 flex items-center gap-4">
-          <button
-            onClick={() => router.push('/dashboard/banks')}
-            className="text-gray-600 hover:text-gray-900 transition"
-          >
-            <BiArrowBack size={24} />
-          </button>
-          <PageHeader
-            title={bank?.name || 'Bank Details'}
-            description={`Manage administrators for this bank`}
-          />
+        {/* Header */}
+        <div className="mb-8 pb-6 border-b border-gray-200">
+          <div className="flex items-center gap-4 mb-6">
+            <button
+              onClick={() => router.push('/dashboard/banks')}
+              className="p-2 hover:bg-gray-100 rounded-lg transition text-gray-600"
+            >
+              <BiArrowBack size={20} />
+            </button>
+            <div>
+              <h1 className="text-3xl font-semibold text-gray-900">{bank?.name || 'Bank Details'}</h1>
+              <p className="text-sm text-gray-600 mt-1">Manage bank information and administrators</p>
+            </div>
+          </div>
         </div>
 
         {/* Bank Info Card */}
         {bank && (
-          <Card padding="lg" shadow="none" className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {/* Logo Section */}
-              <div className="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg bg-gray-50">
-                {bank.logo ? (
-                  <img src={bank.logo.startsWith('http') ? bank.logo : `https://igaa.onrender.com${bank.logo}`} alt={bank.name} className="h-24 w-24 object-contain mb-4" />
-                ) : (
-                  <div className="h-24 w-24 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
-                    <span className="text-4xl">🏦</span>
-                  </div>
-                )}
-                <label className="px-4 py-2 bg-gray-900 hover:bg-black text-white text-sm font-medium rounded-md cursor-pointer transition-colors">
+              <div className="flex flex-col items-center justify-start">
+                <div className="w-32 h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center mb-4">
+                  {bank.logo ? (
+                    <img src={bank.logo.startsWith('http') ? bank.logo : `https://igaa.onrender.com${bank.logo}`} alt={bank.name} className="h-28 w-28 object-contain" />
+                  ) : (
+                    <span className="text-5xl">🏦</span>
+                  )}
+                </div>
+                <label className="w-full px-3 py-2 bg-black hover:bg-gray-900 text-white text-xs font-medium rounded-lg cursor-pointer transition-colors text-center">
                   {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
                   <input
                     type="file"
@@ -172,72 +175,74 @@ export default function BankDetailPage() {
                 </label>
               </div>
 
-              {/* Bank Info */}
-              <div className="md:col-span-2 space-y-4">
+              {/* Bank Info Grid */}
+              <div className="md:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-6">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-600 mb-1">Bank Name</h3>
-                  <p className="text-lg font-semibold text-gray-900">{bank.name}</p>
+                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Bank Name</p>
+                  <p className="text-lg font-semibold text-gray-900 mt-2">{bank.name}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-600 mb-1">Status</h3>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {bank.is_active ? (
-                      <span className="text-green-600">✓ Active</span>
-                    ) : (
-                      <span className="text-red-600">✗ Inactive</span>
-                    )}
+                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Status</p>
+                  <div className="mt-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      bank.is_active
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-red-50 text-red-700'
+                    }`}>
+                      {bank.is_active ? '● Active' : '● Inactive'}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Created</p>
+                  <p className="text-lg font-semibold text-gray-900 mt-2">
+                    {new Date(bank.created_at).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-600 mb-1">Created</h3>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {new Date(bank.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-600 mb-1">Total Admins</h3>
-                    <p className="text-lg font-semibold text-gray-900">{admins.length}</p>
-                  </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Total Admins</p>
+                  <p className="text-lg font-semibold text-gray-900 mt-2">{admins.length}</p>
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
         )}
 
-        {/* Add Admin Section */}
+        {/* Bank Administrators Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Bank Administrators</h2>
-            <ProfessionalButton
-              variant="primary"
-              size="md"
-              icon={<BiPlus size={20} />}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Bank Administrators</h2>
+              <p className="text-sm text-gray-600 mt-1">{admins.length} administrator{admins.length !== 1 ? 's' : ''}</p>
+            </div>
+            <button
               onClick={() => setShowAddAdmin(!showAddAdmin)}
+              className="px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
             >
-              Add Admin
-            </ProfessionalButton>
+              <BiPlus size={18} /> Add Admin
+            </button>
           </div>
 
+          {/* Add Admin Form */}
           {showAddAdmin && (
-            <Card padding="lg" shadow="md" className="mb-8">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-gray-900">Add New Admin</h3>
-                <button onClick={() => setShowAddAdmin(false)}>
-                  <BiX size={24} className="text-gray-400 hover:text-gray-600" />
+                <h3 className="text-lg font-semibold text-gray-900">Add New Administrator</h3>
+                <button onClick={() => setShowAddAdmin(false)} className="text-gray-400 hover:text-gray-600">
+                  <BiX size={24} />
                 </button>
               </div>
               <form onSubmit={handleAddAdmin} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
-                  <div className="flex gap-2 items-start">
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       value={adminFormData.username}
                       onChange={(e) => setAdminFormData({ ...adminFormData, username: e.target.value })}
-                      placeholder="Admin username"
+                      placeholder="Enter username"
                       required
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
                     />
                     <VoiceInputButton
                       onTranscript={(text) => setAdminFormData({ ...adminFormData, username: text })}
@@ -247,14 +252,14 @@ export default function BankDetailPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <div className="flex gap-2 items-start">
+                  <div className="flex gap-2">
                     <input
                       type="email"
                       value={adminFormData.email}
                       onChange={(e) => setAdminFormData({ ...adminFormData, email: e.target.value })}
                       placeholder="admin@bank.com"
                       required
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
                     />
                     <VoiceInputButton
                       onTranscript={(text) => setAdminFormData({ ...adminFormData, email: text })}
@@ -263,67 +268,83 @@ export default function BankDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
                   <input
                     type="password"
                     value={adminFormData.password}
                     onChange={(e) => setAdminFormData({ ...adminFormData, password: e.target.value })}
                     placeholder="Secure password"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
                   />
                 </div>
-                <div className="flex gap-3">
-                  <ProfessionalButton type="submit" variant="primary">
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
                     Add Admin
-                  </ProfessionalButton>
-                  <ProfessionalButton type="button" variant="secondary" onClick={() => setShowAddAdmin(false)}>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddAdmin(false)}
+                    className="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-900 text-sm font-medium rounded-lg transition-colors"
+                  >
                     Cancel
-                  </ProfessionalButton>
+                  </button>
                 </div>
               </form>
-            </Card>
+            </div>
+          )}
+
+          {/* Admins List */}
+          {loading ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+              <p className="text-gray-500">Loading administrators...</p>
+            </div>
+          ) : admins.length > 0 ? (
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">Username</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">Email</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">Role</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {admins.map((admin) => (
+                    <tr key={admin.id} className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">@{admin.user.username}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{admin.user.email}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{admin.role}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          admin.is_active
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : 'bg-gray-50 text-gray-700'
+                        }`}>
+                          {admin.is_active ? '● Active' : '● Inactive'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+              <p className="text-gray-600 mb-6">No administrators assigned to this bank yet</p>
+              <button
+                onClick={() => setShowAddAdmin(true)}
+                className="px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-2"
+              >
+                <BiPlus size={18} /> Add First Admin
+              </button>
+            </div>
           )}
         </div>
-
-        {/* Admins List */}
-        {loading ? (
-          <div className="text-center py-8">Loading admins...</div>
-        ) : admins.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {admins.map((admin) => (
-              <Card key={admin.id} padding="lg" className="border-l-4 border-l-blue-500">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900">@{admin.user.username}</p>
-                    <p className="text-sm text-gray-600">{admin.user.email}</p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Role: <span className="font-medium">{admin.role}</span>
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Status: {admin.is_active ? (
-                        <span className="text-green-600 font-medium">Active</span>
-                      ) : (
-                        <span className="text-red-600 font-medium">Inactive</span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card padding="lg" className="text-center py-12">
-            <p className="text-gray-500 mb-4">No administrators assigned to this bank yet</p>
-            <ProfessionalButton
-              variant="primary"
-              icon={<BiPlus size={20} />}
-              onClick={() => setShowAddAdmin(true)}
-            >
-              Add First Admin
-            </ProfessionalButton>
-          </Card>
-        )}
       </div>
     </Layout>
   );
