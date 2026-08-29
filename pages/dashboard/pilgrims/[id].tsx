@@ -11,7 +11,7 @@ import { Pilgrim, Payment } from '@/types';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { BiArrowLeft, BiPhone, BiMailOpen, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp } from 'react-icons/bi';
+import { BiChevronLeft, BiPhone, BiMailOpen, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp } from 'react-icons/bi';
 
 export default function PilgrimDetailPage() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function PilgrimDetailPage() {
           <ProfessionalButton
             variant="ghost"
             size="sm"
-            icon={<BiArrowLeft size={16} />}
+            icon={<BiChevronLeft size={16} />}
             onClick={() => router.back()}
           >
             Back to Pilgrims

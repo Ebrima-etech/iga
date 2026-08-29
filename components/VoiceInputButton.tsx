@@ -81,7 +81,7 @@ export default function VoiceInputButton({
         }
       }
     }
-  }, [spellingMode, isListening, interimTranscript, transcript, clearTranscript, stopListening, onTranscript]);
+  }, [spellingMode, isListening, interimTranscript, transcript, clearTranscript, stopListening, onTranscript, spelledText]);
 
   // Detect voice commands: "cancel" and "spell" (for non-spelling mode)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -140,7 +140,7 @@ export default function VoiceInputButton({
         }, 800);
       }
     }
-  }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected, spellingMode]);
+  }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected, spellingMode, startListening]);
 
   // Auto-submit when speech ends (transcript becomes available and not listening)
   // eslint-disable-next-line react-hooks/exhaustive-deps
