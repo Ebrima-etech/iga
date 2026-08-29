@@ -44,24 +44,24 @@ export default function Sidebar() {
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <nav className="space-y-1 p-4">
+        <nav className="space-y-0.5 p-4">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link key={item.href} href={item.href}>
                 <span
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer group ${
+                  className={`flex items-center space-x-3 px-4 py-2.5 rounded-md transition-all duration-150 cursor-pointer group ${
                     active
-                      ? 'bg-blue-50 text-blue-600 font-semibold'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-blue-100 text-blue-700 font-semibold border-l-2 border-blue-600'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >
-                  <span className={`flex-shrink-0 ${active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`}>
+                  <span className={`flex-shrink-0 ${active ? 'text-blue-700' : 'text-gray-500 group-hover:text-gray-700'}`}>
                     {item.icon}
                   </span>
                   <span className="flex-1 text-sm font-medium">{item.label}</span>
                   {active && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                    <div className="w-2 h-2 rounded-full bg-blue-700"></div>
                   )}
                 </span>
               </Link>

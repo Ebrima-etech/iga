@@ -91,12 +91,12 @@ export default function ProfessionalTable({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b-2 border-amber-200 bg-amber-50">
+            <tr className="border-b border-gray-200 bg-gray-50">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-6 py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider ${
-                    col.sortable !== false ? 'cursor-pointer hover:bg-amber-100 transition-colors' : ''
+                  className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider ${
+                    col.sortable !== false ? 'cursor-pointer hover:bg-gray-100 transition-colors' : ''
                   }`}
                   style={{ width: col.width, textAlign: col.align || 'left' }}
                   onClick={() => col.sortable !== false && handleSort(col.key)}
@@ -104,23 +104,23 @@ export default function ProfessionalTable({
                   <div className="flex items-center gap-2">
                     <span>{col.label}</span>
                     {col.sortable !== false && sortKey === col.key && (
-                      <span className="text-amber-600">
+                      <span className="text-blue-600">
                         {sortOrder === 'asc' ? <BiChevronUp size={16} /> : <BiChevronDown size={16} />}
                       </span>
                     )}
                   </div>
                 </th>
               ))}
-              {actions && <th className="px-6 py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Actions</th>}
+              {actions && <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-amber-100">
+          <tbody className="divide-y divide-gray-200">
             {sortedData.map((row, idx) => (
               <tr
                 key={row[rowKey] || idx}
                 className={`transition-colors ${
-                  striped && idx % 2 === 1 ? 'bg-white' : 'bg-amber-50/30'
-                } ${onRowClick ? 'hover:bg-amber-100 cursor-pointer' : 'hover:bg-amber-100'}`}
+                  striped && idx % 2 === 1 ? 'bg-white' : 'bg-gray-50/40'
+                } ${onRowClick ? 'hover:bg-blue-50 cursor-pointer' : 'hover:bg-gray-50'}`}
                 onClick={() => onRowClick?.(row)}
               >
                 {columns.map((col) => (

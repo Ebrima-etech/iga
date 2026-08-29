@@ -151,13 +151,13 @@ export default function ProfessionalDashboard() {
     <Layout>
       <div className="min-h-screen bg-white">
         {/* Page Header */}
-        <div className="px-8 py-6 border-b border-gray-200">
+        <div className="px-8 py-8 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-sm text-gray-600 mt-1">Real-time overview of Hajj operations</p>
+              <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
+              <p className="text-sm text-gray-600 mt-2 font-medium">Real-time overview of Hajj operations</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <ProfessionalButton
                 variant="secondary"
                 size="md"

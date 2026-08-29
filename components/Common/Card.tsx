@@ -32,11 +32,11 @@ export default function Card({
   return (
     <div
       className={`
-        bg-white rounded-xl transition-all duration-300
-        ${border ? 'border border-amber-100' : ''}
+        bg-white rounded-lg transition-all duration-200
+        ${border ? 'border border-gray-200' : ''}
         ${shadowStyles[shadow]}
         ${paddingStyles[padding]}
-        ${hoverable ? 'hover:shadow-lg hover:border-amber-200 hover:-translate-y-1 cursor-pointer' : ''}
+        ${hoverable ? 'hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 cursor-pointer' : ''}
         ${className}
       `}
     >

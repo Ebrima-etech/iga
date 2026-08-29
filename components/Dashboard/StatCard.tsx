@@ -13,20 +13,20 @@ export default function StatCard({ label, value, trend, trendUp = true, icon, on
   return (
     <div
       onClick={onClick}
-      className="group relative bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden"
+      className="group relative bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden"
     >
       {/* Background accent */}
-      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-60 transition-opacity duration-200" />
 
       <div className="relative z-10">
         {/* Header with icon */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-600 mb-2">{label}</p>
-            <p className="text-3xl font-bold text-gray-900 tracking-tight">{value}</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</p>
+            <p className="text-4xl font-bold text-gray-900 tracking-tight">{value}</p>
           </div>
           {icon && (
-            <div className="p-3 rounded-lg bg-gradient-to-br from-primary-50 to-primary-100 text-primary-600 group-hover:scale-110 transition-transform duration-300">
+            <div className="p-2.5 rounded-lg bg-blue-100 text-blue-600 group-hover:scale-110 transition-transform duration-200">
               {icon}
             </div>
           )}
@@ -34,17 +34,17 @@ export default function StatCard({ label, value, trend, trendUp = true, icon, on
 
         {/* Trend indicator */}
         {trend && (
-          <div className="flex items-center gap-1">
-            <span className={`text-sm font-semibold ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="flex items-center gap-2 pt-2">
+            <span className={`text-sm font-semibold ${trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
               {trendUp && '↑'} {trend}
             </span>
-            <span className="text-xs text-gray-500">from last month</span>
+            <span className="text-xs text-gray-500">vs last month</span>
           </div>
         )}
       </div>
 
-      {/* Bottom border accent */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-primary-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      {/* Top border accent */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-blue-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
     </div>
   );
 }
