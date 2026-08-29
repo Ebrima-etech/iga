@@ -149,32 +149,36 @@ export default function ProfessionalDashboard() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-white p-8">
+      <div className="min-h-screen bg-white">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
-          <div>
-            <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600 mt-1">Real-time overview of Hajj operations</p>
-          </div>
-          <div className="flex gap-2">
-            <ProfessionalButton
-              variant="secondary"
-              size="md"
-              icon={<BiRefresh size={18} />}
-              onClick={loadDashboardData}
-              loading={loading}
-            >
-              Refresh
-            </ProfessionalButton>
-            <ProfessionalButton
-              variant="primary"
-              size="md"
-              icon={<BiDownload size={18} />}
-            >
-              Export
-            </ProfessionalButton>
+        <div className="px-8 py-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm text-gray-600 mt-1">Real-time overview of Hajj operations</p>
+            </div>
+            <div className="flex gap-2">
+              <ProfessionalButton
+                variant="secondary"
+                size="md"
+                icon={<BiRefresh size={16} />}
+                onClick={loadDashboardData}
+                loading={loading}
+              >
+                Refresh
+              </ProfessionalButton>
+              <ProfessionalButton
+                variant="primary"
+                size="md"
+                icon={<BiDownload size={16} />}
+              >
+                Export
+              </ProfessionalButton>
+            </div>
           </div>
         </div>
+
+        <div className="p-8">
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
