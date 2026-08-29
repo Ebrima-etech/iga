@@ -12,16 +12,30 @@ import api from '@/lib/api';
 import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { BiPlus } from 'react-icons/bi';
+import { useTableState } from '@/lib/useTableState';
+import { TableSearch, TableFilter, SortableHeader, TablePagination, TableControlsWrapper } from '@/components/Common/TableControls';
+import { paymentStatusFilters } from '@/lib/filterConfigs';
+import Badge from '@/components/Common/Badge';
+
+interface PaymentRecord extends Payment {
+  bank_name?: string;
+  payer_name?: string;
+  payer_contact?: string;
+  payer_relationship?: string;
+}
 
 export default function PaymentsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [filteredPayments, setFilteredPayments] = useState<Payment[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [bankFilter, setBankFilter] = useState('');
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [banks, setBanks] = useState<any[]>([]);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Use the new table state hook
+  const tableState = useTableState<PaymentRecord>(payments, {
+    initialPageSize: pageSize,
+    searchableFields: ['reference_number', 'pilgrim_name', 'bank_name', 'payer_name'],
+  });
 
   useEffect(() => {
     console.log('Payments page mounted, fetching data...');
@@ -30,9 +44,9 @@ export default function PaymentsPage() {
   }, []);
 
   useEffect(() => {
-    filterPayments();
+    tableState.handlePageChange(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, statusFilter, bankFilter, payments]);
+  }, [pageSize]);
 
   const fetchPayments = async () => {
     try {
@@ -79,32 +93,11 @@ export default function PaymentsPage() {
     }
   };
 
-  const filterPayments = () => {
-    let filtered = payments;
-
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (p) =>
-          p.reference_number.includes(searchQuery) ||
-          p.pilgrim_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (statusFilter) {
-      filtered = filtered.filter((p) => p.status === statusFilter);
-    }
-
-    if (bankFilter) {
-      filtered = filtered.filter((p) => p.bank.toString() === bankFilter);
-    }
-
-    setFilteredPayments(filtered);
-  };
-
-  const totalAmount = filteredPayments.reduce((sum, p) => sum + p.amount, 0);
-  const confirmedAmount = filteredPayments
+  // Calculate stats from filtered data
+  const totalAmount = tableState.filteredData.reduce((sum, p) => sum + parseFloat(String(p.amount)), 0);
+  const confirmedAmount = tableState.filteredData
     .filter((p) => p.status === 'confirmed')
-    .reduce((sum, p) => sum + p.amount, 0);
+    .reduce((sum, p) => sum + parseFloat(String(p.amount)), 0);
 
   if (loading) return <Layout><Loading /></Layout>;
 
@@ -131,8 +124,8 @@ export default function PaymentsPage() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <p className="text-sm font-medium text-gray-600">Total Payments</p>
-            <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">{filteredPayments.length}</p>
+            <p className="text-sm font-medium text-gray-600">Filtered Payments</p>
+            <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">{tableState.totalItems}</p>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <p className="text-sm font-medium text-gray-600">Total Amount</p>
@@ -144,99 +137,155 @@ export default function PaymentsPage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <input
-            type="text"
-            placeholder="Search by reference or pilgrim name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-          />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-          >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="failed">Failed</option>
-            <option value="refunded">Refunded</option>
-          </select>
-          <select
-            value={bankFilter}
-            onChange={(e) => setBankFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-          >
-            <option value="">All Banks</option>
-            {banks.map((bank) => (
-              <option key={bank.id} value={bank.id}>
-                {bank.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Table (with shimmer loading) */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          {loading ? (
-            <TableSkeleton rows={6} columnCount={6} />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Reference</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Pilgrim</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Bank</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Amount</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                {filteredPayments.length > 0 ? (
-                  filteredPayments.map((payment) => (
-                    <tr
-                      key={payment.id}
-                      onClick={() => router.push(`/dashboard/payments/${payment.id}`)}
-                      className="hover:bg-emerald-50 transition-colors cursor-pointer"
-                    >
-                      <td className="px-4 py-3.5 font-mono text-xs text-gray-500">{payment.reference_number}</td>
-                      <td className="px-4 py-3.5 text-sm text-gray-900 font-medium">{payment.pilgrim_name}</td>
-                      <td className="px-4 py-3.5 text-sm text-gray-600">{payment.bank_name}</td>
-                      <td className="px-4 py-3.5 text-sm font-mono font-medium text-gray-900">
-                        {formatCurrency(payment.amount)}
-                      </td>
-                      <td className="px-4 py-3.5 text-sm">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
-                          {payment.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 text-sm text-gray-600">{formatDate(payment.payment_date)}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                      No payments found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-              </table>
+        {/* Advanced Search, Filters, and Pagination */}
+        <TableControlsWrapper
+          title="Payment Transactions"
+          searchValue={tableState.searchQuery}
+          onSearchChange={tableState.handleSearch}
+          filters={
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <TableFilter
+                label="Status"
+                value={tableState.filters.status || ''}
+                options={paymentStatusFilters}
+                onChange={(value) => tableState.handleFilter('status', value)}
+              />
+              <TableFilter
+                label="Bank"
+                value={tableState.filters.bank || ''}
+                options={banks.map((b) => ({ label: b.name, value: b.id }))}
+                onChange={(value) => tableState.handleFilter('bank', value)}
+              />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">Results per page</label>
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(parseInt(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none cursor-pointer"
+                >
+                  <option value="10">10 per page</option>
+                  <option value="25">25 per page</option>
+                  <option value="50">50 per page</option>
+                </select>
+              </div>
             </div>
-          )}
-        </div>
+          }
+          onClearFilters={tableState.handleClearFilters}
+          hasActiveFilters={
+            tableState.searchQuery !== '' ||
+            Object.values(tableState.filters).some((v) => v !== null && v !== '')
+          }
+        >
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            {loading ? (
+              <TableSkeleton rows={8} columnCount={6} />
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <SortableHeader
+                          label="Reference"
+                          sortKey="reference_number"
+                          currentSort={tableState.sortConfig}
+                          onSort={tableState.handleSort}
+                        />
+                        <SortableHeader
+                          label="Pilgrim"
+                          sortKey="pilgrim_name"
+                          currentSort={tableState.sortConfig}
+                          onSort={tableState.handleSort}
+                        />
+                        <SortableHeader
+                          label="Bank"
+                          sortKey="bank_name"
+                          currentSort={tableState.sortConfig}
+                          onSort={tableState.handleSort}
+                        />
+                        <SortableHeader
+                          label="Amount"
+                          sortKey="amount"
+                          currentSort={tableState.sortConfig}
+                          onSort={tableState.handleSort}
+                        />
+                        <SortableHeader
+                          label="Status"
+                          sortKey="status"
+                          currentSort={tableState.sortConfig}
+                          onSort={tableState.handleSort}
+                        />
+                        <SortableHeader
+                          label="Date"
+                          sortKey="payment_date"
+                          currentSort={tableState.sortConfig}
+                          onSort={tableState.handleSort}
+                        />
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {tableState.paginatedData.length > 0 ? (
+                        tableState.paginatedData.map((payment) => (
+                          <tr
+                            key={payment.id}
+                            onClick={() => router.push(`/dashboard/payments/${payment.id}`)}
+                            className="hover:bg-emerald-50 transition-colors cursor-pointer"
+                          >
+                            <td className="px-4 py-3.5 font-mono text-xs text-gray-500">{payment.reference_number}</td>
+                            <td className="px-4 py-3.5 text-sm text-gray-900 font-medium">{payment.pilgrim_name}</td>
+                            <td className="px-4 py-3.5 text-sm text-gray-600">{payment.bank_name}</td>
+                            <td className="px-4 py-3.5 text-sm font-mono font-medium text-gray-900">
+                              {formatCurrency(payment.amount)}
+                            </td>
+                            <td className="px-4 py-3.5 text-sm">
+                              <Badge
+                                variant={
+                                  payment.status === 'confirmed'
+                                    ? 'success'
+                                    : payment.status === 'pending'
+                                    ? 'warning'
+                                    : 'danger'
+                                }
+                                size="sm"
+                              >
+                                {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3.5 text-sm text-gray-600">{formatDate(payment.payment_date)}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                            No payments found matching your criteria
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                {tableState.totalItems > 0 && (
+                  <TablePagination
+                    currentPage={tableState.currentPage}
+                    totalPages={tableState.totalPages}
+                    pageSize={pageSize}
+                    totalItems={tableState.totalItems}
+                    onPageChange={tableState.handlePageChange}
+                    onPageSizeChange={setPageSize}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </TableControlsWrapper>
 
         {/* Stats by Status */}
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <h2 className="text-sm font-semibold text-gray-900 mb-4">Payment Status Summary</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {['pending', 'confirmed', 'failed', 'refunded'].map((status) => {
-              const statusPayments = filteredPayments.filter((p) => p.status === status);
-              const amount = statusPayments.reduce((sum, p) => sum + p.amount, 0);
+              const statusPayments = tableState.filteredData.filter((p) => p.status === status);
+              const amount = statusPayments.reduce((sum, p) => sum + parseFloat(String(p.amount)), 0);
               return (
                 <div key={status} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                   <p className="text-sm font-medium text-gray-600 capitalize">{status}</p>
