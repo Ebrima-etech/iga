@@ -70,7 +70,7 @@ export default function PaymentDetailPage() {
         last_name: payment.pilgrim_last_name,
         gender: payment.pilgrim_gender || 'M',
         phone: payment.pilgrim_phone,
-        email: payment.pilgrim_email || '',
+        ...(payment.pilgrim_email ? { email: payment.pilgrim_email } : {}),
       };
 
       const pilgrimRes = await api.post('/pilgrims/', pilgrimData);
