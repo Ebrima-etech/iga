@@ -9,6 +9,9 @@ import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import { BiPlus, BiSearch, BiTrash, BiPencil, BiX, BiChevronRight } from 'react-icons/bi';
+import { useTableState } from '@/lib/useTableState';
+import { TableSearch, TableFilter, SortableHeader, TablePagination, TableControlsWrapper } from '@/components/Common/TableControls';
+import { pilgrimStatusFilters, genderFilters } from '@/lib/filterConfigs';
 import { useRouter } from 'next/router';
 import { saveDraft, getDraft, deleteDraft } from '@/lib/draftManager';
 import { TableSkeleton } from '@/components/Common/Skeleton';
@@ -166,14 +169,18 @@ export default function PilgrimsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [pilgrims, setPilgrims] = useState<Pilgrim[]>([]);
-  const [filteredPilgrims, setFilteredPilgrims] = useState<Pilgrim[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
   const [showInlineForm, setShowInlineForm] = useState(false);
   const [showDraftList, setShowDraftList] = useState(false);
   const [draftData, setDraftData] = useState({});
   const [draftsList, setDraftsList] = useState<any[]>([]);
   const [editingPilgrim, setEditingPilgrim] = useState<Pilgrim | null>(null);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Use the new table state hook
+  const tableState = useTableState<Pilgrim>(pilgrims, {
+    initialPageSize: pageSize,
+    searchableFields: ['first_name', 'last_name', 'email', 'registration_id', 'phone'],
+  });
 
   useEffect(() => {
     fetchPilgrims();
@@ -181,9 +188,9 @@ export default function PilgrimsPage() {
   }, []);
 
   useEffect(() => {
-    filterPilgrims();
+    tableState.handlePageChange(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, statusFilter, pilgrims]);
+  }, [pageSize]);
 
   const fetchPilgrims = async () => {
     try {
@@ -205,19 +212,7 @@ export default function PilgrimsPage() {
     }
   };
 
-  const filterPilgrims = () => {
-    let filtered = pilgrims;
-    if (searchQuery) {
-      filtered = filtered.filter(p =>
-        p.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.email.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    if (statusFilter) {
-      filtered = filtered.filter(p => p.status === statusFilter);
-    }
-    setFilteredPilgrims(filtered);
-  };
+  // No need for separate filtering - handled by useTableState hook
 
   const handleFormSubmit = async (formData: Record<string, any>) => {
     try {
@@ -289,28 +284,7 @@ export default function PilgrimsPage() {
     setShowDraftList(false);
   };
 
-  const columns = [
-    { key: 'registration_id', label: 'ID', width: '12%', render: (v: string) => <span className="font-mono text-xs text-gray-500">{v}</span> },
-    { key: 'first_name', label: 'First Name', width: '18%', render: (v: string) => <span className="font-medium text-gray-900">{v}</span> },
-    { key: 'last_name', label: 'Last Name', width: '18%', render: (v: string) => <span className="font-medium text-gray-900">{v}</span> },
-    { key: 'phone', label: 'Phone', width: '18%', render: (v: string) => <span className="text-gray-600 font-mono text-xs">{v}</span> },
-    {
-      key: 'status',
-      label: 'Status',
-      width: '12%',
-      render: (v: string) => (
-        <Badge variant={v === 'paid' ? 'success' : v === 'registered' ? 'info' : 'warning'} size="sm">
-          {v.charAt(0).toUpperCase() + v.slice(1)}
-        </Badge>
-      ),
-    },
-    {
-      key: 'total_amount_due',
-      label: 'Amount Due',
-      width: '12%',
-      render: (v: number) => <span className="text-gray-900 font-mono font-medium">${v.toLocaleString()}</span>,
-    },
-  ];
+  // Columns defined in table header now with sortable headers
 
   return (
     <Layout>
@@ -426,76 +400,173 @@ export default function PilgrimsPage() {
           </div>
         )}
 
-        {/* Search and Filter */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
-            <div className="relative">
-              <BiSearch className="absolute left-3 top-3 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Search by name, email, or ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-sm"
+        {/* Advanced Search, Filters, and Pagination */}
+        <TableControlsWrapper
+          title="Registered Pilgrims"
+          searchValue={tableState.searchQuery}
+          onSearchChange={tableState.handleSearch}
+          filters={
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <TableFilter
+                label="Status"
+                value={tableState.filters.status || ''}
+                options={pilgrimStatusFilters}
+                onChange={(value) => tableState.handleFilter('status', value)}
               />
+              <TableFilter
+                label="Gender"
+                value={tableState.filters.gender || ''}
+                options={genderFilters}
+                onChange={(value) => tableState.handleFilter('gender', value)}
+              />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">Results per page</label>
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(parseInt(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none cursor-pointer"
+                >
+                  <option value="10">10 per page</option>
+                  <option value="25">25 per page</option>
+                  <option value="50">50 per page</option>
+                </select>
+              </div>
             </div>
-          </div>
-          <div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white cursor-pointer text-sm"
-            >
-              <option value="">All Statuses</option>
-              <option value="registered">Registered</option>
-              <option value="paid">Paid</option>
-              <option value="departed">Departed</option>
-              <option value="returned">Returned</option>
-            </select>
-          </div>
-        </div>
+          }
+          onClearFilters={tableState.handleClearFilters}
+          hasActiveFilters={
+            tableState.searchQuery !== '' ||
+            Object.values(tableState.filters).some((v) => v !== null && v !== '')
+          }
+        >
 
-        {/* Pilgrims Table */}
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Registered Pilgrims</h2>
-              <p className="text-sm text-gray-500 mt-0.5">{filteredPilgrims.length} pilgrim{filteredPilgrims.length !== 1 ? 's' : ''} found</p>
-            </div>
-          </div>
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             {loading ? (
               <TableSkeleton rows={8} columnCount={6} />
             ) : (
-              <ProfessionalTable
-                columns={columns}
-                data={filteredPilgrims}
-                loading={false}
-                emptyMessage="No pilgrims registered yet • Click 'Add Pilgrim' to register a new one"
-                actions={(row: Pilgrim) => (
-                  <div className="flex gap-2">
-                    <ProfessionalButton
-                      variant="ghost"
-                      size="sm"
-                      icon={<BiChevronRight size={14} />}
-                      onClick={() => router.push(`/dashboard/pilgrims/${row.id}`)}
-                    >
-                      View
-                    </ProfessionalButton>
-                    <ProfessionalButton
-                    variant="ghost"
-                    size="sm"
-                    icon={<BiPencil size={14} />}
-                    onClick={() => handleEditClick(row)}
-                  >
-                    Edit
-                  </ProfessionalButton>
-                  </div>
+              <>
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <SortableHeader
+                        label="ID"
+                        sortKey="registration_id"
+                        currentSort={tableState.sortConfig}
+                        onSort={tableState.handleSort}
+                      />
+                      <SortableHeader
+                        label="First Name"
+                        sortKey="first_name"
+                        currentSort={tableState.sortConfig}
+                        onSort={tableState.handleSort}
+                      />
+                      <SortableHeader
+                        label="Last Name"
+                        sortKey="last_name"
+                        currentSort={tableState.sortConfig}
+                        onSort={tableState.handleSort}
+                      />
+                      <SortableHeader
+                        label="Phone"
+                        sortKey="phone"
+                        currentSort={tableState.sortConfig}
+                        onSort={tableState.handleSort}
+                      />
+                      <SortableHeader
+                        label="Status"
+                        sortKey="status"
+                        currentSort={tableState.sortConfig}
+                        onSort={tableState.handleSort}
+                      />
+                      <SortableHeader
+                        label="Amount Due"
+                        sortKey="total_amount_due"
+                        currentSort={tableState.sortConfig}
+                        onSort={tableState.handleSort}
+                      />
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {tableState.paginatedData.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                          No pilgrims found matching your criteria
+                        </td>
+                      </tr>
+                    ) : (
+                      tableState.paginatedData.map((pilgrim) => (
+                        <tr key={pilgrim.id} className="hover:bg-gray-50 transition">
+                          <td className="px-6 py-4">
+                            <span className="font-mono text-xs text-gray-500">{pilgrim.registration_id}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="font-medium text-gray-900">{pilgrim.first_name}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="font-medium text-gray-900">{pilgrim.last_name}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-600 font-mono text-xs">{pilgrim.phone}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Badge
+                              variant={
+                                pilgrim.status === 'paid'
+                                  ? 'success'
+                                  : pilgrim.status === 'registered'
+                                  ? 'info'
+                                  : 'warning'
+                              }
+                              size="sm"
+                            >
+                              {pilgrim.status.charAt(0).toUpperCase() + pilgrim.status.slice(1)}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-900 font-mono font-medium">
+                              ${(pilgrim.total_amount_due || 0).toLocaleString()}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex gap-2">
+                              <ProfessionalButton
+                                variant="ghost"
+                                size="sm"
+                                icon={<BiChevronRight size={14} />}
+                                onClick={() => router.push(`/dashboard/pilgrims/${pilgrim.id}`)}
+                              >
+                                View
+                              </ProfessionalButton>
+                              <ProfessionalButton
+                                variant="ghost"
+                                size="sm"
+                                icon={<BiPencil size={14} />}
+                                onClick={() => handleEditClick(pilgrim)}
+                              >
+                                Edit
+                              </ProfessionalButton>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+                {tableState.totalItems > 0 && (
+                  <TablePagination
+                    currentPage={tableState.currentPage}
+                    totalPages={tableState.totalPages}
+                    pageSize={pageSize}
+                    totalItems={tableState.totalItems}
+                    onPageChange={tableState.handlePageChange}
+                    onPageSizeChange={setPageSize}
+                  />
                 )}
-              />
+              </>
             )}
           </div>
-        </div>
+        </TableControlsWrapper>
       </div>
     </Layout>
   );
