@@ -51,6 +51,7 @@ export default function BankDetailPage() {
       fetchBank();
       fetchBankAdmins();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankId]);
 
   const fetchBank = async () => {

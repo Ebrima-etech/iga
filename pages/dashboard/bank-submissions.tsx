@@ -301,7 +301,7 @@ export default function BankSubmissionsPage() {
             <ol className="text-sm text-emerald-700 space-y-1 list-decimal list-inside">
               <li>Bank submits payment with pilgrim information</li>
               <li>Review the submission details above</li>
-              <li>Click "Create Pilgrim" to auto-generate the pilgrim record</li>
+              <li>Click &quot;Create Pilgrim&quot; to auto-generate the pilgrim record</li>
               <li>Payment is automatically linked to the new pilgrim</li>
               <li>Submission is marked as verified</li>
             </ol>

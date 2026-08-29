@@ -81,9 +81,10 @@ export default function VoiceInputButton({
         }
       }
     }
-  }, [spellingMode, isListening, interimTranscript, transcript, clearTranscript, stopListening, onTranscript, transcript]);
+  }, [spellingMode, isListening, interimTranscript, transcript, clearTranscript, stopListening, onTranscript]);
 
   // Detect voice commands: "cancel" and "spell" (for non-spelling mode)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (isListening && (interimTranscript || transcript)) {
       const text = (interimTranscript || transcript).toLowerCase().trim();
@@ -142,6 +143,7 @@ export default function VoiceInputButton({
   }, [isListening, interimTranscript, transcript, stopListening, clearTranscript, cancelDetected, spellingMode]);
 
   // Auto-submit when speech ends (transcript becomes available and not listening)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   // BUT skip if cancel was detected, in spelling mode, "spell" word is in transcript, or skipNextSubmit is true
   useEffect(() => {
     if (!isListening && transcript && transcript.trim() && !error && !cancelDetected && !spellingMode && !skipNextSubmit) {
