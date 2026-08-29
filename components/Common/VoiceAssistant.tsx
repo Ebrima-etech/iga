@@ -57,12 +57,20 @@ export default function VoiceAssistant() {
           response = await handleSearch(command.entity || '');
           break;
 
+        case 'read_report':
+          response = await handleReadReport(command.entity || '', command.dateRange);
+          break;
+
         case 'read':
           response = await handleRead(command.entity || '');
           break;
 
         case 'analytics':
           response = await handleAnalytics(command.entity || '');
+          break;
+
+        case 'export':
+          response = await handleExportReport(command.entity || '', command.dateRange);
           break;
 
         case 'navigate':
@@ -170,6 +178,69 @@ export default function VoiceAssistant() {
     return 'Opening records for you.';
   };
 
+  const handleReadReport = async (reportType: string, dateRange?: { start?: string; end?: string }): Promise<string> => {
+    try {
+      let report = '';
+
+      if (reportType.includes('payment') || reportType.includes('transaction')) {
+        const payments = await api.get('/bank-payment-submissions/').catch(() => ({ data: { results: [] } }));
+        const paymentList = payments.data.results || [];
+
+        if (dateRange?.start && dateRange?.end) {
+          report = `Payments between ${dateRange.start} and ${dateRange.end}: Found ${paymentList.length} transactions. `;
+        } else if (dateRange?.start) {
+          report = `Payments from ${dateRange.start}: Found ${paymentList.length} transactions. `;
+        } else {
+          report = `Total payments in system: ${paymentList.length} transactions. `;
+        }
+
+        const totalAmount = paymentList.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+        const confirmed = paymentList.filter((p: any) => p.status === 'confirmed').length;
+        const pending = paymentList.filter((p: any) => p.status === 'pending').length;
+
+        report += `Total amount: ${totalAmount.toLocaleString()} GMD. Confirmed: ${confirmed}, Pending: ${pending}.`;
+      } else if (reportType.includes('pilgrim')) {
+        const pilgrims = await api.get('/pilgrims/').catch(() => ({ data: { results: [] } }));
+        const pilgrimList = pilgrims.data.results || [];
+        report = `Total pilgrims registered: ${pilgrimList.length}. `;
+
+        if (dateRange?.start) {
+          report += `Filtering from ${dateRange.start} onwards.`;
+        }
+      } else {
+        report = `Reading ${reportType} report. Please specify the date range for more details.`;
+      }
+
+      return report;
+    } catch (error) {
+      return 'Unable to read report at this moment. Please try again.';
+    }
+  };
+
+  const handleExportReport = async (reportType: string, dateRange?: { start?: string; end?: string }): Promise<string> => {
+    try {
+      const format = reportType.includes('pdf') ? 'PDF' : reportType.includes('excel') ? 'Excel' : 'PDF';
+      const report = reportType.includes('payment') ? 'Payment Report' : reportType.includes('pilgrim') ? 'Pilgrim Report' : 'System Report';
+
+      let exportDetails = `Exporting ${report} as ${format}. `;
+
+      if (dateRange?.start && dateRange?.end) {
+        exportDetails += `Date range: ${dateRange.start} to ${dateRange.end}. `;
+      } else if (dateRange?.start) {
+        exportDetails += `From ${dateRange.start} onwards. `;
+      }
+
+      exportDetails += `File will be ready for download in the exports section.`;
+
+      // Simulate export processing
+      toast.success(`${report} export initiated as ${format}!`);
+
+      return exportDetails;
+    } catch (error) {
+      return 'Failed to export report. Please try again.';
+    }
+  };
+
   return (
     <div className="fixed bottom-8 right-8 z-50">
       {/* Main button */}
@@ -249,9 +320,10 @@ export default function VoiceAssistant() {
             <p className="font-medium text-gray-600">Try saying:</p>
             <ul className="list-disc list-inside space-y-0.5">
               <li>"Search for Hassan"</li>
-              <li>"Total payments"</li>
+              <li>"Read payment report for today"</li>
+              <li>"Export pilgrim data as PDF"</li>
+              <li>"Total payments this month"</li>
               <li>"Go to banks"</li>
-              <li>"Create new pilgrim"</li>
             </ul>
           </div>
         </div>

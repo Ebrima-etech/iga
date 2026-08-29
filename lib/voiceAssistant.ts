@@ -4,10 +4,12 @@
  */
 
 export interface VoiceCommand {
-  intent: 'search' | 'read' | 'analytics' | 'navigate' | 'create' | 'unknown';
+  intent: 'search' | 'read' | 'analytics' | 'navigate' | 'create' | 'export' | 'read_report' | 'unknown';
   entity?: string; // what to search for
   location?: string; // page to navigate to
   action?: string; // specific action
+  reportType?: string; // type of report to read/export
+  dateRange?: { start?: string; end?: string }; // date range for reports
   rawText: string;
 }
 
@@ -17,6 +19,11 @@ const INTENT_PATTERNS = {
     /(?:find|search|look for|find me|get me|show me)\s+(.+)/i,
     /(?:who is|where is)\s+(.+)/i,
   ],
+  read_report: [
+    /(?:read|show|display|tell me about)\s+(?:the\s+)?(?:pilgrim|payment|transaction|bank)\s+(?:report|data|records?)(?:\s+for\s+(.+))?/i,
+    /(?:read|show)\s+(?:me\s+)?(?:transactions|payments)\s+(?:from|for|between)?(?:\s+(.+))?/i,
+    /read\s+(?:all\s+)?(?:transactions|payments)\s+(?:on|from|dated)\s+(.+)/i,
+  ],
   read: [
     /(?:read|tell me|read me|read out|read aloud)\s+(?:the\s+)?(.+)/i,
     /(?:what is|give me)\s+(?:the\s+)?(.+)/i,
@@ -24,6 +31,10 @@ const INTENT_PATTERNS = {
   analytics: [
     /(?:total|how many|count|how much)\s+(.+)/i,
     /(?:statistics|stats|analysis|report)\s+(?:for\s+)?(.+)/i,
+  ],
+  export: [
+    /(?:export|download|save|generate)\s+(?:a\s+)?(?:report|data)\s+(?:as\s+)?(?:pdf|excel|csv)?(?:\s+(?:for|from|between)\s+(.+))?/i,
+    /(?:export|download)\s+(?:pilgrim|payment|bank|transaction)\s+(?:report)?(?:\s+(?:in|as|to)\s+(.+))?/i,
   ],
   navigate: [
     /(?:go to|open|show me|take me to)\s+(.+)/i,
