@@ -14,6 +14,7 @@ import api from '@/lib/api';
 interface Bank {
   id: number;
   name: string;
+  logo?: string | null;
   is_active: boolean;
   created_at: string;
 }
@@ -38,6 +39,7 @@ export default function BankDetailPage() {
   const [bank, setBank] = useState<Bank | null>(null);
   const [admins, setAdmins] = useState<BankAdmin[]>([]);
   const [showAddAdmin, setShowAddAdmin] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [adminFormData, setAdminFormData] = useState({
     username: '',
     email: '',
@@ -72,6 +74,28 @@ export default function BankDetailPage() {
       setAdmins([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingLogo(true);
+      const formData = new FormData();
+      formData.append('logo', file);
+
+      const response = await api.patch(`/banks/${bankId}/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      setBank(response.data);
+      toast.success('Bank logo uploaded successfully!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Failed to upload logo');
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
@@ -125,30 +149,56 @@ export default function BankDetailPage() {
         {/* Bank Info Card */}
         {bank && (
           <Card padding="lg" shadow="md" className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Bank Name</h3>
-                <p className="text-lg font-semibold text-gray-900">{bank.name}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Logo Section */}
+              <div className="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg bg-gray-50">
+                {bank.logo ? (
+                  <img src={bank.logo} alt={bank.name} className="h-24 w-24 object-contain mb-4" />
+                ) : (
+                  <div className="h-24 w-24 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
+                    <span className="text-4xl">🏦</span>
+                  </div>
+                )}
+                <label className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg cursor-pointer transition">
+                  {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    disabled={uploadingLogo}
+                    className="hidden"
+                  />
+                </label>
               </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Status</h3>
-                <p className="text-lg font-semibold text-gray-900">
-                  {bank.is_active ? (
-                    <span className="text-green-600">✓ Active</span>
-                  ) : (
-                    <span className="text-red-600">✗ Inactive</span>
-                  )}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Created</h3>
-                <p className="text-lg font-semibold text-gray-900">
-                  {new Date(bank.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Total Admins</h3>
-                <p className="text-lg font-semibold text-gray-900">{admins.length}</p>
+
+              {/* Bank Info */}
+              <div className="md:col-span-2 space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600 mb-1">Bank Name</h3>
+                  <p className="text-lg font-semibold text-gray-900">{bank.name}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600 mb-1">Status</h3>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {bank.is_active ? (
+                      <span className="text-green-600">✓ Active</span>
+                    ) : (
+                      <span className="text-red-600">✗ Inactive</span>
+                    )}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-1">Created</h3>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {new Date(bank.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-1">Total Admins</h3>
+                    <p className="text-lg font-semibold text-gray-900">{admins.length}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </Card>
