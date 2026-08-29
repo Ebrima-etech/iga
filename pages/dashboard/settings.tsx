@@ -496,13 +496,13 @@ export default function SettingsPage() {
                   Update these rates regularly to ensure accurate payment conversions across the system.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-sm font-medium text-gray-700">Base Currency</p>
-                    <p className="text-lg font-bold text-indigo-600 mt-2">GMD</p>
+                  <div className="p-4 bg-white rounded-lg border border-gray-200">
+                    <p className="text-sm font-medium text-gray-500">Base Currency</p>
+                    <p className="text-2xl font-semibold text-gray-900 mt-1.5 font-mono">GMD</p>
                   </div>
-                  <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-sm font-medium text-gray-700">Default Currency</p>
-                    <p className="text-lg font-bold text-green-600 mt-2">{defaultCurrency}</p>
+                  <div className="p-4 bg-white rounded-lg border border-gray-200">
+                    <p className="text-sm font-medium text-gray-500">Default Currency</p>
+                    <p className="text-2xl font-semibold text-gray-900 mt-1.5 font-mono">{defaultCurrency}</p>
                   </div>
                 </div>
               </Card>
@@ -511,34 +511,34 @@ export default function SettingsPage() {
 
           {/* System Tab */}
           {activeTab === 'system' && (
-            <Card padding="lg">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">System Configuration</h2>
+            <Card padding="lg" shadow="none">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">System Configuration</h2>
               <div className="space-y-6">
-                <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                  <p className="text-sm font-medium text-amber-900">System Version</p>
-                  <p className="text-lg font-bold text-amber-700 mt-2">v1.0.0</p>
+                <div className="p-4 bg-white rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-500">System Version</p>
+                  <p className="text-2xl font-semibold text-gray-900 mt-1.5 font-mono">v1.0.0</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-sm font-medium text-gray-700">API Status</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <BiCheckCircle className="text-green-600" size={18} />
-                      <span className="text-sm font-medium text-green-700">Connected</span>
+                  <div className="p-4 bg-white rounded-lg border border-gray-200">
+                    <p className="text-sm font-medium text-gray-500">API Status</p>
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="text-sm font-medium text-gray-900">Connected</span>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-sm font-medium text-gray-700">Database Status</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <BiCheckCircle className="text-green-600" size={18} />
-                      <span className="text-sm font-medium text-green-700">Healthy</span>
+                  <div className="p-4 bg-white rounded-lg border border-gray-200">
+                    <p className="text-sm font-medium text-gray-500">Database Status</p>
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="text-sm font-medium text-gray-900">Healthy</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="text-sm font-medium text-gray-700 mb-3">System Information</p>
+                <div className="p-4 bg-white rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-500 mb-3">System Information</p>
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex justify-between">
                       <span>Organization</span>

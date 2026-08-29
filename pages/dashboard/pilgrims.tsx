@@ -248,10 +248,10 @@ export default function PilgrimsPage() {
   };
 
   const columns = [
-    { key: 'registration_id', label: 'ID', width: '12%', render: (v: string) => <span className="font-medium text-blue-600">{v}</span> },
+    { key: 'registration_id', label: 'ID', width: '12%', render: (v: string) => <span className="font-mono text-xs text-gray-500">{v}</span> },
     { key: 'full_name', label: 'Name', width: '25%', render: (v: string) => <span className="font-medium text-gray-900">{v}</span> },
-    { key: 'email', label: 'Email', width: '20%', render: (v: string) => <span className="text-gray-700">{v}</span> },
-    { key: 'phone', label: 'Phone', width: '15%', render: (v: string) => <span className="text-gray-700">{v}</span> },
+    { key: 'email', label: 'Email', width: '20%', render: (v: string) => <span className="text-gray-600">{v}</span> },
+    { key: 'phone', label: 'Phone', width: '15%', render: (v: string) => <span className="text-gray-600 font-mono text-xs">{v}</span> },
     {
       key: 'status',
       label: 'Status',
@@ -266,7 +266,7 @@ export default function PilgrimsPage() {
       key: 'total_amount_due',
       label: 'Amount Due',
       width: '12%',
-      render: (v: number) => <span className="text-gray-900 font-medium">${v.toLocaleString()}</span>,
+      render: (v: number) => <span className="text-gray-900 font-mono font-medium">${v.toLocaleString()}</span>,
     },
   ];
 

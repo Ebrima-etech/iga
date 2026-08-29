@@ -148,7 +148,7 @@ export default function BankDetailPage() {
 
         {/* Bank Info Card */}
         {bank && (
-          <Card padding="lg" shadow="md" className="mb-8">
+          <Card padding="lg" shadow="none" className="mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Logo Section */}
               <div className="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg bg-gray-50">
@@ -159,7 +159,7 @@ export default function BankDetailPage() {
                     <span className="text-4xl">🏦</span>
                   </div>
                 )}
-                <label className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg cursor-pointer transition">
+                <label className="px-4 py-2 bg-gray-900 hover:bg-black text-white text-sm font-medium rounded-md cursor-pointer transition-colors">
                   {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
                   <input
                     type="file"

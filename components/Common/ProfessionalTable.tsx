@@ -87,48 +87,46 @@ export default function ProfessionalTable({
   }
 
   return (
-    <Card>
+    <Card padding="sm" shadow="none">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
+            <tr className="border-b border-gray-200">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider ${
-                    col.sortable !== false ? 'cursor-pointer hover:bg-gray-100 transition-colors' : ''
+                  className={`px-4 py-3 text-left text-sm font-medium text-gray-500 ${
+                    col.sortable !== false ? 'cursor-pointer hover:text-gray-700 transition-colors' : ''
                   }`}
                   style={{ width: col.width, textAlign: col.align || 'left' }}
                   onClick={() => col.sortable !== false && handleSort(col.key)}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <span>{col.label}</span>
                     {col.sortable !== false && sortKey === col.key && (
-                      <span className="text-blue-600">
+                      <span className="text-gray-900">
                         {sortOrder === 'asc' ? <BiChevronUp size={16} /> : <BiChevronDown size={16} />}
                       </span>
                     )}
                   </div>
                 </th>
               ))}
-              {actions && <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>}
+              {actions && <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Actions</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-100">
             {sortedData.map((row, idx) => (
               <tr
                 key={row[rowKey] || idx}
-                className={`transition-colors ${
-                  striped && idx % 2 === 1 ? 'bg-white' : 'bg-gray-50/40'
-                } ${onRowClick ? 'hover:bg-blue-50 cursor-pointer' : 'hover:bg-gray-50'}`}
+                className={`transition-colors ${onRowClick ? 'hover:bg-gray-50 cursor-pointer' : 'hover:bg-gray-50'}`}
                 onClick={() => onRowClick?.(row)}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-6 py-4 text-sm text-gray-900" style={{ textAlign: col.align || 'left' }}>
+                  <td key={col.key} className="px-4 py-3.5 text-sm text-gray-900" style={{ textAlign: col.align || 'left' }}>
                     {col.render ? col.render(row[col.key], row) : row[col.key]}
                   </td>
                 ))}
-                {actions && <td className="px-6 py-4">{actions(row)}</td>}
+                {actions && <td className="px-4 py-3.5">{actions(row)}</td>}
               </tr>
             ))}
           </tbody>

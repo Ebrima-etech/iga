@@ -5,7 +5,7 @@ interface CardProps {
   className?: string;
   hoverable?: boolean;
   padding?: 'sm' | 'md' | 'lg';
-  shadow?: 'sm' | 'md' | 'lg';
+  shadow?: 'none' | 'sm' | 'md' | 'lg';
   border?: boolean;
 }
 
@@ -16,6 +16,7 @@ const paddingStyles = {
 };
 
 const shadowStyles = {
+  none: '',
   sm: 'shadow-sm',
   md: 'shadow-md',
   lg: 'shadow-lg',
@@ -26,7 +27,7 @@ export default function Card({
   className = '',
   hoverable,
   padding = 'md',
-  shadow = 'sm',
+  shadow = 'none',
   border = true,
 }: CardProps) {
   return (

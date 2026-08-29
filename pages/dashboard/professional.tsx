@@ -108,7 +108,12 @@ export default function ProfessionalDashboard() {
   ];
 
   const paymentColumns = [
-    { key: 'id', label: 'Payment ID', width: '15%' },
+    {
+      key: 'id',
+      label: 'Payment ID',
+      width: '15%',
+      render: (value: string) => <span className="font-mono text-xs text-gray-500">{value}</span>,
+    },
     {
       key: 'pilgrim_name',
       label: 'Pilgrim',
@@ -119,7 +124,7 @@ export default function ProfessionalDashboard() {
       key: 'amount',
       label: 'Amount',
       width: '15%',
-      render: (value: number) => <span className="font-semibold text-green-700">${value.toLocaleString()}</span>,
+      render: (value: number) => <span className="font-mono font-medium text-gray-900">${value.toLocaleString()}</span>,
     },
     {
       key: 'bank_name',
@@ -197,8 +202,8 @@ export default function ProfessionalDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Pilgrim Registration Trend */}
           <div className="lg:col-span-2">
-            <Card padding="lg" shadow="md">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Pilgrim Registration Trend</h3>
+            <Card padding="lg" shadow="none">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Pilgrim Registration Trend</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={pilgrimTrendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
@@ -215,10 +220,10 @@ export default function ProfessionalDashboard() {
                   <Line
                     type="monotone"
                     dataKey="pilgrims"
-                    stroke="#d97706"
-                    strokeWidth={3}
-                    dot={{ fill: '#d97706', r: 5 }}
-                    activeDot={{ r: 7 }}
+                    stroke="#2563eb"
+                    strokeWidth={2}
+                    dot={{ fill: '#2563eb', r: 4 }}
+                    activeDot={{ r: 6 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -227,8 +232,8 @@ export default function ProfessionalDashboard() {
 
           {/* Payment Status Breakdown */}
           <div>
-            <Card padding="lg" shadow="md">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Payment Status</h3>
+            <Card padding="lg" shadow="none">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Status</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -253,8 +258,8 @@ export default function ProfessionalDashboard() {
         </div>
 
         {/* Bank Comparison Chart */}
-        <Card padding="lg" shadow="md" className="mb-8">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Bank Payment Comparison</h3>
+        <Card padding="lg" shadow="none" className="mb-8">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Bank Payment Comparison</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={bankComparisonData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
@@ -267,7 +272,7 @@ export default function ProfessionalDashboard() {
                   borderRadius: '8px',
                 }}
               />
-              <Bar dataKey="amount" fill="#d97706" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="amount" fill="#111827" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -294,74 +299,82 @@ export default function ProfessionalDashboard() {
           {/* Right Sidebar */}
           <div className="space-y-6">
             {/* Quick Stats */}
-            <Card padding="lg">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Payment Summary</h3>
+            <Card padding="lg" shadow="none">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Summary</h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Confirmed</span>
-                  <span className="font-bold text-green-700">2,150</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{ width: '88%' }}></div>
-                </div>
-
-                <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg mt-4">
-                  <span className="text-sm font-medium text-gray-700">Pending</span>
-                  <span className="font-bold text-yellow-700">250</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '10%' }}></div>
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-sm text-gray-600">Confirmed</span>
+                    <span className="font-mono font-semibold text-gray-900">2,150</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-1.5">
+                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '88%' }}></div>
+                  </div>
                 </div>
 
-                <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg mt-4">
-                  <span className="text-sm font-medium text-gray-700">Failed</span>
-                  <span className="font-bold text-red-700">50</span>
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-sm text-gray-600">Pending</span>
+                    <span className="font-mono font-semibold text-gray-900">250</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-1.5">
+                    <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: '10%' }}></div>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-red-500 h-2 rounded-full" style={{ width: '2%' }}></div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-sm text-gray-600">Failed</span>
+                    <span className="font-mono font-semibold text-gray-900">50</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-1.5">
+                    <div className="bg-red-500 h-1.5 rounded-full" style={{ width: '2%' }}></div>
+                  </div>
                 </div>
               </div>
             </Card>
 
             {/* Top Banks */}
-            <Card padding="lg">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Top Banks</h3>
-              <div className="space-y-3">
+            <Card padding="lg" shadow="none">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Banks</h3>
+              <div className="space-y-1">
                 {[
-                  { name: 'Bank A', amount: '$450K', color: 'from-blue-500 to-blue-600' },
-                  { name: 'Bank B', amount: '$380K', color: 'from-purple-500 to-purple-600' },
-                  { name: 'Bank C', amount: '$220K', color: 'from-pink-500 to-pink-600' },
+                  { name: 'Bank A', amount: '$450K' },
+                  { name: 'Bank B', amount: '$380K' },
+                  { name: 'Bank C', amount: '$220K' },
                 ].map((bank, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${bank.color}`}></div>
-                      <span className="font-medium text-gray-900">{bank.name}</span>
+                  <div key={idx} className="flex items-center justify-between py-2 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center text-white text-[10px] font-semibold">
+                        {bank.name.charAt(bank.name.length - 1)}
+                      </div>
+                      <span className="text-sm text-gray-900">{bank.name}</span>
                     </div>
-                    <span className="font-semibold text-gray-700">{bank.amount}</span>
+                    <span className="text-sm font-mono font-medium text-gray-700">{bank.amount}</span>
                   </div>
                 ))}
               </div>
             </Card>
 
             {/* System Status */}
-            <Card padding="lg" shadow="sm">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">System Status</h3>
+            <Card padding="lg" shadow="none">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">System Status</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">API Status</span>
+                  <span className="text-sm text-gray-600">API Status</span>
                   <Badge variant="success" size="sm">
                     Online
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Database</span>
+                  <span className="text-sm text-gray-600">Database</span>
                   <Badge variant="success" size="sm">
                     Healthy
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Response Time</span>
-                  <span className="text-sm font-medium text-gray-900">45ms</span>
+                  <span className="text-sm text-gray-600">Response Time</span>
+                  <span className="text-sm font-mono font-medium text-gray-900">45ms</span>
                 </div>
               </div>
             </Card>
