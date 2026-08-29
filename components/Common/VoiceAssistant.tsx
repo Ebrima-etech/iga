@@ -11,6 +11,7 @@ export default function VoiceAssistant() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isAwaitingWakeWord, setIsAwaitingWakeWord] = useState(true);
   const [transcript, setTranscript] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const stopRecordingRef = useRef<(() => void) | null>(null);
@@ -19,6 +20,55 @@ export default function VoiceAssistant() {
   if (router.pathname.startsWith('/bank') || router.pathname.startsWith('/bank-portal')) {
     return null;
   }
+
+  // Auto-start listening for wake word on mount
+  React.useEffect(() => {
+    if (isAwaitingWakeWord && !isListening && !isOpen) {
+      const timer = setTimeout(() => {
+        handleStartListeningForWakeWord();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isAwaitingWakeWord, isListening, isOpen]);
+
+  const handleStartListeningForWakeWord = async () => {
+    try {
+      setIsListening(true);
+      stopRecordingRef.current = startSpeechRecognition(
+        async (recognizedText) => {
+          const text = recognizedText.toLowerCase().trim();
+
+          // Check for wake word "aja"
+          if (text.includes('aja')) {
+            setIsListening(false);
+            setIsAwaitingWakeWord(false);
+            setIsOpen(true);
+
+            // Respond to wake word
+            await speak('Hello! How can I help you?');
+            setTranscript('');
+          } else {
+            // Continue listening for wake word
+            setTranscript('');
+            handleStartListeningForWakeWord();
+          }
+        },
+        (error) => {
+          // Silently continue listening on error
+          console.log('Wake word listening error:', error);
+          setTimeout(() => {
+            if (isAwaitingWakeWord && !isOpen) {
+              setIsListening(false);
+              handleStartListeningForWakeWord();
+            }
+          }, 1000);
+        }
+      );
+    } catch (error) {
+      console.error('Microphone access denied');
+      setIsListening(false);
+    }
+  };
 
   const handleStartListening = async () => {
     try {
@@ -259,7 +309,14 @@ export default function VoiceAssistant() {
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Voice Assistant</h3>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                setIsAwaitingWakeWord(true);
+                setTranscript('');
+                if (stopRecordingRef.current) {
+                  stopRecordingRef.current();
+                }
+              }}
               className="text-gray-400 hover:text-gray-600"
             >
               <FaTimes size={20} />
