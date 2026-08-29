@@ -71,7 +71,6 @@ export default function PaymentDetailPage() {
         gender: payment.pilgrim_gender || 'M',
         phone: payment.pilgrim_phone,
         email: payment.pilgrim_email || '',
-        registration_number: `REG${Date.now()}`,
       };
 
       const pilgrimRes = await api.post('/pilgrims/', pilgrimData);
