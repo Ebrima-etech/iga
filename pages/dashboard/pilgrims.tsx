@@ -11,6 +11,7 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import { BiPlus, BiSearch, BiTrash, BiPencil, BiX, BiChevronRight } from 'react-icons/bi';
 import { useRouter } from 'next/router';
 import { saveDraft, getDraft, deleteDraft } from '@/lib/draftManager';
+import { TableSkeleton } from '@/components/Common/Skeleton';
 import toast from 'react-hot-toast';
 import { Pilgrim } from '@/types';
 import api from '@/lib/api';
@@ -462,22 +463,25 @@ export default function PilgrimsPage() {
             </div>
           </div>
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <ProfessionalTable
-              columns={columns}
-              data={filteredPilgrims}
-              loading={loading}
-              emptyMessage="No pilgrims registered yet • Click 'Add Pilgrim' to register a new one"
-              actions={(row: Pilgrim) => (
-                <div className="flex gap-2">
-                  <ProfessionalButton
-                    variant="ghost"
-                    size="sm"
-                    icon={<BiChevronRight size={14} />}
-                    onClick={() => router.push(`/dashboard/pilgrims/${row.id}`)}
-                  >
-                    View
-                  </ProfessionalButton>
-                  <ProfessionalButton
+            {loading ? (
+              <TableSkeleton rows={8} columnCount={6} />
+            ) : (
+              <ProfessionalTable
+                columns={columns}
+                data={filteredPilgrims}
+                loading={false}
+                emptyMessage="No pilgrims registered yet • Click 'Add Pilgrim' to register a new one"
+                actions={(row: Pilgrim) => (
+                  <div className="flex gap-2">
+                    <ProfessionalButton
+                      variant="ghost"
+                      size="sm"
+                      icon={<BiChevronRight size={14} />}
+                      onClick={() => router.push(`/dashboard/pilgrims/${row.id}`)}
+                    >
+                      View
+                    </ProfessionalButton>
+                    <ProfessionalButton
                     variant="ghost"
                     size="sm"
                     icon={<BiPencil size={14} />}
@@ -485,9 +489,10 @@ export default function PilgrimsPage() {
                   >
                     Edit
                   </ProfessionalButton>
-                </div>
-              )}
-            />
+                  </div>
+                )}
+              />
+            )}
           </div>
         </div>
       </div>

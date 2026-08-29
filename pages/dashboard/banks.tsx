@@ -8,6 +8,7 @@ import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
 import { BiPlus, BiPencil, BiTrash, BiX, BiSearch } from 'react-icons/bi';
+import { TableSkeleton } from '@/components/Common/Skeleton';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 
@@ -227,31 +228,35 @@ export default function BanksManagementPage() {
             </div>
           </div>
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <ProfessionalTable
-              columns={columns}
-              data={filteredBanks}
-              loading={loading}
-              emptyMessage="No banks found • Click 'Add Bank' to create one"
-              actions={(row: Bank) => (
-                <div className="flex gap-2">
-                  <ProfessionalButton
-                    variant="ghost"
-                    size="sm"
-                    icon={<BiPencil size={14} />}
-                    onClick={() => router.push(`/dashboard/banks/${row.id}`)}
-                  >
-                    Manage
-                  </ProfessionalButton>
-                  <button
-                    onClick={() => handleDeleteBank(row.id)}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition"
-                    title="Delete bank"
-                  >
-                    <BiTrash size={16} />
-                  </button>
-                </div>
-              )}
-            />
+            {loading ? (
+              <TableSkeleton rows={5} columnCount={3} />
+            ) : (
+              <ProfessionalTable
+                columns={columns}
+                data={filteredBanks}
+                loading={false}
+                emptyMessage="No banks found • Click 'Add Bank' to create one"
+                actions={(row: Bank) => (
+                  <div className="flex gap-2">
+                    <ProfessionalButton
+                      variant="ghost"
+                      size="sm"
+                      icon={<BiPencil size={14} />}
+                      onClick={() => router.push(`/dashboard/banks/${row.id}`)}
+                    >
+                      Manage
+                    </ProfessionalButton>
+                    <button
+                      onClick={() => handleDeleteBank(row.id)}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition"
+                      title="Delete bank"
+                    >
+                      <BiTrash size={16} />
+                    </button>
+                  </div>
+                )}
+              />
+            )}
           </div>
         </div>
       </div>

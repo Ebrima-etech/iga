@@ -4,6 +4,7 @@ import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
+import { TableSkeleton } from '@/components/Common/Skeleton';
 import { Payment } from '@/types';
 import api from '@/lib/api';
 import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
@@ -158,21 +159,24 @@ export default function PaymentsPage() {
           </select>
         </div>
 
-        {/* Table */}
+        {/* Table (with shimmer loading) */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Reference</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Pilgrim</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Bank</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Amount</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
+          {loading ? (
+            <TableSkeleton rows={6} columnCount={6} />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Reference</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Pilgrim</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Bank</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Amount</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
                 {filteredPayments.length > 0 ? (
                   filteredPayments.map((payment) => (
                     <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
@@ -198,8 +202,9 @@ export default function PaymentsPage() {
                   </tr>
                 )}
               </tbody>
-            </table>
-          </div>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Stats by Status */}

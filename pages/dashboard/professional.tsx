@@ -8,6 +8,7 @@ import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
+import { StatCardSkeleton, ChartSkeleton, TableSkeleton } from '@/components/Common/Skeleton';
 import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -205,19 +206,28 @@ export default function ProfessionalDashboard() {
 
         <div className="p-8">
 
-        {/* Stats Panel */}
+        {/* Stats Panel - with shimmer loading */}
         <div className="mb-8">
-          <MetricsPanel title="Season overview" metrics={statCards} />
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => <StatCardSkeleton key={i} />)}
+            </div>
+          ) : (
+            <MetricsPanel title="Season overview" metrics={statCards} />
+          )}
         </div>
 
-        {/* Charts Grid */}
+        {/* Charts Grid - with shimmer loading */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Pilgrim Registration Trend */}
           <div className="lg:col-span-2">
-            <Card padding="lg" shadow="none">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Pilgrim Registration Trend</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={pilgrimTrendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+            {loading ? (
+              <ChartSkeleton />
+            ) : (
+              <Card padding="lg" shadow="none">
+                <h3 className="text-sm font-semibold text-gray-900 mb-4">Pilgrim Registration Trend</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={pilgrimTrendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
                   <XAxis dataKey="week" stroke="var(--text-secondary)" />
                   <YAxis stroke="var(--text-secondary)" />
@@ -239,14 +249,18 @@ export default function ProfessionalDashboard() {
                   />
                 </LineChart>
               </ResponsiveContainer>
-            </Card>
+              </Card>
+            )}
           </div>
 
           {/* Payment Status Breakdown */}
           <div>
-            <Card padding="lg" shadow="none">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Status</h3>
-              <ResponsiveContainer width="100%" height={300}>
+            {loading ? (
+              <ChartSkeleton />
+            ) : (
+              <Card padding="lg" shadow="none">
+                <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Status</h3>
+                <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={paymentStatusData}
@@ -265,14 +279,18 @@ export default function ProfessionalDashboard() {
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
-            </Card>
+              </Card>
+            )}
           </div>
         </div>
 
         {/* Bank Comparison Chart */}
-        <Card padding="lg" shadow="none" className="mb-8">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Bank Payment Comparison</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        {loading ? (
+          <ChartSkeleton className="mb-8" />
+        ) : (
+          <Card padding="lg" shadow="none" className="mb-8">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Bank Payment Comparison</h3>
+            <ResponsiveContainer width="100%" height={300}>
             <BarChart data={bankComparisonData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
               <XAxis dataKey="bank" stroke="var(--text-secondary)" />
@@ -287,25 +305,30 @@ export default function ProfessionalDashboard() {
               <Bar dataKey="amount" fill="#111827" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </Card>
+          </Card>
+        )}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Payments Table - spans 2 columns */}
+          {/* Payments Table - spans 2 columns (with shimmer loading) */}
           <div className="lg:col-span-2">
-            <ProfessionalTable
-              columns={paymentColumns}
-              data={payments.slice(0, 10)}
-              loading={loading}
-              emptyMessage="No recent payments"
-              actions={(row) => (
-                <div className="flex gap-2">
-                  <ProfessionalButton variant="ghost" size="sm">
-                    View
-                  </ProfessionalButton>
-                </div>
-              )}
-            />
+            {loading ? (
+              <TableSkeleton rows={5} columnCount={6} />
+            ) : (
+              <ProfessionalTable
+                columns={paymentColumns}
+                data={payments.slice(0, 10)}
+                loading={false}
+                emptyMessage="No recent payments"
+                actions={(row) => (
+                  <div className="flex gap-2">
+                    <ProfessionalButton variant="ghost" size="sm">
+                      View
+                    </ProfessionalButton>
+                  </div>
+                )}
+              />
+            )}
           </div>
 
           {/* Right Sidebar */}

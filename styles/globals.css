@@ -163,6 +163,15 @@
   }
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
 .animate-spin {
   animation: spin 1s linear infinite;
 }
@@ -177,4 +186,8 @@
 
 .animate-slideDown {
   animation: slideDown 0.3s ease-out;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
 }
