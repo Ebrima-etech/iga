@@ -106,7 +106,13 @@ export default function ReportsPage() {
     }
   };
 
-  if (loading) return <Layout><Loading /></Layout>;
+  if (loading) {
+    return (
+      <Layout>
+        <Loading />
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -117,7 +123,6 @@ export default function ReportsPage() {
         />
 
         <div className="space-y-6">
-          {/* Date Range Filter Section */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center gap-3 mb-4">
               <BiCalendar size={20} className="text-primary-600" />
@@ -155,7 +160,6 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {/* Summary Stats */}
           {reportData && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white p-6 rounded-lg border border-gray-200">
@@ -181,11 +185,9 @@ export default function ReportsPage() {
             </div>
           )}
 
-          {/* Available Reports */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6">Available Reports</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Pilgrim Summary Report */}
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -218,7 +220,6 @@ export default function ReportsPage() {
                 </div>
               </div>
 
-              {/* Payment Reconciliation Report */}
               <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -251,7 +252,6 @@ export default function ReportsPage() {
                 </div>
               </div>
 
-              {/* Bank Performance Report */}
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -284,7 +284,6 @@ export default function ReportsPage() {
                 </div>
               </div>
 
-              {/* Daily Activity Report */}
               <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -319,7 +318,6 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {/* Export History */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6">Recent Exports</h3>
             {exportHistory.length > 0 ? (
@@ -334,13 +332,13 @@ export default function ReportsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {exportHistory.map((export) => (
-                      <tr key={export.id} className="hover:bg-gray-50">
-                        <td className="py-3 px-4 text-sm text-gray-900">{export.reportType}</td>
+                    {exportHistory.map((exp) => (
+                      <tr key={exp.id} className="hover:bg-gray-50">
+                        <td className="py-3 px-4 text-sm text-gray-900">{exp.reportType}</td>
                         <td className="py-3 px-4 text-sm">
-                          <Badge variant="info" size="sm">{export.type}</Badge>
+                          <Badge variant="info" size="sm">{exp.type}</Badge>
                         </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">{formatDate(export.generatedAt)}</td>
+                        <td className="py-3 px-4 text-sm text-gray-600">{formatDate(exp.generatedAt)}</td>
                         <td className="py-3 px-4 text-sm">
                           <Badge variant="success" size="sm">Ready</Badge>
                         </td>
