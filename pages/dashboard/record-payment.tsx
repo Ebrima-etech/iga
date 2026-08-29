@@ -87,11 +87,11 @@ const paymentFormSteps = [
       },
       {
         name: 'payer_relationship',
-        label: 'Relationship to Pilgrim',
+        label: 'Relationship to Pilgrim (Auto-filled as Self)',
         type: 'select' as const,
         required: false,
         options: [
-          { label: 'Self', value: 'Self' },
+          { label: 'Self (Pilgrim themselves)', value: 'Self' },
           { label: 'Parent', value: 'Parent' },
           { label: 'Spouse', value: 'Spouse' },
           { label: 'Child', value: 'Child' },
