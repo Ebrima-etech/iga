@@ -9,11 +9,12 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [voiceAssistantOpen, setVoiceAssistantOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
-      <Sidebar />
-      <div className="md:ml-64 flex flex-col min-h-screen">
+      <Sidebar isCollapsed={sidebarCollapsed} onCollapsedChange={setSidebarCollapsed} />
+      <div className={`flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         <Header onVoiceAssistantToggle={() => setVoiceAssistantOpen(!voiceAssistantOpen)} />
         <main className="flex-1 pb-20 md:pb-0">
           <div className="max-w-[1400px] mx-auto">{children}</div>

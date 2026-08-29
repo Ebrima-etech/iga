@@ -57,7 +57,12 @@ const navSections: NavSection[] = [
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  isCollapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+}
+
+export default function Sidebar({ isCollapsed = false, onCollapsedChange }: SidebarProps) {
   const router = useRouter();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -96,49 +101,65 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-64 border-r border-gray-200 bg-white transform transition-transform md:translate-x-0 z-50 flex flex-col ${
+        className={`fixed left-0 top-0 h-screen border-r border-gray-200 bg-white transform transition-all duration-300 md:translate-x-0 z-50 flex flex-col ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } ${isCollapsed ? 'md:w-20' : 'md:w-64'} w-64`}
       >
         {/* Org switcher */}
         <div className="px-3 pt-4 pb-3 border-b border-gray-200">
-          <Link href="/dashboard">
-            <div className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 cursor-pointer transition-colors">
-              <div className="w-6 h-6 rounded-md bg-emerald-600 flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-xs">G</span>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard" className="flex-1">
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 cursor-pointer transition-colors">
+                <div className="w-6 h-6 rounded-md bg-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-xs">G</span>
+                </div>
+                {!isCollapsed && (
+                  <>
+                    <span className="font-semibold text-gray-900 text-sm truncate">GIA Hajj</span>
+                    <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 flex-shrink-0">
+                      2026
+                    </span>
+                    <BiChevronDown size={14} className="text-gray-400 ml-auto flex-shrink-0" />
+                  </>
+                )}
               </div>
-              <span className="font-semibold text-gray-900 text-sm truncate">GIA Hajj</span>
-              <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-                2026
-              </span>
-              <BiChevronDown size={14} className="text-gray-400 ml-auto flex-shrink-0" />
-            </div>
-          </Link>
+            </Link>
+            <button
+              onClick={() => onCollapsedChange && onCollapsedChange(!isCollapsed)}
+              className="hidden md:flex items-center justify-center p-1.5 rounded-md hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"
+              title={isCollapsed ? 'Expand' : 'Collapse'}
+            >
+              <BiMenu size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto p-3 space-y-5">
           {navSections.map((section) => (
             <div key={section.label}>
-              <p className="px-3 mb-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wide">
-                {section.label}
-              </p>
+              {!isCollapsed && (
+                <p className="px-3 mb-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wide">
+                  {section.label}
+                </p>
+              )}
               <div className="space-y-0.5">
                 {section.items.map((item) => {
                   const active = isActive(item.href);
                   return (
                     <Link key={item.href} href={item.href}>
                       <span
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-100 cursor-pointer group ${
+                        className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-100 cursor-pointer group justify-center md:justify-start ${
                           active
                             ? 'bg-gray-100 text-gray-900 font-medium'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
+                        } ${isCollapsed ? 'md:justify-center' : ''}`}
+                        title={isCollapsed ? item.label : ''}
                       >
                         <span className={active ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'}>
                           {item.icon}
                         </span>
-                        <span className="text-sm">{item.label}</span>
+                        {!isCollapsed && <span className="text-sm">{item.label}</span>}
                       </span>
                     </Link>
                   );

@@ -305,26 +305,42 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
   };
 
   return (
-    <div>
+    <>
+      <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .voice-assistant-panel {
+          animation: slideDown 0.3s ease-out;
+        }
+      `}</style>
       {isOpen && (
-        <div className="absolute bottom-20 right-0 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 space-y-4">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Voice Assistant</h3>
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                setIsAwaitingWakeWord(true);
-                setTranscript('');
-                if (stopRecordingRef.current) {
-                  stopRecordingRef.current();
-                }
-              }}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <FaTimes size={20} />
-            </button>
-          </div>
+        <div className="voice-assistant-panel fixed top-14 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-lg">
+          <div className="max-w-[1400px] mx-auto px-6 py-4 space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Voice Assistant</h3>
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsAwaitingWakeWord(true);
+                  setTranscript('');
+                  if (stopRecordingRef.current) {
+                    stopRecordingRef.current();
+                  }
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
 
           {/* Microphone status */}
           <div className={`p-4 rounded-lg ${isListening ? 'bg-blue-50 border-2 border-blue-200' : 'bg-gray-50 border border-gray-200'}`}>
@@ -375,19 +391,20 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
             {isSpeaking ? 'Stop Speaking' : 'Volume On'}
           </button>
 
-          {/* Help text */}
-          <div className="text-xs text-gray-500 space-y-1">
-            <p className="font-medium text-gray-600">Try saying:</p>
-            <ul className="list-disc list-inside space-y-0.5">
-              <li>"Search for Hassan"</li>
-              <li>"Read payment report for today"</li>
-              <li>"Export pilgrim data as PDF"</li>
-              <li>"Total payments this month"</li>
-              <li>"Go to banks"</li>
-            </ul>
+            {/* Help text */}
+            <div className="text-xs text-gray-500 space-y-1">
+              <p className="font-medium text-gray-600">Try saying:</p>
+              <ul className="list-disc list-inside space-y-0.5">
+                <li>"Search for Hassan"</li>
+                <li>"Read payment report for today"</li>
+                <li>"Export pilgrim data as PDF"</li>
+                <li>"Total payments this month"</li>
+                <li>"Go to banks"</li>
+              </ul>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
