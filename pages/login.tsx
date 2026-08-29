@@ -35,17 +35,33 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-gradient-to-b from-emerald-950 via-emerald-950 to-black">
       <HajjVisualPanel />
 
-      <div className="relative flex-1 flex flex-col bg-gradient-to-br from-emerald-50 via-white to-amber-50/40 overflow-hidden">
+      <div className="relative flex-1 flex flex-col overflow-hidden">
+        {/* Geometric Islamic pattern, matching the visual panel */}
+        <svg className="absolute inset-0 w-full h-full opacity-[0.08]" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="girihForm" width="56" height="56" patternUnits="userSpaceOnUse">
+              <g stroke="#d4af37" strokeWidth="1" fill="none">
+                <rect x="8" y="8" width="40" height="40" transform="rotate(45 28 28)" />
+                <rect x="8" y="8" width="40" height="40" />
+              </g>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#girihForm)" />
+        </svg>
+
+        {/* Soft gold glow, echoing the visual panel */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'radial-gradient(circle at 50% 30%, rgba(212,175,55,0.10), transparent 60%)' }}
+        />
+
         <HajjTermsBackground />
 
-        {/* Soft seam blending into the dark visual panel */}
-        <div className="hidden lg:block absolute top-0 left-0 h-full w-32 bg-gradient-to-r from-emerald-900/10 to-transparent pointer-events-none" />
-
         {/* Mobile-only compact Hajj banner */}
-        <div className="lg:hidden bg-gradient-to-r from-emerald-950 to-emerald-900 px-6 py-6 flex items-center gap-4">
+        <div className="relative z-10 lg:hidden px-6 py-6 flex items-center gap-4 border-b border-emerald-900/60">
           <svg width="40" height="36" viewBox="0 0 220 200" fill="none" className="flex-shrink-0">
             <polygon points="150,60 168,48 168,140 150,150" fill="#000000" />
             <polygon points="70,60 88,48 168,48 150,60" fill="#1c1c1c" />
@@ -63,13 +79,13 @@ export default function LoginPage() {
           <div className="w-full max-w-sm">
             {/* Header (desktop) */}
             <div className="hidden lg:block text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-1">GIA Hajj</h1>
-              <p className="text-sm text-gray-600">Operations Management System</p>
+              <h1 className="text-3xl font-bold text-white mb-1">GIA Hajj</h1>
+              <p className="text-sm text-emerald-200/60">Operations Management System</p>
               <div className="mt-4 h-px w-16 bg-amber-400/50 mx-auto" />
             </div>
 
             {/* Card */}
-            <div className="bg-white/90 backdrop-blur-sm border border-emerald-100 rounded-lg p-8 shadow-sm shadow-emerald-900/5 mt-8 lg:mt-0">
+            <div className="bg-white/95 backdrop-blur-sm border border-white/10 rounded-lg p-8 shadow-xl shadow-black/40 mt-8 lg:mt-0">
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">Sign in</h2>
                 <p className="text-sm text-gray-600">to access your dashboard</p>
@@ -123,7 +139,7 @@ export default function LoginPage() {
             </div>
 
             {/* Footer */}
-            <div className="mt-8 text-center text-xs text-gray-500">
+            <div className="mt-8 text-center text-xs text-emerald-200/40">
               <p>© 2026 Gambia International Airlines</p>
             </div>
           </div>
