@@ -15,6 +15,8 @@ import {
   BiBuilding,
   BiChevronDown,
   BiLogOut,
+  BiHotel,
+  BiPlane,
 } from 'react-icons/bi';
 
 interface NavItem {
@@ -37,6 +39,15 @@ const navSections: NavSection[] = [
       { label: 'Payments', href: '/dashboard/payments', icon: <BiWallet size={18} /> },
       { label: 'Banks', href: '/dashboard/banks', icon: <BiBuilding size={18} /> },
       { label: 'Reports', href: '/dashboard/reports', icon: <BiLineChart size={18} /> },
+    ],
+  },
+  {
+    label: 'Accommodations',
+    items: [
+      { label: 'Hotels', href: '/dashboard/accommodations/hotels', icon: <BiHotel size={18} /> },
+      { label: 'Room Assignments', href: '/dashboard/accommodations/room-assignments', icon: <BiBuilding size={18} /> },
+      { label: 'Flights', href: '/dashboard/accommodations/flights', icon: <BiPlane size={18} /> },
+      { label: 'Flight Assignments', href: '/dashboard/accommodations/flight-assignments', icon: <BiPlane size={18} /> },
     ],
   },
   {
