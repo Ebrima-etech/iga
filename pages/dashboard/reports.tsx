@@ -19,10 +19,20 @@ interface ReportData {
   totalPilgrims: number;
 }
 
+interface BankData {
+  id: string;
+  name: string;
+  totalPayments: number;
+  totalAmount: number;
+  confirmedAmount: number;
+}
+
 export default function ReportsPage() {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [bankData, setBankData] = useState<BankData[]>([]);
+  const [selectedBank, setSelectedBank] = useState<string>('all');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [exportHistory, setExportHistory] = useState<any[]>([]);
 
@@ -33,13 +43,15 @@ export default function ReportsPage() {
   const fetchReportData = async () => {
     try {
       setLoading(true);
-      const [pilgrims, payments] = await Promise.all([
+      const [pilgrims, payments, banks] = await Promise.all([
         api.get('/pilgrims/').catch(() => ({ data: { results: [] } })),
         api.get('/bank-payment-submissions/').catch(() => ({ data: { results: [] } })),
+        api.get('/banks/').catch(() => ({ data: { results: [] } })),
       ]);
 
       const pilgrimList = pilgrims.data.results || [];
       const paymentList = payments.data.results || [];
+      const bankList = banks.data.results || [];
 
       const totalAmount = paymentList.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
       const confirmedAmount = paymentList
@@ -49,6 +61,23 @@ export default function ReportsPage() {
         .filter((p: any) => p.status === 'pending')
         .reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
 
+      // Calculate bank-specific data
+      const bankStats: BankData[] = bankList.map((bank: any) => {
+        const bankPayments = paymentList.filter((p: any) => p.bank === bank.id);
+        const bankTotal = bankPayments.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+        const bankConfirmed = bankPayments
+          .filter((p: any) => p.status === 'confirmed')
+          .reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+
+        return {
+          id: bank.id,
+          name: bank.name,
+          totalPayments: bankPayments.length,
+          totalAmount: bankTotal,
+          confirmedAmount: bankConfirmed,
+        };
+      });
+
       setReportData({
         totalPayments: paymentList.length,
         totalAmount,
@@ -56,6 +85,8 @@ export default function ReportsPage() {
         pendingAmount,
         totalPilgrims: pilgrimList.length,
       });
+
+      setBankData(bankStats);
     } catch (error) {
       console.error('Failed to fetch report data:', error);
       toast.error('Failed to load report data');
@@ -305,6 +336,91 @@ export default function ReportsPage() {
               </div>
             </div>
           </div>
+
+          {/* Bank Selection */}
+          {bankData.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Bank-Specific Reports</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <button
+                  onClick={() => setSelectedBank('all')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    selectedBank === 'all'
+                      ? 'bg-primary-600 text-white'
+                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}
+                >
+                  All Banks
+                </button>
+                {bankData.map((bank) => (
+                  <button
+                    key={bank.id}
+                    onClick={() => setSelectedBank(bank.id)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      selectedBank === bank.id
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    }`}
+                  >
+                    {bank.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Bank-Specific Stats */}
+          {selectedBank !== 'all' && bankData.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                {bankData.find((b) => b.id === selectedBank)?.name} - Performance
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                  <p className="text-sm font-medium text-gray-600">Total Transactions</p>
+                  <p className="text-2xl font-bold text-blue-600 mt-2">
+                    {bankData.find((b) => b.id === selectedBank)?.totalPayments || 0}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                  <p className="text-sm font-medium text-gray-600">Confirmed Amount</p>
+                  <p className="text-2xl font-bold text-green-600 mt-2">
+                    {formatCurrency(bankData.find((b) => b.id === selectedBank)?.confirmedAmount || 0)}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                  <p className="text-sm font-medium text-gray-600">Total Amount</p>
+                  <p className="text-2xl font-bold text-purple-600 mt-2">
+                    {formatCurrency(bankData.find((b) => b.id === selectedBank)?.totalAmount || 0)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Bank-Specific Export */}
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-sm font-medium text-gray-700 mb-4">Export Bank Report</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {['PDF', 'Excel', 'CSV', 'Image'].map((format) => (
+                    <ProfessionalButton
+                      key={format}
+                      variant="secondary"
+                      size="sm"
+                      onClick={() =>
+                        handleExport(
+                          `${bankData.find((b) => b.id === selectedBank)?.name} Report`,
+                          format
+                        )
+                      }
+                      loading={exporting}
+                      className="w-full"
+                    >
+                      {format}
+                    </ProfessionalButton>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {reportData && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
