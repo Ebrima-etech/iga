@@ -5,6 +5,7 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Input from '@/components/Common/Input';
 import FormField from '@/components/Common/FormField';
 import HajjVisualPanel from '@/components/HajjVisualPanel';
+import HajjTermsBackground from '@/components/HajjTermsBackground';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -37,7 +38,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex">
       <HajjVisualPanel />
 
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="relative flex-1 flex flex-col bg-white overflow-hidden">
+        <HajjTermsBackground />
+
         {/* Mobile-only compact Hajj banner */}
         <div className="lg:hidden bg-gradient-to-r from-emerald-950 to-emerald-900 px-6 py-6 flex items-center gap-4">
           <svg width="40" height="36" viewBox="0 0 220 200" fill="none" className="flex-shrink-0">

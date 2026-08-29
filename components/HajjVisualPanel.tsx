@@ -37,34 +37,52 @@ export default function HajjVisualPanel() {
       </div>
 
       {/* Airplane flying across the sky */}
-      <div className="absolute top-[10%] left-0 w-full pointer-events-none hajj-plane-track">
-        <svg width="64" height="38" viewBox="0 0 64 38" fill="none" className="text-amber-200/95">
-          {/* tail fin */}
-          <path d="M6 19 L15 6 L19 6 L15 19 Z" fill="currentColor" />
-          <path d="M6 19 L15 32 L19 32 Z" fill="currentColor" opacity="0.85" />
+      <div className="absolute top-[9%] left-0 w-full pointer-events-none hajj-plane-track">
+        <svg width="110" height="64" viewBox="0 0 110 64" fill="none" className="text-amber-200/95">
+          <defs>
+            <clipPath id="tailFlagClip">
+              <path d="M10 34 L26 8 L33 8 L26 34 Z" />
+            </clipPath>
+          </defs>
+
+          {/* horizontal stabilizer */}
+          <path d="M10 34 L26 50 L33 50 Z" fill="currentColor" opacity="0.85" />
+
+          {/* vertical tail fin — Gambia flag livery */}
+          <g clipPath="url(#tailFlagClip)">
+            <rect x="5" y="8" width="35" height="8" fill="#CE1126" />
+            <rect x="5" y="16" width="35" height="1" fill="#ffffff" />
+            <rect x="5" y="17" width="35" height="8" fill="#0C1C8C" />
+            <rect x="5" y="25" width="35" height="1" fill="#ffffff" />
+            <rect x="5" y="26" width="35" height="8" fill="#3A7728" />
+          </g>
+
           {/* main wings */}
-          <path d="M24 19 L38 2 L42 2 L32 19 Z" fill="currentColor" />
-          <path d="M24 19 L38 36 L42 36 L32 19 Z" fill="currentColor" opacity="0.85" />
+          <path d="M41 34 L64 4 L71 4 L55 34 Z" fill="currentColor" />
+          <path d="M41 34 L64 60 L71 60 L55 34 Z" fill="currentColor" opacity="0.85" />
+
           {/* fuselage */}
-          <rect x="10" y="15" width="48" height="8" rx="4" fill="currentColor" />
+          <rect x="17" y="27" width="82" height="14" rx="7" fill="currentColor" />
+
           {/* nose */}
-          <path d="M58 15 L64 19 L58 23 Z" fill="currentColor" />
+          <path d="M99 27 L110 34 L99 41 Z" fill="currentColor" />
+
           {/* GIA livery text */}
           <text
-            x="30"
-            y="20.5"
-            fontSize="6.5"
-            fontWeight="700"
+            x="58"
+            y="36"
+            fontSize="14"
+            fontWeight="800"
             fill="#052e21"
             textAnchor="middle"
             fontFamily="Arial, sans-serif"
-            letterSpacing="0.5"
+            letterSpacing="1"
           >
             GIA
           </text>
         </svg>
-        <svg width="90" height="4" viewBox="0 0 90 4" className="text-amber-100/25 -mt-1 -ml-16">
-          <line x1="0" y1="2" x2="85" y2="2" stroke="currentColor" strokeWidth="1" strokeDasharray="2 3" />
+        <svg width="150" height="5" viewBox="0 0 150 5" className="text-amber-100/25 -mt-1 -ml-24">
+          <line x1="0" y1="2.5" x2="145" y2="2.5" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 4" />
         </svg>
       </div>
 
