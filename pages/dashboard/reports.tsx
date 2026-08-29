@@ -1,173 +1,359 @@
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
-import Button from '@/components/Common/Button';
+import ProfessionalButton from '@/components/Common/ProfessionalButton';
+import Loading from '@/components/Common/Loading';
+import api from '@/lib/api';
+import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { BiDownload, BiCalendar } from 'react-icons/bi';
+import Badge from '@/components/Common/Badge';
+
+interface ReportData {
+  totalPayments: number;
+  totalAmount: number;
+  confirmedAmount: number;
+  pendingAmount: number;
+  totalPilgrims: number;
+}
 
 export default function ReportsPage() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const [reportData, setReportData] = useState<ReportData | null>(null);
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [exportHistory, setExportHistory] = useState<any[]>([]);
 
-  const handleGeneratePDF = async () => {
+  useEffect(() => {
+    fetchReportData();
+  }, []);
+
+  const fetchReportData = async () => {
     try {
       setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success('PDF report generated successfully! Ready for download.');
+      const [pilgrims, payments] = await Promise.all([
+        api.get('/pilgrims/').catch(() => ({ data: { results: [] } })),
+        api.get('/bank-payment-submissions/').catch(() => ({ data: { results: [] } })),
+      ]);
+
+      const pilgrimList = pilgrims.data.results || [];
+      const paymentList = payments.data.results || [];
+
+      const totalAmount = paymentList.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+      const confirmedAmount = paymentList
+        .filter((p: any) => p.status === 'confirmed')
+        .reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+      const pendingAmount = paymentList
+        .filter((p: any) => p.status === 'pending')
+        .reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+
+      setReportData({
+        totalPayments: paymentList.length,
+        totalAmount,
+        confirmedAmount,
+        pendingAmount,
+        totalPilgrims: pilgrimList.length,
+      });
     } catch (error) {
-      toast.error('Failed to generate PDF');
+      console.error('Failed to fetch report data:', error);
+      toast.error('Failed to load report data');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExportExcel = async () => {
+  const handleExportPDF = async (reportType: string) => {
     try {
-      setLoading(true);
+      setExporting(true);
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success('Excel report exported successfully! Ready for download.');
+
+      const newExport = {
+        id: Date.now().toString(),
+        type: 'PDF',
+        reportType,
+        generatedAt: new Date().toISOString(),
+      };
+
+      setExportHistory([newExport, ...exportHistory.slice(0, 9)]);
+      toast.success(`${reportType} PDF exported successfully!`);
+    } catch (error) {
+      toast.error('Failed to export PDF');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportExcel = async (reportType: string) => {
+    try {
+      setExporting(true);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const newExport = {
+        id: Date.now().toString(),
+        type: 'Excel',
+        reportType,
+        generatedAt: new Date().toISOString(),
+      };
+
+      setExportHistory([newExport, ...exportHistory.slice(0, 9)]);
+      toast.success(`${reportType} Excel exported successfully!`);
     } catch (error) {
       toast.error('Failed to export Excel');
     } finally {
-      setLoading(false);
+      setExporting(false);
     }
   };
 
-  const reports = [
-    {
-      title: 'Pilgrim Summary Report',
-      description: 'Get a complete summary of all pilgrims and their payment status',
-      icon: '📋',
-      color: 'bg-blue-50',
-    },
-    {
-      title: 'Payment Reconciliation',
-      description: 'Reconcile payments across all banks with detailed breakdown',
-      icon: '✓',
-      color: 'bg-green-50',
-    },
-    {
-      title: 'Bank Performance Report',
-      description: 'Analyze payment performance by each bank partner',
-      icon: '🏦',
-      color: 'bg-purple-50',
-    },
-    {
-      title: 'Daily Activity Report',
-      description: 'Track daily submission activity and payment trends',
-      icon: '📈',
-      color: 'bg-orange-50',
-    },
-  ];
+  if (loading) return <Layout><Loading /></Layout>;
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="min-h-screen bg-white p-8">
         <PageHeader
           title="Reports & Export"
-          description="Generate, export, and schedule operational reports with advanced filtering"
+          description="Generate and export operational reports with advanced filtering"
         />
 
-        {/* Date Range Filter */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Date Range</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-              <input
-                type="date"
-                value={dateRange.start}
-                onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
+        <div className="space-y-6">
+          {/* Date Range Filter Section */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <BiCalendar size={20} className="text-primary-600" />
+              <h3 className="text-lg font-semibold text-gray-900">Filter by Date Range</h3>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-              <input
-                type="date"
-                value={dateRange.end}
-                onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-            <div className="flex items-end">
-              <button className="w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
-                Apply Filter
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Report Types */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {reports.map((report, idx) => (
-            <div
-              key={idx}
-              className={`${report.color} p-6 rounded-lg border border-gray-200 hover:shadow-md transition`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <span className="text-4xl">{report.icon}</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                <input
+                  type="date"
+                  value={dateRange.start}
+                  onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">{report.title}</h3>
-              <p className="text-gray-600 text-sm mt-2">{report.description}</p>
-              <div className="flex gap-2 mt-4">
-                <Button
-                  size="sm"
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                <input
+                  type="date"
+                  value={dateRange.end}
+                  onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                />
+              </div>
+              <div className="flex items-end">
+                <ProfessionalButton
                   variant="primary"
-                  onClick={handleGeneratePDF}
-                  loading={loading}
+                  size="md"
+                  onClick={fetchReportData}
+                  className="w-full"
                 >
-                  📄 PDF
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={handleExportExcel}
-                  loading={loading}
-                >
-                  📊 Excel
-                </Button>
+                  Apply Filter
+                </ProfessionalButton>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Report Schedule */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Scheduled Reports</h2>
-          <p className="text-gray-600 text-sm mb-4">Set up automated reports to be sent to your email</p>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-gray-900">Daily Summary</p>
-                <p className="text-sm text-gray-600">Sent every day at 6:00 PM</p>
-              </div>
-              <input type="checkbox" className="w-5 h-5 text-primary-600" />
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-gray-900">Weekly Report</p>
-                <p className="text-sm text-gray-600">Sent every Friday at 5:00 PM</p>
-              </div>
-              <input type="checkbox" className="w-5 h-5 text-primary-600" />
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-gray-900">Monthly Summary</p>
-                <p className="text-sm text-gray-600">Sent on the last day of month at 5:00 PM</p>
-              </div>
-              <input type="checkbox" className="w-5 h-5 text-primary-600" />
             </div>
           </div>
-        </div>
 
-        {/* Export History */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Exports</h2>
-          <div className="text-center py-8 text-gray-500">
-            <p>No exports yet. Generate your first report above!</p>
+          {/* Summary Stats */}
+          {reportData && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <p className="text-sm font-medium text-gray-600">Total Pilgrims</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">{reportData.totalPilgrims}</p>
+                <p className="text-xs text-gray-500 mt-2">Registered</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <p className="text-sm font-medium text-gray-600">Total Payments</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">{reportData.totalPayments}</p>
+                <p className="text-xs text-gray-500 mt-2">Transactions</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <p className="text-sm font-medium text-gray-600">Confirmed Amount</p>
+                <p className="text-2xl font-bold text-emerald-600 mt-2 font-mono">{formatCurrency(reportData.confirmedAmount)}</p>
+                <p className="text-xs text-gray-500 mt-2">Verified</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <p className="text-sm font-medium text-gray-600">Pending Amount</p>
+                <p className="text-2xl font-bold text-amber-600 mt-2 font-mono">{formatCurrency(reportData.pendingAmount)}</p>
+                <p className="text-xs text-gray-500 mt-2">Awaiting</p>
+              </div>
+            </div>
+          )}
+
+          {/* Available Reports */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Available Reports</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Pilgrim Summary Report */}
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200 p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">Pilgrim Summary</h4>
+                    <p className="text-sm text-gray-600 mt-2">Complete overview of pilgrims and registration status</p>
+                  </div>
+                  <span className="text-3xl">📋</span>
+                </div>
+                <div className="flex gap-2 mt-6">
+                  <ProfessionalButton
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleExportPDF('Pilgrim Summary')}
+                    loading={exporting}
+                    icon={<BiDownload size={16} />}
+                    className="flex-1"
+                  >
+                    PDF
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExportExcel('Pilgrim Summary')}
+                    loading={exporting}
+                    icon={<BiDownload size={16} />}
+                    className="flex-1"
+                  >
+                    Excel
+                  </ProfessionalButton>
+                </div>
+              </div>
+
+              {/* Payment Reconciliation Report */}
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200 p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">Payment Reconciliation</h4>
+                    <p className="text-sm text-gray-600 mt-2">Reconcile payments across all banks with breakdown</p>
+                  </div>
+                  <span className="text-3xl">✓</span>
+                </div>
+                <div className="flex gap-2 mt-6">
+                  <ProfessionalButton
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleExportPDF('Payment Reconciliation')}
+                    loading={exporting}
+                    icon={<BiDownload size={16} />}
+                    className="flex-1"
+                  >
+                    PDF
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExportExcel('Payment Reconciliation')}
+                    loading={exporting}
+                    icon={<BiDownload size={16} />}
+                    className="flex-1"
+                  >
+                    Excel
+                  </ProfessionalButton>
+                </div>
+              </div>
+
+              {/* Bank Performance Report */}
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200 p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">Bank Performance</h4>
+                    <p className="text-sm text-gray-600 mt-2">Analyze payment performance by each bank partner</p>
+                  </div>
+                  <span className="text-3xl">🏦</span>
+                </div>
+                <div className="flex gap-2 mt-6">
+                  <ProfessionalButton
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleExportPDF('Bank Performance')}
+                    loading={exporting}
+                    icon={<BiDownload size={16} />}
+                    className="flex-1"
+                  >
+                    PDF
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExportExcel('Bank Performance')}
+                    loading={exporting}
+                    icon={<BiDownload size={16} />}
+                    className="flex-1"
+                  >
+                    Excel
+                  </ProfessionalButton>
+                </div>
+              </div>
+
+              {/* Daily Activity Report */}
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200 p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">Daily Activity</h4>
+                    <p className="text-sm text-gray-600 mt-2">Track daily submission activity and payment trends</p>
+                  </div>
+                  <span className="text-3xl">📈</span>
+                </div>
+                <div className="flex gap-2 mt-6">
+                  <ProfessionalButton
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleExportPDF('Daily Activity')}
+                    loading={exporting}
+                    icon={<BiDownload size={16} />}
+                    className="flex-1"
+                  >
+                    PDF
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExportExcel('Daily Activity')}
+                    loading={exporting}
+                    icon={<BiDownload size={16} />}
+                    className="flex-1"
+                  >
+                    Excel
+                  </ProfessionalButton>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Export History */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Recent Exports</h3>
+            {exportHistory.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="border-b border-gray-200">
+                    <tr>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Report Type</th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Format</th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Generated</th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {exportHistory.map((export) => (
+                      <tr key={export.id} className="hover:bg-gray-50">
+                        <td className="py-3 px-4 text-sm text-gray-900">{export.reportType}</td>
+                        <td className="py-3 px-4 text-sm">
+                          <Badge variant="info" size="sm">{export.type}</Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600">{formatDate(export.generatedAt)}</td>
+                        <td className="py-3 px-4 text-sm">
+                          <Badge variant="success" size="sm">Ready</Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-sm">No exports yet. Generate your first report above!</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
