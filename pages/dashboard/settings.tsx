@@ -48,13 +48,6 @@ export default function SettingsPage() {
     { code: 'EUR', name: 'Euro', symbol: '€', rate: 0.016 },
   ]);
 
-  useEffect(() => {
-    fetchUserData();
-    loadCurrencySettings();
-    const mode = getCurrencyMode();
-    setCurrencyModeState(mode);
-  }, []);
-
   const loadCurrencySettings = async () => {
     try {
       const currencyStore = useCurrencyStore.getState();
@@ -77,6 +70,13 @@ export default function SettingsPage() {
       // Fall back to store defaults
     }
   };
+
+  useEffect(() => {
+    fetchUserData();
+    loadCurrencySettings();
+    const mode = getCurrencyMode();
+    setCurrencyModeState(mode);
+  }, []);
 
   const fetchUserData = async () => {
     try {
