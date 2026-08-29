@@ -76,21 +76,12 @@ export default function PaymentDetailPage() {
       const pilgrimRes = await api.post('/pilgrims/', pilgrimData);
       const newPilgrim = pilgrimRes.data;
 
-      // Create corresponding payment record linking to the new pilgrim
-      const paymentData = {
-        pilgrim: newPilgrim.id,
-        bank: payment.bank,
-        amount: payment.amount,
+      // Link the existing payment to the new pilgrim
+      // (Payment was already created by the bank submission signal)
+      await api.post('/payments/link_pilgrim/', {
         reference_number: payment.reference_number,
-        payment_date: payment.payment_date,
-        status: 'confirmed',
-        description: `From bank submission - ${payment.reference_number}`,
-        payer_name: payment.payer_name,
-        payer_contact: payment.payer_contact,
-        payer_relationship: payment.payer_relationship,
-      };
-
-      await api.post('/payments/', paymentData);
+        pilgrim_id: newPilgrim.id,
+      });
 
       // Update the bank submission to mark pilgrim as created
       await api.patch(`/bank-payment-submissions/${id}/`, {
