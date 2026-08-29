@@ -173,11 +173,11 @@
 }
 
 @keyframes subtle-shimmer {
-  0% {
-    background-position: -1000px 0;
+  0%, 100% {
+    opacity: 0.6;
   }
-  100% {
-    background-position: 1000px 0;
+  50% {
+    opacity: 0.8;
   }
 }
 
@@ -202,5 +202,5 @@
 }
 
 .animate-subtle-shimmer {
-  animation: subtle-shimmer 2.5s ease-in-out infinite;
+  animation: subtle-shimmer 3s ease-in-out infinite;
 }
