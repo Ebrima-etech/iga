@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
@@ -493,13 +491,12 @@ export default function ReportsPage() {
                   </div>
                   <span className="text-3xl">✓</span>
                 </div>
-                <div className="flex gap-2 mt-6">
+                <div className="grid grid-cols-2 gap-2 mt-6">
                   <ProfessionalButton
                     variant="primary"
                     size="sm"
-                    onClick={() => handleExportPDF('Payment Reconciliation')}
+                    onClick={() => handleExport('Payment Reconciliation', 'PDF')}
                     loading={exporting}
-                    icon={<BiDownload size={16} />}
                     className="flex-1"
                   >
                     PDF
@@ -507,12 +504,29 @@ export default function ReportsPage() {
                   <ProfessionalButton
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleExportExcel('Payment Reconciliation')}
+                    onClick={() => handleExport('Payment Reconciliation', 'Excel')}
                     loading={exporting}
-                    icon={<BiDownload size={16} />}
                     className="flex-1"
                   >
                     Excel
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExport('Payment Reconciliation', 'CSV')}
+                    loading={exporting}
+                    className="flex-1"
+                  >
+                    CSV
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExport('Payment Reconciliation', 'Image')}
+                    loading={exporting}
+                    className="flex-1"
+                  >
+                    Image
                   </ProfessionalButton>
                 </div>
               </div>
@@ -525,13 +539,12 @@ export default function ReportsPage() {
                   </div>
                   <span className="text-3xl">🏦</span>
                 </div>
-                <div className="flex gap-2 mt-6">
+                <div className="grid grid-cols-2 gap-2 mt-6">
                   <ProfessionalButton
                     variant="primary"
                     size="sm"
-                    onClick={() => handleExportPDF('Bank Performance')}
+                    onClick={() => handleExport('Bank Performance', 'PDF')}
                     loading={exporting}
-                    icon={<BiDownload size={16} />}
                     className="flex-1"
                   >
                     PDF
@@ -539,12 +552,29 @@ export default function ReportsPage() {
                   <ProfessionalButton
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleExportExcel('Bank Performance')}
+                    onClick={() => handleExport('Bank Performance', 'Excel')}
                     loading={exporting}
-                    icon={<BiDownload size={16} />}
                     className="flex-1"
                   >
                     Excel
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExport('Bank Performance', 'CSV')}
+                    loading={exporting}
+                    className="flex-1"
+                  >
+                    CSV
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExport('Bank Performance', 'Image')}
+                    loading={exporting}
+                    className="flex-1"
+                  >
+                    Image
                   </ProfessionalButton>
                 </div>
               </div>
@@ -557,13 +587,12 @@ export default function ReportsPage() {
                   </div>
                   <span className="text-3xl">📈</span>
                 </div>
-                <div className="flex gap-2 mt-6">
+                <div className="grid grid-cols-2 gap-2 mt-6">
                   <ProfessionalButton
                     variant="primary"
                     size="sm"
-                    onClick={() => handleExportPDF('Daily Activity')}
+                    onClick={() => handleExport('Daily Activity', 'PDF')}
                     loading={exporting}
-                    icon={<BiDownload size={16} />}
                     className="flex-1"
                   >
                     PDF
@@ -571,12 +600,29 @@ export default function ReportsPage() {
                   <ProfessionalButton
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleExportExcel('Daily Activity')}
+                    onClick={() => handleExport('Daily Activity', 'Excel')}
                     loading={exporting}
-                    icon={<BiDownload size={16} />}
                     className="flex-1"
                   >
                     Excel
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExport('Daily Activity', 'CSV')}
+                    loading={exporting}
+                    className="flex-1"
+                  >
+                    CSV
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleExport('Daily Activity', 'Image')}
+                    loading={exporting}
+                    className="flex-1"
+                  >
+                    Image
                   </ProfessionalButton>
                 </div>
               </div>

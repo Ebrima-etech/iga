@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import Card from '@/components/Common/Card';
 import { StatCardSkeleton } from '@/components/Common/Skeleton';
-import { BiArrowBack, BiDownload, BiRefresh, BiCalendar } from 'react-icons/bi';
+import { BiDownload, BiRefresh, BiUser, BiWallet, BiCheckCircle, BiTrendingUp, BiBarChartAlt2, BiBuilding, BiTime, BiGlobe } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import {
@@ -217,47 +217,55 @@ export default function AnalyticsPage() {
 
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="p-6">
+            <Card className="p-6 border-l-4 border-l-blue-500">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Total Pilgrims</p>
                   <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalPilgrims.toLocaleString()}</p>
                   <p className="text-xs text-emerald-600 mt-2">↑ 12.5% from last period</p>
                 </div>
-                <div className="text-4xl">👥</div>
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <BiUser size={24} className="text-blue-600" />
+                </div>
               </div>
             </Card>
 
-            <Card className="p-6">
+            <Card className="p-6 border-l-4 border-l-emerald-500">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Total Revenue</p>
                   <p className="text-3xl font-bold text-gray-900 mt-2">${(metrics.totalPayments / 1000000).toFixed(2)}M</p>
                   <p className="text-xs text-emerald-600 mt-2">↑ 8.3% from last period</p>
                 </div>
-                <div className="text-4xl">💰</div>
+                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <BiWallet size={24} className="text-emerald-600" />
+                </div>
               </div>
             </Card>
 
-            <Card className="p-6">
+            <Card className="p-6 border-l-4 border-l-amber-500">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Completion Rate</p>
                   <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.paymentCompletionRate}%</p>
                   <p className="text-xs text-emerald-600 mt-2">↑ 3.2% from last period</p>
                 </div>
-                <div className="text-4xl">✅</div>
+                <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <BiCheckCircle size={24} className="text-amber-600" />
+                </div>
               </div>
             </Card>
 
-            <Card className="p-6">
+            <Card className="p-6 border-l-4 border-l-purple-500">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Avg Payment</p>
                   <p className="text-3xl font-bold text-gray-900 mt-2">${metrics.avgPaymentAmount.toLocaleString()}</p>
                   <p className="text-xs text-emerald-600 mt-2">↑ 5.1% from last period</p>
                 </div>
-                <div className="text-4xl">📊</div>
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <BiTrendingUp size={24} className="text-purple-600" />
+                </div>
               </div>
             </Card>
           </div>
@@ -398,30 +406,58 @@ export default function AnalyticsPage() {
 
           {/* Additional Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="p-6">
-              <p className="text-sm text-gray-600 font-medium">Conversion Rate</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.conversionRate}%</p>
-              <div className="mt-4 bg-gray-200 rounded-full h-2">
-                <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${metrics.conversionRate}%` }} />
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Conversion Rate</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.conversionRate}%</p>
+                  <div className="mt-4 bg-gray-200 rounded-full h-2">
+                    <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${metrics.conversionRate}%` }} />
+                  </div>
+                </div>
+                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <BiBarChartAlt2 size={20} className="text-emerald-600" />
+                </div>
               </div>
             </Card>
 
-            <Card className="p-6">
-              <p className="text-sm text-gray-600 font-medium">Active Banks</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.activeBanks}</p>
-              <p className="text-xs text-gray-500 mt-2">Connected & operational</p>
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Active Banks</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.activeBanks}</p>
+                  <p className="text-xs text-gray-500 mt-2">Connected & operational</p>
+                </div>
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <BiBuilding size={20} className="text-blue-600" />
+                </div>
+              </div>
             </Card>
 
-            <Card className="p-6">
-              <p className="text-sm text-gray-600 font-medium">Avg Registration Time</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.avgRegistrationTime}m</p>
-              <p className="text-xs text-gray-500 mt-2">Minutes per pilgrim</p>
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Avg Registration Time</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.avgRegistrationTime}m</p>
+                  <p className="text-xs text-gray-500 mt-2">Minutes per pilgrim</p>
+                </div>
+                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <BiTime size={20} className="text-orange-600" />
+                </div>
+              </div>
             </Card>
 
-            <Card className="p-6">
-              <p className="text-sm text-gray-600 font-medium">Countries Represented</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalCountries}</p>
-              <p className="text-xs text-gray-500 mt-2">Global participation</p>
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Countries Represented</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalCountries}</p>
+                  <p className="text-xs text-gray-500 mt-2">Global participation</p>
+                </div>
+                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <BiGlobe size={20} className="text-indigo-600" />
+                </div>
+              </div>
             </Card>
           </div>
         </div>
