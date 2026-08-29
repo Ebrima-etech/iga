@@ -154,7 +154,7 @@ export default function BankDetailPage() {
               {/* Logo Section */}
               <div className="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg bg-gray-50">
                 {bank.logo ? (
-                  <img src={bank.logo} alt={bank.name} className="h-24 w-24 object-contain mb-4" />
+                  <img src={bank.logo.startsWith('http') ? bank.logo : `https://igaa.onrender.com${bank.logo}`} alt={bank.name} className="h-24 w-24 object-contain mb-4" />
                 ) : (
                   <div className="h-24 w-24 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
                     <span className="text-4xl">🏦</span>
