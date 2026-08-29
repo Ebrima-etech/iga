@@ -322,11 +322,15 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
         }
       `}</style>
       {isOpen && (
-        <div className="voice-assistant-panel fixed top-14 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-lg">
-          <div className="max-w-[1400px] mx-auto px-6 py-4 space-y-4">
-            {/* Header */}
+        <div className="voice-assistant-panel fixed top-14 left-0 right-0 z-40 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 shadow-md md:ml-64 transition-all duration-300">
+          <div className="px-6 py-3 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Voice Assistant</h3>
+              <div className="flex items-center gap-2">
+                <div className={`w-2.5 h-2.5 rounded-full ${isListening ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`} />
+                <span className="text-sm font-medium text-gray-700">
+                  {isListening ? 'Listening...' : 'Ready to listen'}
+                </span>
+              </div>
               <button
                 onClick={() => {
                   setIsOpen(false);
@@ -336,71 +340,46 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
                     stopRecordingRef.current();
                   }
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <FaTimes size={20} />
+                <FaTimes size={18} />
               </button>
             </div>
 
-          {/* Microphone status */}
-          <div className={`p-4 rounded-lg ${isListening ? 'bg-blue-50 border-2 border-blue-200' : 'bg-gray-50 border border-gray-200'}`}>
-            <div className="flex items-center gap-2 mb-2">
-              <div className={`w-3 h-3 rounded-full ${isListening ? 'bg-red-500 animate-pulse' : 'bg-gray-300'}`} />
-              <span className="text-sm font-medium text-gray-700">
-                {isListening ? 'Listening...' : 'Ready to listen'}
-              </span>
-            </div>
             {transcript && (
-              <p className="text-sm text-gray-600 mt-2">
-                <span className="text-gray-400">Heard: </span>"{transcript}"
+              <p className="text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-md">
+                "{transcript}"
               </p>
             )}
-          </div>
 
-          {/* Control buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={handleStartListening}
-              disabled={isListening || isSpeaking}
-              className="flex-1 px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white rounded-lg font-medium transition-colors text-sm"
-            >
-              {isListening ? 'Listening...' : 'Start Recording'}
-            </button>
-            {isListening && (
+            <div className="flex gap-2 items-center">
               <button
-                onClick={handleStopListening}
-                className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors text-sm"
+                onClick={handleStartListening}
+                disabled={isListening || isSpeaking}
+                className="flex-1 px-3 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 text-white rounded-md font-medium transition-colors text-sm"
               >
-                Stop
+                {isListening ? 'Listening' : 'Record'}
               </button>
-            )}
-          </div>
-
-          {/* Speaker control */}
-          <button
-            onClick={() => {
-              if (isSpeaking) {
-                stopSpeaking();
-                setIsSpeaking(false);
-              }
-            }}
-            disabled={!isSpeaking}
-            className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 disabled:opacity-50 text-gray-700 rounded-lg font-medium transition-colors text-sm flex items-center justify-center gap-2"
-          >
-            {isSpeaking ? <FaVolumeMute size={18} /> : <FaVolumeUp size={18} />}
-            {isSpeaking ? 'Stop Speaking' : 'Volume On'}
-          </button>
-
-            {/* Help text */}
-            <div className="text-xs text-gray-500 space-y-1">
-              <p className="font-medium text-gray-600">Try saying:</p>
-              <ul className="list-disc list-inside space-y-0.5">
-                <li>"Search for Hassan"</li>
-                <li>"Read payment report for today"</li>
-                <li>"Export pilgrim data as PDF"</li>
-                <li>"Total payments this month"</li>
-                <li>"Go to banks"</li>
-              </ul>
+              {isListening && (
+                <button
+                  onClick={handleStopListening}
+                  className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md font-medium transition-colors text-sm"
+                >
+                  Stop
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  if (isSpeaking) {
+                    stopSpeaking();
+                    setIsSpeaking(false);
+                  }
+                }}
+                disabled={!isSpeaking}
+                className="px-3 py-2 border border-gray-300 hover:bg-gray-100 disabled:opacity-50 text-gray-700 rounded-md transition-colors text-sm flex items-center gap-1"
+              >
+                {isSpeaking ? <FaVolumeMute size={14} /> : <FaVolumeUp size={14} />}
+              </button>
             </div>
           </div>
         </div>
