@@ -49,6 +49,10 @@ export interface Payment {
   notes: string;
   created_at: string;
   updated_at: string;
+  // Payer information
+  payer_name?: string;
+  payer_contact?: string;
+  payer_relationship?: string;
 }
 
 export interface Bank {
@@ -75,6 +79,19 @@ export interface BankPaymentSubmission {
   description: string;
   submitted_at: string;
   verified_at: string;
+  submitted_by_user?: string;
+  // Pilgrim information (collected at bank)
+  pilgrim_first_name?: string;
+  pilgrim_last_name?: string;
+  pilgrim_gender?: 'M' | 'F';
+  pilgrim_phone?: string;
+  pilgrim_email?: string;
+  // Payer information (who made the deposit)
+  payer_name?: string;
+  payer_contact?: string;
+  payer_relationship?: string;
+  // Link to created pilgrim (after GIA creates them)
+  created_pilgrim_id?: number;
 }
 
 export interface DashboardSummary {

@@ -8,7 +8,8 @@ import ProfessionalTable from '@/components/Common/ProfessionalTable';
 import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
-import { BiPlus, BiSearch, BiTrash, BiPencil, BiX } from 'react-icons/bi';
+import { BiPlus, BiSearch, BiTrash, BiPencil, BiX, BiChevronRight } from 'react-icons/bi';
+import { useRouter } from 'next/router';
 import { saveDraft, getDraft, deleteDraft } from '@/lib/draftManager';
 import toast from 'react-hot-toast';
 import { Pilgrim } from '@/types';
@@ -155,6 +156,7 @@ const pilgrimFormSteps = [
 ];
 
 export default function PilgrimsPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [pilgrims, setPilgrims] = useState<Pilgrim[]>([]);
   const [filteredPilgrims, setFilteredPilgrims] = useState<Pilgrim[]>([]);
@@ -460,14 +462,24 @@ export default function PilgrimsPage() {
               loading={loading}
               emptyMessage="No pilgrims registered yet • Click 'Add Pilgrim' to register a new one"
               actions={(row: Pilgrim) => (
-                <ProfessionalButton
-                  variant="ghost"
-                  size="sm"
-                  icon={<BiPencil size={14} />}
-                  onClick={() => handleEditClick(row)}
-                >
-                  Edit
-                </ProfessionalButton>
+                <div className="flex gap-2">
+                  <ProfessionalButton
+                    variant="ghost"
+                    size="sm"
+                    icon={<BiChevronRight size={14} />}
+                    onClick={() => router.push(`/dashboard/pilgrims/${row.id}`)}
+                  >
+                    View
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="ghost"
+                    size="sm"
+                    icon={<BiPencil size={14} />}
+                    onClick={() => handleEditClick(row)}
+                  >
+                    Edit
+                  </ProfessionalButton>
+                </div>
               )}
             />
           </div>
