@@ -38,14 +38,33 @@ export default function HajjVisualPanel() {
 
       {/* Airplane flying across the sky */}
       <div className="absolute top-[10%] left-0 w-full pointer-events-none hajj-plane-track">
-        <svg width="30" height="18" viewBox="0 0 30 18" fill="none" className="text-amber-200/70">
-          <path
-            d="M2 11 L14 9.5 L19 2 L21.5 2 L19 9.5 L27 9 L29 10.5 L19.5 11.5 L17 17 L14.5 17 L15.5 11.8 L4 12.5 Z"
-            fill="currentColor"
-          />
+        <svg width="64" height="38" viewBox="0 0 64 38" fill="none" className="text-amber-200/95">
+          {/* tail fin */}
+          <path d="M6 19 L15 6 L19 6 L15 19 Z" fill="currentColor" />
+          <path d="M6 19 L15 32 L19 32 Z" fill="currentColor" opacity="0.85" />
+          {/* main wings */}
+          <path d="M24 19 L38 2 L42 2 L32 19 Z" fill="currentColor" />
+          <path d="M24 19 L38 36 L42 36 L32 19 Z" fill="currentColor" opacity="0.85" />
+          {/* fuselage */}
+          <rect x="10" y="15" width="48" height="8" rx="4" fill="currentColor" />
+          {/* nose */}
+          <path d="M58 15 L64 19 L58 23 Z" fill="currentColor" />
+          {/* GIA livery text */}
+          <text
+            x="30"
+            y="20.5"
+            fontSize="6.5"
+            fontWeight="700"
+            fill="#052e21"
+            textAnchor="middle"
+            fontFamily="Arial, sans-serif"
+            letterSpacing="0.5"
+          >
+            GIA
+          </text>
         </svg>
-        <svg width="60" height="4" viewBox="0 0 60 4" className="text-amber-100/20 -mt-1 -ml-8">
-          <line x1="0" y1="2" x2="55" y2="2" stroke="currentColor" strokeWidth="1" strokeDasharray="2 3" />
+        <svg width="90" height="4" viewBox="0 0 90 4" className="text-amber-100/25 -mt-1 -ml-16">
+          <line x1="0" y1="2" x2="85" y2="2" stroke="currentColor" strokeWidth="1" strokeDasharray="2 3" />
         </svg>
       </div>
 
@@ -61,10 +80,22 @@ export default function HajjVisualPanel() {
         <div className="relative flex items-end justify-center">
           {/* Safa (left hill) */}
           <svg width="70" height="90" viewBox="0 0 70 90" fill="none" className="relative -mr-4 mb-1">
-            <path d="M0 90 L8 55 Q35 20 62 55 L70 90 Z" fill="#57534e" opacity="0.75" />
+            <path d="M0 90 L8 55 Q35 20 62 55 L70 90 Z" fill="#57534e" opacity="0.8" />
             <path d="M8 55 Q35 20 62 55" stroke="#a8a29e" strokeWidth="1" opacity="0.4" fill="none" />
-            <text x="35" y="82" textAnchor="middle" fontSize="8" fill="#d6d3d1" opacity="0.7" fontFamily="sans-serif">
-              Safa
+            <text
+              x="35"
+              y="80"
+              textAnchor="middle"
+              fontSize="14"
+              fontWeight="700"
+              fill="#fde68a"
+              stroke="#052e21"
+              strokeWidth="0.6"
+              paintOrder="stroke"
+              fontFamily="Arial, sans-serif"
+              letterSpacing="0.5"
+            >
+              SAFA
             </text>
           </svg>
 
@@ -98,10 +129,22 @@ export default function HajjVisualPanel() {
 
           {/* Marwa (right hill) */}
           <svg width="70" height="90" viewBox="0 0 70 90" fill="none" className="relative -ml-4 mb-1">
-            <path d="M0 90 L8 55 Q35 20 62 55 L70 90 Z" fill="#57534e" opacity="0.75" />
+            <path d="M0 90 L8 55 Q35 20 62 55 L70 90 Z" fill="#57534e" opacity="0.8" />
             <path d="M8 55 Q35 20 62 55" stroke="#a8a29e" strokeWidth="1" opacity="0.4" fill="none" />
-            <text x="35" y="82" textAnchor="middle" fontSize="8" fill="#d6d3d1" opacity="0.7" fontFamily="sans-serif">
-              Marwa
+            <text
+              x="35"
+              y="80"
+              textAnchor="middle"
+              fontSize="14"
+              fontWeight="700"
+              fill="#fde68a"
+              stroke="#052e21"
+              strokeWidth="0.6"
+              paintOrder="stroke"
+              fontFamily="Arial, sans-serif"
+              letterSpacing="0.5"
+            >
+              MARWA
             </text>
           </svg>
         </div>
