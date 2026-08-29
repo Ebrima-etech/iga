@@ -36,28 +36,27 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen flex bg-gradient-to-b from-emerald-950 via-emerald-950 to-black overflow-hidden">
+      {/* One shared background layer spanning the full page — pattern and glow are
+          computed once here so there's no seam where the two columns meet */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.08] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="girihPage" width="56" height="56" patternUnits="userSpaceOnUse">
+            <g stroke="#d4af37" strokeWidth="1" fill="none">
+              <rect x="8" y="8" width="40" height="40" transform="rotate(45 28 28)" />
+              <rect x="8" y="8" width="40" height="40" />
+            </g>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#girihPage)" />
+      </svg>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(circle at 28% 34%, rgba(212,175,55,0.14), transparent 55%)' }}
+      />
+
       <HajjVisualPanel />
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
-        {/* Geometric Islamic pattern, matching the visual panel */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.08]" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="girihForm" width="56" height="56" patternUnits="userSpaceOnUse">
-              <g stroke="#d4af37" strokeWidth="1" fill="none">
-                <rect x="8" y="8" width="40" height="40" transform="rotate(45 28 28)" />
-                <rect x="8" y="8" width="40" height="40" />
-              </g>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#girihForm)" />
-        </svg>
-
-        {/* Soft gold glow, echoing the visual panel */}
-        <div
-          className="absolute inset-0"
-          style={{ background: 'radial-gradient(circle at 50% 30%, rgba(212,175,55,0.10), transparent 60%)' }}
-        />
-
         <HajjTermsBackground />
 
         {/* Mobile-only compact Hajj banner */}

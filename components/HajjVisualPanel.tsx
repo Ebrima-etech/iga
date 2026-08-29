@@ -1,22 +1,6 @@
 export default function HajjVisualPanel() {
   return (
-    <div className="relative hidden lg:flex lg:w-1/2 overflow-hidden bg-gradient-to-b from-emerald-950 via-emerald-950 to-black">
-      {/* Geometric Islamic star pattern overlay */}
-      <svg className="absolute inset-0 w-full h-full opacity-[0.08]" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="girih" width="56" height="56" patternUnits="userSpaceOnUse">
-            <g stroke="#d4af37" strokeWidth="1" fill="none">
-              <rect x="8" y="8" width="40" height="40" transform="rotate(45 28 28)" />
-              <rect x="8" y="8" width="40" height="40" />
-            </g>
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#girih)" />
-      </svg>
-
-      {/* Radial gold glow, gently breathing */}
-      <div className="absolute inset-0 hajj-glow" />
-
+    <div className="relative hidden lg:flex lg:w-1/2 overflow-hidden">
       {/* Twinkling stars */}
       <div className="absolute inset-0 pointer-events-none">
         {[
@@ -186,15 +170,6 @@ export default function HajjVisualPanel() {
       </div>
 
       <style jsx>{`
-        .hajj-glow {
-          background: radial-gradient(circle at 50% 38%, rgba(212, 175, 55, 0.16), transparent 60%);
-          animation: hajjGlowPulse 6s ease-in-out infinite;
-        }
-        @keyframes hajjGlowPulse {
-          0%, 100% { opacity: 0.75; }
-          50% { opacity: 1; }
-        }
-
         .hajj-star {
           position: absolute;
           border-radius: 9999px;
