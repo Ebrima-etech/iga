@@ -11,7 +11,7 @@ import { Pilgrim, Payment } from '@/types';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { BiChevronLeft, BiPhone, BiMailOpen, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp } from 'react-icons/bi';
+import { BiChevronLeft, BiPhone, BiEnvelope, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp } from 'react-icons/bi';
 
 export default function PilgrimDetailPage() {
   const router = useRouter();
@@ -122,7 +122,7 @@ export default function PilgrimDetailPage() {
 
             <Card padding="lg" shadow="none" className="border border-gray-200">
               <div className="flex items-start gap-3">
-                <BiMailOpen className="text-emerald-600 mt-1" size={20} />
+                <BiEnvelope className="text-emerald-600 mt-1" size={20} />
                 <div>
                   <p className="text-xs text-gray-600 font-medium uppercase">Email</p>
                   <p className="text-sm font-mono text-gray-900 mt-1">{pilgrim.email}</p>
