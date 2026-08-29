@@ -1,5 +1,6 @@
 import Header from './Header';
 import Sidebar from './Sidebar';
+import VoiceAssistant from '../Common/VoiceAssistant';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="max-w-[1400px] mx-auto">{children}</div>
         </main>
       </div>
+      <VoiceAssistant />
     </div>
   );
 }
