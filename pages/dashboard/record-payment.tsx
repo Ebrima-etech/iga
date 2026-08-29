@@ -185,6 +185,12 @@ export default function RecordPaymentPage() {
       // Find the selected pilgrim to get their name
       const selectedPilgrim = pilgrims.find((p) => p.id.toString() === formData.pilgrim);
 
+      // If payer_relationship is "Self", auto-fill with pilgrim name
+      let payerName = formData.payer_name;
+      if (formData.payer_relationship === 'Self' && selectedPilgrim) {
+        payerName = `${selectedPilgrim.first_name} ${selectedPilgrim.last_name}`;
+      }
+
       const paymentData = {
         pilgrim: parseInt(formData.pilgrim),
         amount: parseFloat(formData.amount),
@@ -194,9 +200,9 @@ export default function RecordPaymentPage() {
         description: formData.description || '',
         notes: formData.description || '',
         bank: parseInt(formData.bank),
-        payer_name: formData.payer_name,
+        payer_name: payerName,
         payer_contact: formData.payer_contact || '',
-        payer_relationship: formData.payer_relationship || '',
+        payer_relationship: formData.payer_relationship || 'Self',
       };
 
       await api.post('/payments/', paymentData);
