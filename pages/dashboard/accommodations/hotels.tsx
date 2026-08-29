@@ -5,7 +5,7 @@ import Layout from '@/components/Layout';
 import { BiPlus, BiEdit, BiTrash, BiMapPin, BiPhone, BiMail } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
-import { TableSkeleton } from '@/components/Common/Skeleton';
+import { KabaaTableSkeleton } from '@/components/Common/Skeleton';
 
 interface Hotel {
   id: number;
@@ -232,7 +232,7 @@ export default function HotelsPage() {
         {/* Hotels Table */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           {loading ? (
-            <TableSkeleton rows={5} columnCount={7} />
+            <KabaaTableSkeleton rows={5} columnCount={7} />
           ) : hotels.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">

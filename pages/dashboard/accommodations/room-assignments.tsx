@@ -6,7 +6,7 @@ import Layout from '@/components/Layout';
 import { BiPlus, BiDownload, BiTrash, BiArrowBack } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
-import { TableSkeleton } from '@/components/Common/Skeleton';
+import { KabaaTableSkeleton } from '@/components/Common/Skeleton';
 
 interface RoomAssignment {
   id: number;
@@ -215,7 +215,7 @@ export default function RoomAssignmentsPage() {
         {/* Assignments Table */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           {loading ? (
-            <TableSkeleton rows={8} columnCount={8} />
+            <KabaaTableSkeleton rows={8} columnCount={8} />
           ) : assignments.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">

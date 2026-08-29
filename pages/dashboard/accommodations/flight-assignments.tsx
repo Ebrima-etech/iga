@@ -6,7 +6,7 @@ import Layout from '@/components/Layout';
 import { BiPlus, BiDownload, BiTrash, BiArrowBack } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
-import { TableSkeleton } from '@/components/Common/Skeleton';
+import { KabaaTableSkeleton } from '@/components/Common/Skeleton';
 
 interface FlightAssignment {
   id: number;
@@ -174,7 +174,7 @@ export default function FlightAssignmentsPage() {
         {/* Table */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           {loading ? (
-            <TableSkeleton rows={8} columnCount={6} />
+            <KabaaTableSkeleton rows={8} columnCount={6} />
           ) : assignments.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
