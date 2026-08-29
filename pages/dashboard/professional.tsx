@@ -367,6 +367,7 @@ export default function ProfessionalDashboard() {
             </Card>
           </div>
         </div>
+        </div>
       </div>
     </Layout>
   );
