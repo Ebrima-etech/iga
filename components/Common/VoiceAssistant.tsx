@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { BiMicrophone, BiX, BiVolume2, BiVolumeX } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import { detectIntent, startSpeechRecognition, speak, stopSpeaking } from '@/lib/voiceAssistant';
