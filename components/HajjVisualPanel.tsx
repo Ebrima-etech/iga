@@ -185,51 +185,6 @@ export default function HajjVisualPanel() {
         <p className="mt-1 text-sm text-emerald-200/50">Serving the Guests of Allah</p>
       </div>
 
-      {/* Sand dunes with drifting particles */}
-      <div className="absolute bottom-0 left-0 w-full">
-        <svg viewBox="0 0 800 90" preserveAspectRatio="none" className="w-full h-[90px]">
-          <path d="M0 40 Q200 5 400 30 T800 20 V90 H0 Z" fill="#78350f" opacity="0.55" />
-          <path d="M0 55 Q220 25 450 50 T800 42 V90 H0 Z" fill="#92400e" opacity="0.6" />
-          <path d="M0 70 Q250 50 500 68 T800 60 V90 H0 Z" fill="#b45309" opacity="0.5" />
-        </svg>
-
-        {/* Mosque skyline silhouette, sitting on the dunes */}
-        <svg
-          className="absolute bottom-6 left-0 w-full"
-          viewBox="0 0 800 120"
-          preserveAspectRatio="none"
-          fill="#000000"
-          opacity="0.55"
-        >
-          <rect x="0" y="70" width="800" height="50" />
-          <rect x="60" y="40" width="16" height="80" />
-          <circle cx="68" cy="36" r="7" />
-          <rect x="700" y="40" width="16" height="80" />
-          <circle cx="708" cy="36" r="7" />
-          <path d="M300 70 C300 20 500 20 500 70 Z" />
-          <rect x="380" y="10" width="10" height="60" />
-          <circle cx="385" cy="8" r="5" />
-        </svg>
-
-        {/* Drifting sand particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[
-            { left: '10%', delay: '0s', dur: '7s' },
-            { left: '25%', delay: '1.5s', dur: '9s' },
-            { left: '45%', delay: '0.8s', dur: '8s' },
-            { left: '65%', delay: '2.2s', dur: '10s' },
-            { left: '80%', delay: '1s', dur: '7.5s' },
-            { left: '92%', delay: '3s', dur: '9s' },
-          ].map((p, i) => (
-            <span
-              key={i}
-              className="hajj-sand"
-              style={{ left: p.left, animationDelay: p.delay, animationDuration: p.dur }}
-            />
-          ))}
-        </div>
-      </div>
-
       <style jsx>{`
         .hajj-glow {
           background: radial-gradient(circle at 50% 38%, rgba(212, 175, 55, 0.16), transparent 60%);
@@ -286,24 +241,6 @@ export default function HajjVisualPanel() {
         @keyframes hajjBandShimmer {
           0%, 100% { filter: brightness(1); }
           50% { filter: brightness(1.25); }
-        }
-
-        .hajj-sand {
-          position: absolute;
-          bottom: 10px;
-          width: 3px;
-          height: 3px;
-          border-radius: 9999px;
-          background: #f2d98a;
-          opacity: 0;
-          animation-name: hajjSandDrift;
-          animation-timing-function: ease-in;
-          animation-iteration-count: infinite;
-        }
-        @keyframes hajjSandDrift {
-          0% { transform: translateY(0) translateX(0); opacity: 0; }
-          15% { opacity: 0.6; }
-          100% { transform: translateY(-70px) translateX(10px); opacity: 0; }
         }
       `}</style>
     </div>
