@@ -223,6 +223,7 @@ interface TableControlsWrapperProps {
   onClearFilters: () => void;
   hasActiveFilters: boolean;
   children: React.ReactNode;
+  showControls?: boolean; // Role-based visibility
 }
 
 export function TableControlsWrapper({
@@ -233,6 +234,7 @@ export function TableControlsWrapper({
   onClearFilters,
   hasActiveFilters,
   children,
+  showControls = true,
 }: TableControlsWrapperProps) {
   return (
     <div className="space-y-4">
@@ -240,7 +242,7 @@ export function TableControlsWrapper({
       {(title || hasActiveFilters) && (
         <div className="flex items-center justify-between">
           {title && <h3 className="text-lg font-semibold text-gray-900">{title}</h3>}
-          {hasActiveFilters && (
+          {hasActiveFilters && showControls && (
             <button
               onClick={onClearFilters}
               className="text-sm text-primary-600 hover:text-primary-700 font-medium"
@@ -251,11 +253,13 @@ export function TableControlsWrapper({
         </div>
       )}
 
-      {/* Search and Filters */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
-        <TableSearch value={searchValue} onChange={onSearchChange} />
-        {filters}
-      </div>
+      {/* Search and Filters - Only show if showControls is true */}
+      {showControls && (
+        <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+          <TableSearch value={searchValue} onChange={onSearchChange} />
+          {filters}
+        </div>
+      )}
 
       {/* Table */}
       {children}
