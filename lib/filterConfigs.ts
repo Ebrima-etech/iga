@@ -40,6 +40,12 @@ export const verificationStatusFilters = [
   { label: 'Failed', value: 'failed' },
 ];
 
+export const bankSubmissionStatusFilters = [
+  { label: 'Verified', value: 'verified' },
+  { label: 'Pending', value: 'pending' },
+  { label: 'Failed', value: 'failed' },
+];
+
 export const genderFilters = [
   { label: 'Male', value: 'M' },
   { label: 'Female', value: 'F' },

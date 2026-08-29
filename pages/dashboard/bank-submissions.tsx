@@ -12,23 +12,30 @@ import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { BiPlus, BiCheck, BiX } from 'react-icons/bi';
+import { useTableState } from '@/lib/useTableState';
+import { TableSearch, TableFilter, SortableHeader, TablePagination, TableControlsWrapper } from '@/components/Common/TableControls';
+import { submissionMethodFilters, verificationStatusFilters } from '@/lib/filterConfigs';
 
 export default function BankSubmissionsPage() {
   const [loading, setLoading] = useState(true);
   const [submissions, setSubmissions] = useState<BankPaymentSubmission[]>([]);
-  const [filteredSubmissions, setFilteredSubmissions] = useState<BankPaymentSubmission[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('pending');
   const [creatingPilgrim, setCreatingPilgrim] = useState<string | null>(null);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Use the new table state hook
+  const tableState = useTableState<BankPaymentSubmission>(submissions, {
+    initialPageSize: pageSize,
+    searchableFields: ['reference_number', 'pilgrim_first_name', 'pilgrim_last_name', 'payer_name', 'bank_name'],
+  });
 
   useEffect(() => {
     fetchSubmissions();
   }, []);
 
   useEffect(() => {
-    filterSubmissions();
+    tableState.handlePageChange(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, statusFilter, submissions]);
+  }, [pageSize]);
 
   const fetchSubmissions = async () => {
     try {
@@ -43,25 +50,7 @@ export default function BankSubmissionsPage() {
     }
   };
 
-  const filterSubmissions = () => {
-    let filtered = submissions;
-
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (s) =>
-          s.reference_number?.includes(searchQuery) ||
-          s.pilgrim_first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.pilgrim_last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.payer_name?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (statusFilter) {
-      filtered = filtered.filter((s) => s.status === statusFilter);
-    }
-
-    setFilteredSubmissions(filtered);
-  };
+  // Filtering handled by useTableState hook
 
   const handleCreatePilgrim = async (submission: BankPaymentSubmission) => {
     if (!submission.pilgrim_first_name || !submission.pilgrim_last_name) {
