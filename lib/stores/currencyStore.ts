@@ -32,7 +32,7 @@ const currenciesRecord = defaultCurrencies.reduce((acc, curr) => {
 }, {} as Record<CurrencyCode, CurrencyRate>);
 
 export const useCurrencyStore = create<CurrencyStoreState>((set, get) => ({
-  defaultCurrency: 'USD',
+  defaultCurrency: 'GMD',
   baseCurrency: 'GMD',
   currencies: currenciesRecord,
 
