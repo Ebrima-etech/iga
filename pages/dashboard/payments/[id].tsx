@@ -7,7 +7,7 @@ import Loading from '@/components/Common/Loading';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { BiChevronLeft, BiPlus } from 'react-icons/bi';
+import { BiChevronLeft } from 'react-icons/bi';
 
 interface BankPaymentSubmission {
   id: string | number;
@@ -34,7 +34,6 @@ export default function PaymentDetailPage() {
   const { id } = router.query;
 
   const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
   const [payment, setPayment] = useState<BankPaymentSubmission | null>(null);
   const [error, setError] = useState('');
 
@@ -59,49 +58,6 @@ export default function PaymentDetailPage() {
     }
   };
 
-  const handleCreatePilgrim = async () => {
-    if (!payment) return;
-
-    setCreating(true);
-    try {
-      // Create new pilgrim from payment data
-      const pilgrimData = {
-        first_name: payment.pilgrim_first_name,
-        last_name: payment.pilgrim_last_name,
-        gender: payment.pilgrim_gender || 'M',
-        phone: payment.pilgrim_phone,
-        ...(payment.pilgrim_email ? { email: payment.pilgrim_email } : {}),
-      };
-
-      const pilgrimRes = await api.post('/pilgrims/', pilgrimData);
-      const newPilgrim = pilgrimRes.data;
-
-      // Link the existing payment to the new pilgrim
-      // (Payment was already created by the bank submission signal)
-      await api.post('/payments/link_pilgrim/', {
-        reference_number: payment.reference_number,
-        pilgrim_id: newPilgrim.id,
-      });
-
-      // Update the bank submission to mark pilgrim as created
-      await api.patch(`/bank-payment-submissions/${id}/`, {
-        created_pilgrim_id: newPilgrim.id,
-        status: 'verified',
-      });
-
-      toast.success(`Pilgrim ${newPilgrim.full_name} created successfully!`);
-
-      // Refresh payment data
-      fetchPayment();
-    } catch (err: any) {
-      console.error('Failed to create pilgrim:', err);
-      const errorMsg = err.response?.data?.detail || 'Failed to create pilgrim';
-      setError(errorMsg);
-      toast.error(errorMsg);
-    } finally {
-      setCreating(false);
-    }
-  };
 
   if (loading) return <Layout><Loading /></Layout>;
 
@@ -115,47 +71,23 @@ export default function PaymentDetailPage() {
     );
   }
 
-  const hasPilgrim = payment?.created_pilgrim_id || false;
-  const isFirstDeposit = !hasPilgrim;
-
   return (
     <Layout>
       <div className="max-w-4xl mx-auto space-y-6 p-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700"
-            >
-              <BiChevronLeft size={20} />
-              Back
-            </button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Payment Details</h1>
-              <p className="text-gray-600 mt-1">{payment.reference_number}</p>
-            </div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700"
+          >
+            <BiChevronLeft size={20} />
+            Back
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Payment Details</h1>
+            <p className="text-gray-600 mt-1">{payment.reference_number}</p>
           </div>
-          {isFirstDeposit && (
-            <button
-              onClick={handleCreatePilgrim}
-              disabled={creating}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
-            >
-              <BiPlus size={18} />
-              {creating ? 'Creating...' : 'Create Pilgrim'}
-            </button>
-          )}
         </div>
-
-        {/* Status Alert */}
-        {isFirstDeposit && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <p className="text-sm text-amber-900">
-              <strong>⚠️ First Deposit:</strong> This payment is not yet linked to a pilgrim. Click &quot;Create Pilgrim&quot; to register them in the system.
-            </p>
-          </div>
-        )}
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
