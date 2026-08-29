@@ -7,7 +7,7 @@ import MultiStepForm from '@/components/Common/MultiStepForm';
 import { Pilgrim } from '@/types';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
-import { BiArrowLeft } from 'react-icons/bi';
+import { BiChevronLeft } from 'react-icons/bi';
 
 const paymentFormSteps = [
   {
@@ -225,7 +225,7 @@ export default function RecordPaymentPage() {
             onClick={() => router.back()}
             className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 text-sm font-medium mb-4"
           >
-            <BiArrowLeft size={16} />
+            <BiChevronLeft size={16} />
             Back to Payments
           </button>
           <div>
