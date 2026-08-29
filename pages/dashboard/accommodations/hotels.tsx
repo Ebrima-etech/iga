@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import { BiPlus, BiEdit, BiTrash, BiMapPin, BiPhone, BiMail } from 'react-icons/bi';
+import { BiPlus, BiEdit, BiTrash, BiMapPin, BiPhone } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { KabaaTableSkeleton } from '@/components/Common/Skeleton';
@@ -266,7 +266,7 @@ export default function HotelsPage() {
                       <td className="px-6 py-4 text-sm text-gray-600">
                         <div className="flex flex-col gap-1">
                           {hotel.phone && <span className="flex items-center gap-1"><BiPhone size={14} /> {hotel.phone}</span>}
-                          {hotel.email && <span className="flex items-center gap-1"><BiMail size={14} /> {hotel.email}</span>}
+                          {hotel.email && <span className="flex items-center gap-1">📧 {hotel.email}</span>}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm">

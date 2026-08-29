@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
-import { BiArrowBack, BiCheck, BiPlane } from 'react-icons/bi';
+import { BiArrowBack, BiCheck } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 

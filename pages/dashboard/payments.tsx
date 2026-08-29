@@ -17,7 +17,7 @@ import { TableSearch, TableFilter, SortableHeader, TablePagination, TableControl
 import { paymentStatusFilters } from '@/lib/filterConfigs';
 import Badge from '@/components/Common/Badge';
 
-interface PaymentRecord extends Payment {
+type PaymentRecord = Payment & {
   bank_name?: string;
   payer_name?: string;
   payer_contact?: string;
@@ -146,7 +146,7 @@ export default function PaymentsPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <TableFilter
                 label="Status"
-                value={tableState.filters.status || ''}
+                value={String(tableState.filters.status || '')}
                 options={paymentStatusFilters}
                 onChange={(value) => tableState.handleFilter('status', value)}
               />

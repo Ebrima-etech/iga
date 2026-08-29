@@ -228,13 +228,13 @@ export default function BankSubmissionsPage() {
             <input
               type="text"
               placeholder="Search by reference, pilgrim, or payer name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={tableState.searchQuery}
+              onChange={(e) => tableState.handleSearch(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
             />
             <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              value={String(tableState.filters.status || '')}
+              onChange={(e) => tableState.handleFilter('status', e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none cursor-pointer"
             >
               <option value="">All Statuses</option>
@@ -248,7 +248,7 @@ export default function BankSubmissionsPage() {
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             <ProfessionalTable
               columns={columns}
-              data={filteredSubmissions}
+              data={tableState.paginatedData}
               loading={loading}
               emptyMessage="No submissions found"
               actions={(row: BankPaymentSubmission) => (
