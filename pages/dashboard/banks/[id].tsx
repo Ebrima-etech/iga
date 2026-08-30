@@ -120,13 +120,13 @@ export default function BankDetailPage() {
       const formData = new FormData();
       formData.append('logo', file);
 
-      const response = await api.patch(`/banks/${bankId}/`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await api.patch(`/banks/${bankId}/`, formData);
 
       setBank(response.data);
       toast.success('Bank logo uploaded successfully!');
     } catch (error: any) {
+      console.error('Upload error:', error);
+      console.error('Error response:', error.response?.data);
       toast.error(error.response?.data?.detail || 'Failed to upload logo');
     } finally {
       setUploadingLogo(false);
