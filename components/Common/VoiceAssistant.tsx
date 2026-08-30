@@ -431,26 +431,119 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
 
   const handleExportReport = async (reportType: string, dateRange?: { start?: string; end?: string }): Promise<string> => {
     try {
-      const format = reportType.includes('pdf') ? 'PDF' : reportType.includes('excel') ? 'Excel' : 'PDF';
-      const report = reportType.includes('payment') ? 'Payment Report' : reportType.includes('pilgrim') ? 'Pilgrim Report' : 'System Report';
+      const format = reportType.includes('pdf') ? 'pdf' : reportType.includes('csv') ? 'csv' : 'excel';
+      const reportName = reportType.includes('payment') ? 'Payment Report' : reportType.includes('pilgrim') ? 'Pilgrim Report' : 'System Report';
 
-      let exportDetails = `Exporting ${report} as ${format}. `;
-
-      if (dateRange?.start && dateRange?.end) {
-        exportDetails += `Date range: ${dateRange.start} to ${dateRange.end}. `;
-      } else if (dateRange?.start) {
-        exportDetails += `From ${dateRange.start} onwards. `;
+      // Fetch data based on report type
+      let data: any[] = [];
+      if (reportType.includes('payment')) {
+        const response = await api.get('/bank-payment-submissions/');
+        data = response.data.results || response.data;
+      } else if (reportType.includes('pilgrim')) {
+        const response = await api.get('/pilgrims/');
+        data = response.data.results || response.data;
       }
 
-      exportDetails += `File will be ready for download in the exports section.`;
+      // Filter by date range if provided
+      if (dateRange?.start) {
+        const startDate = new Date(dateRange.start);
+        data = data.filter((item: any) => {
+          const itemDate = new Date(item.created_at || item.submitted_at);
+          return itemDate >= startDate;
+        });
+      }
 
-      // Simulate export processing
-      toast.success(`${report} export initiated as ${format}!`);
+      // Generate file based on format
+      if (format === 'pdf') {
+        await generatePDFReport(reportName, data);
+      } else if (format === 'excel') {
+        await generateExcelReport(reportName, data);
+      } else {
+        await generateCSVReport(reportName, data);
+      }
 
-      return exportDetails;
+      const formatName = format.toUpperCase();
+      toast.success(`${reportName} exported as ${formatName}!`);
+      return `Exported ${reportName} as ${formatName}. File download started.`;
     } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export report');
       return 'Failed to export report. Please try again.';
     }
+  };
+
+  const generatePDFReport = async (reportName: string, data: any[]) => {
+    const { jsPDF } = await import('jspdf');
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text(reportName, 20, 20);
+
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, 30);
+
+    let yPosition = 45;
+    doc.setFontSize(11);
+
+    if (data.length === 0) {
+      doc.text('No data available', 20, yPosition);
+    } else {
+      const headers = Object.keys(data[0]).filter(key => !key.startsWith('_'));
+      doc.text(headers.join(' | '), 20, yPosition);
+      yPosition += 10;
+
+      data.slice(0, 50).forEach((row: any) => {
+        const values = headers.map(header => String(row[header] || '').substring(0, 15));
+        doc.setFontSize(8);
+        doc.text(values.join(' | '), 20, yPosition);
+        yPosition += 5;
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+      });
+    }
+
+    doc.save(`${reportName}-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
+  const generateExcelReport = async (reportName: string, data: any[]) => {
+    const XLSX = await import('xlsx');
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Report');
+    XLSX.writeFile(wb, `${reportName}-${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const generateCSVReport = async (reportName: string, data: any[]) => {
+    if (data.length === 0) {
+      console.log('No data to export');
+      return;
+    }
+
+    const headers = Object.keys(data[0]);
+    const csv = [
+      headers.join(','),
+      ...data.map(row =>
+        headers.map(header => {
+          const value = row[header];
+          if (typeof value === 'string' && value.includes(',')) {
+            return `"${value}"`;
+          }
+          return value;
+        }).join(',')
+      ),
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${reportName}-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   const handleTodaysReport = async (): Promise<string> => {
