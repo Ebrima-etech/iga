@@ -9,10 +9,7 @@ import { BiTrendingUp, BiUsers, BiWallet, BiCalendar, BiBarChartAlt2, BiLineChar
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { HajjYear } from '@/types';
-import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
-} from 'recharts';
+import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 
 interface YearStats {
   year: HajjYear;
