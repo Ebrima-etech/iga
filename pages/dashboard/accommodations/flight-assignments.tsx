@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { BiPlus, BiDownload, BiTrash, BiArrowBack } from 'react-icons/bi';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { KabaaTableSkeleton } from '@/components/Common/Skeleton';
@@ -20,6 +21,7 @@ interface FlightAssignment {
 
 export default function FlightAssignmentsPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const [assignments, setAssignments] = useState<FlightAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [flights, setFlights] = useState<any[]>([]);
@@ -29,7 +31,7 @@ export default function FlightAssignmentsPage() {
   useEffect(() => {
     fetchAssignments();
     fetchFlights();
-  }, [filters]);
+  }, [filters, selectedHajjYear]);
 
   const fetchAssignments = async () => {
     try {
@@ -39,6 +41,7 @@ export default function FlightAssignmentsPage() {
       if (filters.flight) params.append('flight', filters.flight);
       if (filters.status) params.append('status', filters.status);
       if (filters.boarding_group) params.append('boarding_group', filters.boarding_group);
+      if (selectedHajjYear) params.append('hajj_year', String(selectedHajjYear));
       if (params.toString()) url += `?${params.toString()}`;
 
       const response = await api.get(url);

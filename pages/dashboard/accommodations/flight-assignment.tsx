@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { BiArrowBack, BiCheck } from 'react-icons/bi';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 
@@ -30,6 +31,7 @@ const steps = [
 
 export default function FlightAssignmentPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const [currentStep, setCurrentStep] = useState(1);
   const [airports, setAirports] = useState<Airport[]>([]);
   const [flights, setFlights] = useState<any[]>([]);
@@ -58,7 +60,8 @@ export default function FlightAssignmentPage() {
 
   const fetchFlights = async () => {
     try {
-      const response = await api.get(`/flights/available-flights/?departure_date=${formData.departure_date}&arrival_airport_id=${formData.arrival_airport_id}`);
+      const hajjYearParam = selectedHajjYear ? `&hajj_year=${selectedHajjYear}` : '';
+      const response = await api.get(`/flights/available-flights/?departure_date=${formData.departure_date}&arrival_airport_id=${formData.arrival_airport_id}${hajjYearParam}`);
       setFlights(response.data);
     } catch (error) {
       toast.error('Failed to load available flights');
@@ -85,6 +88,7 @@ export default function FlightAssignmentPage() {
         arrival_airport_id: formData.arrival_airport_id,
         people_per_flight: formData.people_per_flight,
         priority: formData.priority,
+        hajj_year: selectedHajjYear,
       });
 
       setAssignments(response.data.assignments || []);

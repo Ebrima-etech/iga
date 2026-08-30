@@ -82,6 +82,7 @@ export default function BankSubmissionsPage() {
         emergency_contact_phone: '',
         emergency_contact_email: '',
         total_amount_due: submission.amount,
+        hajj_year: selectedHajjYear,
       };
 
       const pilgrimRes = await api.post('/pilgrims/', pilgrimData);
@@ -99,6 +100,7 @@ export default function BankSubmissionsPage() {
         payer_name: submission.payer_name,
         payer_contact: submission.payer_contact,
         payer_relationship: submission.payer_relationship,
+        hajj_year: selectedHajjYear,
       };
 
       await api.post('/payments/', paymentData);

@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import MultiStepForm from '@/components/Common/MultiStepForm';
 import { Pilgrim } from '@/types';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { BiChevronLeft } from 'react-icons/bi';
@@ -122,6 +123,7 @@ const paymentFormSteps = [
 
 export default function RecordPaymentPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const [pilgrims, setPilgrims] = useState<Pilgrim[]>([]);
   const [banks, setBanks] = useState<any[]>([]);
   const [formSteps, setFormSteps] = useState(paymentFormSteps);
@@ -129,13 +131,14 @@ export default function RecordPaymentPage() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [selectedHajjYear]);
 
   const loadData = async () => {
     try {
       setLoading(true);
+      const params = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
       const [pilgrimsRes, banksRes] = await Promise.all([
-        api.get('/pilgrims/'),
+        api.get(`/pilgrims/${params}`),
         api.get('/banks/'),
       ]);
 
@@ -203,6 +206,7 @@ export default function RecordPaymentPage() {
         payer_name: payerName,
         payer_contact: formData.payer_contact || '',
         payer_relationship: formData.payer_relationship || 'Self',
+        hajj_year: selectedHajjYear,
       };
 
       await api.post('/payments/', paymentData);

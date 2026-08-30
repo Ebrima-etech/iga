@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { BiPlus, BiDownload, BiTrash, BiArrowBack } from 'react-icons/bi';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { KabaaTableSkeleton } from '@/components/Common/Skeleton';
@@ -28,6 +29,7 @@ interface Filters {
 
 export default function RoomAssignmentsPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const [assignments, setAssignments] = useState<RoomAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [hotels, setHotels] = useState<any[]>([]);
@@ -41,7 +43,7 @@ export default function RoomAssignmentsPage() {
   useEffect(() => {
     fetchAssignments();
     fetchHotels();
-  }, [filters]);
+  }, [filters, selectedHajjYear]);
 
   const fetchAssignments = async () => {
     try {
@@ -52,6 +54,7 @@ export default function RoomAssignmentsPage() {
       if (filters.hotel) params.append('room__hotel', filters.hotel);
       if (filters.status) params.append('status', filters.status);
       if (filters.check_in_date) params.append('check_in_date', filters.check_in_date);
+      if (selectedHajjYear) params.append('hajj_year', String(selectedHajjYear));
 
       if (params.toString()) {
         url += `?${params.toString()}`;

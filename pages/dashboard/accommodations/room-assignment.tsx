@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { BiArrowBack, BiCheck, BiX } from 'react-icons/bi';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 
@@ -30,6 +31,7 @@ const steps = [
 
 export default function RoomAssignmentPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const [currentStep, setCurrentStep] = useState(1);
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -76,6 +78,7 @@ export default function RoomAssignmentPage() {
         days_stay: formData.days_stay,
         people_per_room: formData.people_per_room,
         gender_segregation: formData.gender_segregation,
+        hajj_year: selectedHajjYear,
       });
 
       setAssignments(response.data.assignments || []);
