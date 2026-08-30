@@ -280,7 +280,14 @@ export default function BankDetailPage() {
               <div className="flex flex-col items-center justify-start">
                 <div className="w-32 h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center mb-4">
                   {bank.logo ? (
-                    <img src={bank.logo.startsWith('http') ? bank.logo : `https://igaa.onrender.com${bank.logo}`} alt={bank.name} className="h-28 w-28 object-contain" />
+                    <img
+                      src={bank.logo.startsWith('http') ? bank.logo : `http://localhost:8000${bank.logo}`}
+                      alt={bank.name}
+                      className="h-28 w-28 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' font-size='50' fill='%23999'%3E🏦%3C/text%3E%3C/svg%3E`;
+                      }}
+                    />
                   ) : (
                     <span className="text-5xl">🏦</span>
                   )}
