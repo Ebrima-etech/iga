@@ -202,8 +202,9 @@ export default function ProfessionalDashboard() {
 
   return (
     <Layout>
-      <GIALogoEngravings />
-      <div className="min-h-screen bg-white">
+      <div className="relative">
+        <GIALogoEngravings />
+        <div className="min-h-screen bg-white/95 relative z-10">
         {/* Page Header */}
         <div className="px-8 py-8 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between">
