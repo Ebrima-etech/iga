@@ -277,6 +277,10 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
           response = await handleCreate(command.entity || '');
           break;
 
+        case 'todays_report':
+          response = await handleTodaysReport();
+          break;
+
         default:
           response = `Sorry, I didn't understand. You can say things like "search for Hassan", "read pilgrim records", "total payments", or "go to dashboard".`;
       }
@@ -429,6 +433,54 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
       return exportDetails;
     } catch (error) {
       return 'Failed to export report. Please try again.';
+    }
+  };
+
+  const handleTodaysReport = async (): Promise<string> => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      // Fetch pilgrims and payments for today
+      const [pilgrims, payments] = await Promise.all([
+        api.get('/pilgrims/').catch(() => ({ data: { results: [] } })),
+        api.get('/bank-payment-submissions/').catch(() => ({ data: { results: [] } })),
+      ]);
+
+      const pilgrimList = pilgrims.data.results || [];
+      const paymentList = payments.data.results || [];
+
+      // Filter today's data
+      const todaysPilgrims = pilgrimList.filter((p: any) => {
+        const createdDate = new Date(p.created_at).toISOString().split('T')[0];
+        return createdDate === today;
+      });
+
+      const todaysPayments = paymentList.filter((p: any) => {
+        const submittedDate = new Date(p.submitted_at).toISOString().split('T')[0];
+        return submittedDate === today;
+      });
+
+      // Calculate payment stats
+      const totalAmount = todaysPayments.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+      const verifiedPayments = todaysPayments.filter((p: any) => p.status === 'verified').length;
+      const pendingPayments = todaysPayments.filter((p: any) => p.status === 'pending').length;
+
+      // Build report
+      let report = `Today's Report for ${new Date().toLocaleDateString()}. `;
+
+      report += `Pilgrims registered today: ${todaysPilgrims.length}. `;
+
+      report += `Payment submissions today: ${todaysPayments.length} total. `;
+      report += `Total amount: ${totalAmount.toLocaleString()} GMD. `;
+      report += `Verified: ${verifiedPayments}, Pending: ${pendingPayments}. `;
+
+      if (todaysPilgrims.length === 0 && todaysPayments.length === 0) {
+        report = `Today's Report for ${new Date().toLocaleDateString()}. No new pilgrims or payments recorded today.`;
+      }
+
+      return report;
+    } catch (error) {
+      return 'Unable to retrieve today\'s report. Please try again.';
     }
   };
 

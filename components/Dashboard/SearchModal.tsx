@@ -55,16 +55,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         // Search pilgrims
         pilgrimsList.forEach((p: Pilgrim) => {
           if (
-            p.full_name.toLowerCase().includes(searchQuery) ||
-            p.registration_id.toLowerCase().includes(searchQuery) ||
-            p.email.toLowerCase().includes(searchQuery) ||
-            p.phone.includes(searchQuery)
+            (p.full_name && p.full_name.toLowerCase().includes(searchQuery)) ||
+            (p.registration_id && p.registration_id.toLowerCase().includes(searchQuery)) ||
+            (p.email && p.email.toLowerCase().includes(searchQuery)) ||
+            (p.phone && p.phone.includes(searchQuery))
           ) {
             searchResults.push({
               id: `pilgrim-${p.id}`,
               type: 'pilgrim',
-              title: p.full_name,
-              subtitle: `ID: ${p.registration_id} • ${p.email}`,
+              title: p.full_name || 'Unknown',
+              subtitle: `ID: ${p.registration_id || 'N/A'} • ${p.email || 'N/A'}`,
               icon: '👤',
               href: `/dashboard/pilgrims/${p.id}`,
             });
@@ -74,15 +74,15 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         // Search payments
         paymentsList.forEach((p: Payment) => {
           if (
-            p.reference_number.toLowerCase().includes(searchQuery) ||
-            p.pilgrim_name.toLowerCase().includes(searchQuery) ||
-            p.bank_name.toLowerCase().includes(searchQuery)
+            (p.reference_number && p.reference_number.toLowerCase().includes(searchQuery)) ||
+            (p.pilgrim_name && p.pilgrim_name.toLowerCase().includes(searchQuery)) ||
+            (p.bank_name && p.bank_name.toLowerCase().includes(searchQuery))
           ) {
             searchResults.push({
               id: `payment-${p.id}`,
               type: 'payment',
-              title: `Payment: ${p.reference_number}`,
-              subtitle: `${p.pilgrim_name} • ${p.bank_name}`,
+              title: `Payment: ${p.reference_number || 'N/A'}`,
+              subtitle: `${p.pilgrim_name || 'Unknown'} • ${p.bank_name || 'Unknown'}`,
               icon: '💳',
               href: `/dashboard/payments`,
             });

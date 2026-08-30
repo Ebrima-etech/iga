@@ -4,7 +4,7 @@
  */
 
 export interface VoiceCommand {
-  intent: 'search' | 'read' | 'analytics' | 'navigate' | 'create' | 'export' | 'read_report' | 'unknown';
+  intent: 'search' | 'read' | 'analytics' | 'navigate' | 'create' | 'export' | 'read_report' | 'todays_report' | 'unknown';
   entity?: string; // what to search for
   location?: string; // page to navigate to
   label?: string; // user-friendly label for navigation
@@ -16,6 +16,12 @@ export interface VoiceCommand {
 
 // Intent detection patterns
 const INTENT_PATTERNS = {
+  todays_report: [
+    /(?:give me|show me|get|display)\s+(?:todays?|today's)\s+(?:reports?|data)/i,
+    /(?:todays?|today's)\s+(?:reports?|data)/i,
+    /(?:reports?|data)\s+(?:for\s+)?today/i,
+    /report\s+today/i,
+  ],
   search: [
     /(?:find|search|look for|find me|get me|show me)\s+(.+)/i,
     /(?:who is|where is)\s+(.+)/i,
