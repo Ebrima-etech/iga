@@ -205,7 +205,7 @@ export default function ProfessionalDashboard() {
       <div className="relative">
         <GIALogoEngravings />
         <div className="min-h-screen bg-white/95 relative z-10">
-        {/* Page Header */}
+          {/* Page Header */}
         <div className="px-8 py-8 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between">
             <div>
@@ -477,6 +477,7 @@ export default function ProfessionalDashboard() {
           </div>
         </div>
         </div>
+      </div>
       </div>
     </Layout>
   );
