@@ -7,7 +7,7 @@ import PageHeader from '@/components/Dashboard/PageHeader';
 import Card from '@/components/Common/Card';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import VoiceInputButton from '@/components/VoiceInputButton';
-import { BiArrowBack, BiPlus, BiX } from 'react-icons/bi';
+import { BiArrowBack, BiPlus, BiX, BiTrash } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 
@@ -16,6 +16,7 @@ interface Bank {
   name: string;
   logo?: string | null;
   is_active: boolean;
+  payment_view_access: 'date_restricted' | 'unrestricted';
   created_at: string;
 }
 
@@ -40,6 +41,11 @@ export default function BankDetailPage() {
   const [admins, setAdmins] = useState<BankAdmin[]>([]);
   const [showAddAdmin, setShowAddAdmin] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [togglingStatus, setTogglingStatus] = useState(false);
+  const [showAccessModal, setShowAccessModal] = useState(false);
+  const [accessValue, setAccessValue] = useState<'date_restricted' | 'unrestricted'>('date_restricted');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [adminFormData, setAdminFormData] = useState({
     username: '',
     email: '',
@@ -100,6 +106,45 @@ export default function BankDetailPage() {
       toast.error(error.response?.data?.detail || 'Failed to upload logo');
     } finally {
       setUploadingLogo(false);
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    if (!bank) return;
+    try {
+      setTogglingStatus(true);
+      await api.patch(`/banks/${bankId}/`, { is_active: !bank.is_active });
+      toast.success(`Bank ${!bank.is_active ? 'activated' : 'deactivated'} successfully`);
+      fetchBank();
+    } catch (error) {
+      toast.error('Failed to toggle bank status');
+    } finally {
+      setTogglingStatus(false);
+    }
+  };
+
+  const handleUpdateAccessLevel = async () => {
+    try {
+      await api.patch(`/banks/${bankId}/`, { payment_view_access: accessValue });
+      toast.success('Payment access level updated successfully');
+      setShowAccessModal(false);
+      fetchBank();
+    } catch (error) {
+      toast.error('Failed to update access level');
+    }
+  };
+
+  const handleDeleteBank = async () => {
+    if (deleteConfirmText !== bank?.name) {
+      toast.error(`Please type "${bank?.name}" to confirm deletion`);
+      return;
+    }
+    try {
+      await api.delete(`/banks/${bankId}/`);
+      toast.success('Bank deleted successfully');
+      router.push('/dashboard/banks');
+    } catch (error) {
+      toast.error('Failed to delete bank');
     }
   };
 
@@ -345,6 +390,177 @@ export default function BankDetailPage() {
               >
                 <BiPlus size={18} /> Add First Admin
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* Settings Section */}
+        <div className="mb-8">
+          <div className="flex items-center mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">Settings</h2>
+          </div>
+
+          {/* Bank Status */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Bank Status</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {bank?.is_active ? 'Bank is currently active' : 'Bank is currently inactive'}
+                </p>
+              </div>
+              <button
+                onClick={handleToggleStatus}
+                disabled={togglingStatus}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  bank?.is_active
+                    ? 'bg-red-50 text-red-700 hover:bg-red-100'
+                    : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                } disabled:opacity-50`}
+              >
+                {togglingStatus ? 'Processing...' : bank?.is_active ? 'Deactivate' : 'Activate'}
+              </button>
+            </div>
+          </div>
+
+          {/* Payment Access Level */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Payment View Access</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {bank?.payment_view_access === 'date_restricted' ? 'Date-restricted access' : 'Unrestricted access'}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setAccessValue(bank?.payment_view_access || 'date_restricted');
+                  setShowAccessModal(true);
+                }}
+                className="px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                Configure
+              </button>
+            </div>
+          </div>
+
+          {/* Access Modal */}
+          {showAccessModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Configure Payment Access</h3>
+                  <button onClick={() => setShowAccessModal(false)} className="text-gray-400 hover:text-gray-600">
+                    <BiX size={24} />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">Access Type</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="access"
+                          value="date_restricted"
+                          checked={accessValue === 'date_restricted'}
+                          onChange={(e) => setAccessValue(e.target.value as 'date_restricted' | 'unrestricted')}
+                          className="w-4 h-4"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Date Restricted</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="access"
+                          value="unrestricted"
+                          checked={accessValue === 'unrestricted'}
+                          onChange={(e) => setAccessValue(e.target.value as 'date_restricted' | 'unrestricted')}
+                          className="w-4 h-4"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Unrestricted</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={handleUpdateAccessLevel}
+                      className="flex-1 px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setShowAccessModal(false)}
+                      className="flex-1 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-900 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Danger Zone */}
+        <div className="mb-8">
+          <div className="border border-red-200 bg-red-50 rounded-lg p-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-red-900">Danger Zone</h3>
+                <p className="text-sm text-red-700 mt-1">Once you delete a bank, there is no going back. Be certain.</p>
+              </div>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-2"
+              >
+                <BiTrash size={16} /> Delete Bank
+              </button>
+            </div>
+          </div>
+
+          {/* Delete Confirmation Modal */}
+          {showDeleteConfirm && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Delete Bank</h3>
+                  <button onClick={() => setShowDeleteConfirm(false)} className="text-gray-400 hover:text-gray-600">
+                    <BiX size={24} />
+                  </button>
+                </div>
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-4">
+                    This action cannot be undone. Please type the bank name to confirm deletion.
+                  </p>
+                  <p className="font-semibold text-gray-900 mb-3">Bank: <span className="text-red-600">{bank?.name}</span></p>
+                  <input
+                    type="text"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder={`Type "${bank?.name}" to confirm`}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleDeleteBank}
+                    disabled={deleteConfirmText !== bank?.name}
+                    className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowDeleteConfirm(false);
+                      setDeleteConfirmText('');
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-900 text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

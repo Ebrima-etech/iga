@@ -353,33 +353,6 @@ export default function BanksManagementPage() {
                 actions={(row: Bank) => (
                   <div className="flex gap-2">
                     <ProfessionalButton
-                      variant={row.is_active ? 'ghost' : 'danger'}
-                      size="sm"
-                      onClick={() => handleToggleBankStatus(row.id, row.is_active)}
-                      loading={togglingBank === row.id}
-                    >
-                      {row.is_active ? 'Deactivate' : 'Activate'}
-                    </ProfessionalButton>
-                    <ProfessionalButton
-                      variant="ghost"
-                      size="sm"
-                      icon={<BiPencil size={14} />}
-                      onClick={() => {
-                        setEditingAccessLevel(row.id);
-                        setEditingAccessValue(row.payment_view_access);
-                      }}
-                    >
-                      Access
-                    </ProfessionalButton>
-                    <ProfessionalButton
-                      variant="ghost"
-                      size="sm"
-                      icon={<BiTime size={14} />}
-                      onClick={() => handleOpenLocationForm(row)}
-                    >
-                      Location
-                    </ProfessionalButton>
-                    <ProfessionalButton
                       variant="ghost"
                       size="sm"
                       icon={<BiPencil size={14} />}
@@ -387,13 +360,6 @@ export default function BanksManagementPage() {
                     >
                       Manage
                     </ProfessionalButton>
-                    <button
-                      onClick={() => handleDeleteBank(row.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition"
-                      title="Delete bank"
-                    >
-                      <BiTrash size={16} />
-                    </button>
                   </div>
                 )}
               />
