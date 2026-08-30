@@ -287,10 +287,10 @@ export default function BankDetailPage() {
                         bank.logo.startsWith('http')
                           ? bank.logo
                           : bank.logo.startsWith('/media')
-                          ? `http://localhost:8000${bank.logo}`
+                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL?.split('/api/v1')[0]}${bank.logo}`
                           : bank.logo.startsWith('/')
-                          ? `http://localhost:8000${bank.logo}`
-                          : `http://localhost:8000/media/${bank.logo}`
+                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL?.split('/api/v1')[0]}${bank.logo}`
+                          : `${process.env.NEXT_PUBLIC_API_BASE_URL?.split('/api/v1')[0]}/media/${bank.logo}`
                       }
                       alt={bank.name}
                       className="h-28 w-28 object-contain"
