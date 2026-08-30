@@ -6,7 +6,7 @@ export default function GIALogoEngravings() {
     >
       <defs>
         <pattern id="giaLogos" width="800" height="600" patternUnits="userSpaceOnUse">
-          <g fill="none" stroke="#d4af37" strokeWidth="1.2" opacity="0.08">
+          <g fill="none" stroke="#d4af37" strokeWidth="1.2" opacity="0.15">
             {/* GIA Logo 1 - Top Left */}
             <g transform="translate(100,80)">
               <rect x="-15" y="-15" width="30" height="30" rx="2" />
