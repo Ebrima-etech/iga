@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { getMe } from '@/lib/auth';
 import { User } from '@/types';
 import { BiSearch, BiHelpCircle } from 'react-icons/bi';
-import { FaMicrophone } from 'react-icons/fa';
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import SearchModal from '@/components/Dashboard/SearchModal';
 
 const pageTitles: Record<string, string> = {
@@ -20,9 +20,15 @@ const pageTitles: Record<string, string> = {
 
 interface HeaderProps {
   onVoiceAssistantToggle?: () => void;
+  voiceAssistantEnabled?: boolean;
+  onVoiceAssistantEnabledChange?: (enabled: boolean) => void;
 }
 
-export default function Header({ onVoiceAssistantToggle }: HeaderProps) {
+export default function Header({
+  onVoiceAssistantToggle,
+  voiceAssistantEnabled = true,
+  onVoiceAssistantEnabledChange,
+}: HeaderProps) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -78,11 +84,18 @@ export default function Header({ onVoiceAssistantToggle }: HeaderProps) {
           </span>
           {!router.pathname.startsWith('/bank') && (
             <button
-              onClick={onVoiceAssistantToggle}
-              className="p-2 rounded-md text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
-              title="Voice Assistant"
+              onClick={() => onVoiceAssistantEnabledChange?.(!voiceAssistantEnabled)}
+              className={`relative p-2 rounded-md transition-colors ${
+                voiceAssistantEnabled
+                  ? 'text-primary-600 bg-primary-50 hover:bg-primary-100'
+                  : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
+              }`}
+              title={voiceAssistantEnabled ? 'Voice Assistant On (listening)' : 'Voice Assistant Off'}
             >
               <FaMicrophone size={18} />
+              {voiceAssistantEnabled && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-primary-600 rounded-full animate-pulse" />
+              )}
             </button>
           )}
           <button className="p-2 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">

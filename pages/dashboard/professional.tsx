@@ -9,7 +9,7 @@ import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
 import { StatCardSkeleton, ChartSkeleton, TableSkeleton } from '@/components/Common/Skeleton';
-import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh } from 'react-icons/bi';
+import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh, BiShow, BiHide } from 'react-icons/bi';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -33,6 +33,7 @@ export default function ProfessionalDashboard() {
   const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState('');
+  const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState({
     totalPilgrims: 0,
     totalPayments: 0,
@@ -89,30 +90,48 @@ export default function ProfessionalDashboard() {
     }
   };
 
+  const toggleFieldVisibility = (fieldId: string) => {
+    const newHidden = new Set(hiddenFields);
+    if (newHidden.has(fieldId)) {
+      newHidden.delete(fieldId);
+    } else {
+      newHidden.add(fieldId);
+    }
+    setHiddenFields(newHidden);
+  };
+
+  const isFieldHidden = (fieldId: string) => hiddenFields.has(fieldId);
+
   const statCards = [
     {
       label: 'Total Pilgrims',
       value: stats.totalPilgrims.toLocaleString(),
       caption: `${stats.totalPilgrims} registered`,
       icon: <BiUser size={15} />,
+      isFinancial: false,
     },
     {
       label: 'Total Payments',
-      value: `$${(stats.totalPayments / 1000000).toFixed(2)}M`,
+      value: `D${(stats.totalPayments / 1000000).toFixed(2)}M`,
       caption: `${payments.length === 10 ? '10+ recent' : payments.length} transactions`,
       icon: <BiWallet size={15} />,
+      isFinancial: true,
+      fieldId: 'dashboard-total-payments',
+      isHidden: isFieldHidden('dashboard-total-payments'),
     },
     {
       label: 'Payment Rate',
       value: `${stats.paymentRate}%`,
       caption: `${payments.filter((p: any) => p.status === 'confirmed').length} confirmed`,
       icon: <BiTrendingUp size={15} />,
+      isFinancial: false,
     },
     {
       label: 'Banks Connected',
       value: stats.activeBanks.toString(),
       caption: `${stats.activeBanks} active`,
       icon: <BiBarChartAlt2 size={15} />,
+      isFinancial: false,
     },
   ];
 
@@ -152,7 +171,7 @@ export default function ProfessionalDashboard() {
       key: 'amount',
       label: 'Amount',
       width: '15%',
-      render: (value: number) => <span className="font-mono font-medium text-gray-900">${value.toLocaleString()}</span>,
+      render: (value: number) => <span className="font-mono font-medium text-gray-900">D{value.toLocaleString()}</span>,
     },
     {
       key: 'bank_name',
@@ -220,7 +239,7 @@ export default function ProfessionalDashboard() {
               {[...Array(4)].map((_, i) => <StatCardSkeleton key={i} />)}
             </div>
           ) : (
-            <MetricsPanel title="Season overview" metrics={statCards} />
+            <MetricsPanel title="Season overview" metrics={statCards} onToggleField={toggleFieldVisibility} />
           )}
         </div>
 
@@ -346,6 +365,23 @@ export default function ProfessionalDashboard() {
             <Card padding="lg" shadow="none">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Summary</h3>
               <div className="space-y-4">
+                {/* Total Amount */}
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-blue-700 font-medium">Total Amount</span>
+                    <button
+                      onClick={() => toggleFieldVisibility('payments-total-amount')}
+                      className="p-1 hover:bg-blue-200 rounded transition-colors"
+                      title={isFieldHidden('payments-total-amount') ? 'Show' : 'Hide'}
+                    >
+                      {isFieldHidden('payments-total-amount') ? <BiHide size={14} className="text-blue-600" /> : <BiShow size={14} className="text-blue-600" />}
+                    </button>
+                  </div>
+                  <p className="text-lg font-semibold text-blue-900 mt-2">
+                    {isFieldHidden('payments-total-amount') ? '••••••' : `D${(payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) / 1000000).toFixed(2)}M`}
+                  </p>
+                </div>
+
                 {(() => {
                   const confirmed = payments.filter((p: any) => p.status === 'confirmed').length;
                   const pending = payments.filter((p: any) => p.status === 'pending').length;

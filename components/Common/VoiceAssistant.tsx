@@ -10,9 +10,11 @@ import api from '@/lib/api';
 interface VoiceAssistantProps {
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
+  enabled?: boolean;
+  onEnabledChange?: (enabled: boolean) => void;
 }
 
-export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }: VoiceAssistantProps) {
+export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, enabled: externalEnabled = true, onEnabledChange }: VoiceAssistantProps) {
   const router = useRouter();
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
@@ -21,6 +23,15 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
       onOpenChange(value);
     } else {
       setInternalIsOpen(value);
+    }
+  };
+  const [internalEnabled, setInternalEnabled] = useState(true);
+  const enabled = externalEnabled !== undefined ? externalEnabled : internalEnabled;
+  const setEnabled = (value: boolean) => {
+    if (onEnabledChange) {
+      onEnabledChange(value);
+    } else {
+      setInternalEnabled(value);
     }
   };
   const [isListening, setIsListening] = useState(false);
@@ -34,15 +45,36 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
     return null;
   }
 
-  // Auto-start listening for wake word on mount
+  // Auto-start listening for wake word on mount (only if enabled)
   React.useEffect(() => {
-    if (isAwaitingWakeWord && !isListening && !isOpen) {
+    if (enabled && isAwaitingWakeWord && !isListening && !isOpen) {
       const timer = setTimeout(() => {
         handleStartListeningForWakeWord();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isAwaitingWakeWord, isListening, isOpen]);
+  }, [enabled, isAwaitingWakeWord, isListening, isOpen]);
+
+  // Stop all listening when enabled is toggled to false
+  React.useEffect(() => {
+    if (!enabled) {
+      // Stop any active speech recognition
+      if (stopRecordingRef.current) {
+        stopRecordingRef.current();
+      }
+      // Stop speaking if active
+      if (isSpeaking) {
+        stopSpeaking();
+        setIsSpeaking(false);
+      }
+      // Close dialog
+      setIsOpen(false);
+      // Reset states
+      setIsListening(false);
+      setIsAwaitingWakeWord(true);
+      setTranscript('');
+    }
+  }, [enabled]);
 
   const handleStartListeningForWakeWord = async () => {
     try {
@@ -53,6 +85,11 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
 
           // Check for wake word "assistant"
           if (text.includes('assistant')) {
+            // Stop the wake word listening immediately
+            if (stopRecordingRef.current) {
+              stopRecordingRef.current();
+            }
+
             setIsListening(false);
             setIsAwaitingWakeWord(false);
             setIsOpen(true);
@@ -60,6 +97,9 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
             // Respond to wake word
             await speak('Hello! How can I help you?');
             setTranscript('');
+
+            // Auto-start listening for commands immediately after response
+            handleStartListeningForCommand();
           } else {
             // Continue listening for wake word
             setTranscript('');
@@ -83,18 +123,82 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
     }
   };
 
+  const handleStartListeningForCommand = async () => {
+    // Don't start listening if assistant is disabled
+    if (!enabled) {
+      return;
+    }
+
+    try {
+      setIsListening(true);
+      stopRecordingRef.current = startSpeechRecognition(
+        async (recognizedText) => {
+          const text = recognizedText.toLowerCase().trim();
+
+          // Check if "assistant" wake word is detected during listening
+          if (text.includes('assistant')) {
+            setIsListening(false);
+            // Restart listening instead of processing
+            setTimeout(() => {
+              handleStartListeningForCommand();
+            }, 300);
+          } else {
+            setTranscript(recognizedText);
+            setIsListening(false);
+            // Process the command
+            await processCommand(recognizedText);
+            // Continue listening for next command automatically
+            setTimeout(() => {
+              handleStartListeningForCommand();
+            }, 1000);
+          }
+        },
+        (error) => {
+          setIsListening(false);
+          // Silently continue listening on error
+          setTimeout(() => {
+            handleStartListeningForCommand();
+          }, 1000);
+        }
+      );
+    } catch (error) {
+      console.error('Microphone access denied');
+      setIsListening(false);
+    }
+  };
+
   const handleStartListening = async () => {
     try {
       setIsListening(true);
       stopRecordingRef.current = startSpeechRecognition(
         async (recognizedText) => {
-          setTranscript(recognizedText);
-          setIsListening(false);
-          await processCommand(recognizedText);
+          const text = recognizedText.toLowerCase().trim();
+
+          // Check if "assistant" wake word is detected during manual recording
+          if (text.includes('assistant')) {
+            setIsListening(false);
+            // Restart listening instead of processing
+            setTimeout(() => {
+              if (isOpen) {
+                handleStartListeningForCommand();
+              }
+            }, 300);
+          } else {
+            setTranscript(recognizedText);
+            setIsListening(false);
+            // Process the command
+            await processCommand(recognizedText);
+            // Continue listening for next command
+            setTimeout(() => {
+              if (isOpen) {
+                handleStartListeningForCommand();
+              }
+            }, 1000);
+          }
         },
         (error) => {
-          toast.error(error);
           setIsListening(false);
+          console.error('Microphone error:', error);
         }
       );
     } catch (error) {
@@ -137,7 +241,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
           break;
 
         case 'navigate':
-          response = await handleNavigate(command.location || command.entity || '');
+          response = await handleNavigate(command.location || command.entity || '', command.label);
           break;
 
         case 'create':
@@ -211,23 +315,17 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
     }
   };
 
-  const handleNavigate = async (location: string): Promise<string> => {
-    const navigationMap: Record<string, string> = {
-      'pilgrims': '/dashboard/pilgrims',
-      'pilgrim': '/dashboard/pilgrims',
-      'payments': '/dashboard/payments',
-      'payment': '/dashboard/payments',
-      'banks': '/dashboard/banks',
-      'bank': '/dashboard/banks',
-      'submissions': '/dashboard/bank-submissions',
-      'submission': '/dashboard/bank-submissions',
-      'dashboard': '/dashboard',
-      'home': '/dashboard',
-    };
+  const handleNavigate = async (location: string, label?: string): Promise<string> => {
+    // location is already a path from detectIntent (e.g., '/dashboard/pilgrims')
+    const path = location.startsWith('/') ? location : '/dashboard';
 
-    const path = navigationMap[location.toLowerCase()] || '/dashboard';
-    router.push(path);
-    return `Taking you to ${location}.`;
+    try {
+      await router.push(path);
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
+
+    return `Opening ${label || location}.`;
   };
 
   const handleCreate = async (entity: string): Promise<string> => {
@@ -328,7 +426,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
               <div className="flex items-center gap-2">
                 <div className={`w-2.5 h-2.5 rounded-full ${isListening ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`} />
                 <span className="text-sm font-medium text-gray-700">
-                  {isListening ? 'Listening...' : 'Ready to listen'}
+                  {isListening ? 'Listening for command...' : 'Assistant ready - say "assistant" or speak a command'}
                 </span>
               </div>
               <button
@@ -353,21 +451,6 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
             )}
 
             <div className="flex gap-2 items-center">
-              <button
-                onClick={handleStartListening}
-                disabled={isListening || isSpeaking}
-                className="flex-1 px-3 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 text-white rounded-md font-medium transition-colors text-sm"
-              >
-                {isListening ? 'Listening' : 'Record'}
-              </button>
-              {isListening && (
-                <button
-                  onClick={handleStopListening}
-                  className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md font-medium transition-colors text-sm"
-                >
-                  Stop
-                </button>
-              )}
               <button
                 onClick={() => {
                   if (isSpeaking) {

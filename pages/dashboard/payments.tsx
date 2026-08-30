@@ -12,7 +12,7 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { BiPlus } from 'react-icons/bi';
+import { BiPlus, BiShow, BiHide } from 'react-icons/bi';
 import { useTableState } from '@/lib/useTableState';
 import { TableSearch, TableFilter, SortableHeader, TablePagination, TableControlsWrapper } from '@/components/Common/TableControls';
 import { paymentStatusFilters } from '@/lib/filterConfigs';
@@ -32,6 +32,7 @@ export default function PaymentsPage() {
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [banks, setBanks] = useState<any[]>([]);
   const [pageSize, setPageSize] = useState(10);
+  const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
 
   // Use the new table state hook
   const tableState = useTableState<PaymentRecord>(payments, {
@@ -96,6 +97,18 @@ export default function PaymentsPage() {
     }
   };
 
+  const toggleFieldVisibility = (fieldId: string) => {
+    const newHidden = new Set(hiddenFields);
+    if (newHidden.has(fieldId)) {
+      newHidden.delete(fieldId);
+    } else {
+      newHidden.add(fieldId);
+    }
+    setHiddenFields(newHidden);
+  };
+
+  const isFieldHidden = (fieldId: string) => hiddenFields.has(fieldId);
+
   // Calculate stats from filtered data
   const totalAmount = tableState.filteredData.reduce((sum, p) => sum + parseFloat(String(p.amount)), 0);
   const confirmedAmount = tableState.filteredData
@@ -131,12 +144,34 @@ export default function PaymentsPage() {
             <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">{tableState.totalItems}</p>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <p className="text-sm font-medium text-gray-600">Total Amount</p>
-            <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">{formatCurrency(totalAmount)}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-600">Total Amount</p>
+              <button
+                onClick={() => toggleFieldVisibility('payments-total-amount')}
+                className="p-1 hover:bg-gray-200 rounded transition-colors"
+                title={isFieldHidden('payments-total-amount') ? 'Show' : 'Hide'}
+              >
+                {isFieldHidden('payments-total-amount') ? <BiHide size={16} className="text-gray-600" /> : <BiShow size={16} className="text-gray-600" />}
+              </button>
+            </div>
+            <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">
+              {isFieldHidden('payments-total-amount') ? '••••••' : formatCurrency(totalAmount)}
+            </p>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <p className="text-sm font-medium text-gray-600">Confirmed Amount</p>
-            <p className="text-2xl font-bold text-emerald-600 mt-2 font-mono">{formatCurrency(confirmedAmount)}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-600">Confirmed Amount</p>
+              <button
+                onClick={() => toggleFieldVisibility('payments-confirmed-amount')}
+                className="p-1 hover:bg-emerald-200 rounded transition-colors"
+                title={isFieldHidden('payments-confirmed-amount') ? 'Show' : 'Hide'}
+              >
+                {isFieldHidden('payments-confirmed-amount') ? <BiHide size={16} className="text-emerald-600" /> : <BiShow size={16} className="text-emerald-600" />}
+              </button>
+            </div>
+            <p className="text-2xl font-bold text-emerald-600 mt-2 font-mono">
+              {isFieldHidden('payments-confirmed-amount') ? '••••••' : formatCurrency(confirmedAmount)}
+            </p>
           </div>
         </div>
 

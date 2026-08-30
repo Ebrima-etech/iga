@@ -69,7 +69,10 @@ export default function BankDetailPage() {
     try {
       setLoading(true);
       const response = await api.get(`/user-roles/?role=bank_admin&bank=${bankId}`);
-      setAdmins(response.data.results || response.data);
+      const allAdmins = response.data.results || response.data;
+      // Filter to ensure only admins for this specific bank are shown
+      const filteredAdmins = allAdmins.filter((admin: any) => admin.bank === parseInt(bankId as string) || admin.bank?.id === parseInt(bankId as string));
+      setAdmins(filteredAdmins);
     } catch (error) {
       console.error('Error fetching admins:', error);
       setAdmins([]);

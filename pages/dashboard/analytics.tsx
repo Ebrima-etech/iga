@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import Card from '@/components/Common/Card';
 import { StatCardSkeleton, ChartSkeleton, Skeleton } from '@/components/Common/Skeleton';
-import { BiDownload, BiRefresh, BiUser, BiWallet, BiCheckCircle, BiTrendingUp, BiBarChartAlt2, BiBuilding, BiTime, BiGlobe } from 'react-icons/bi';
+import { BiDownload, BiRefresh, BiUser, BiWallet, BiCheckCircle, BiTrendingUp, BiBarChartAlt2, BiBuilding, BiTime, BiGlobe, BiShow, BiHide } from 'react-icons/bi';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -32,6 +32,7 @@ export default function AnalyticsPage() {
   const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('30days');
+  const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
   const [data, setData] = useState<any>({
     pilgrimTrend: [],
     paymentTrend: [],
@@ -166,6 +167,23 @@ export default function AnalyticsPage() {
 
   const COLORS = ['#22c55e', '#eab308', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899'];
 
+  const toggleFieldVisibility = (fieldId: string) => {
+    const newHidden = new Set(hiddenFields);
+    if (newHidden.has(fieldId)) {
+      newHidden.delete(fieldId);
+    } else {
+      newHidden.add(fieldId);
+    }
+    setHiddenFields(newHidden);
+  };
+
+  const isFieldHidden = (fieldId: string) => hiddenFields.has(fieldId);
+
+  const formatMoney = (value: number, format: 'millions' | 'regular' = 'regular') => {
+    if (format === 'millions') return `D${(value / 1000000).toFixed(2)}M`;
+    return `D${value.toLocaleString()}`;
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -282,7 +300,16 @@ export default function AnalyticsPage() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Total Revenue</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">${(metrics.totalPayments / 1000000).toFixed(2)}M</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-3xl font-bold text-gray-900">{isFieldHidden('total-payments') ? '••••••' : formatMoney(metrics.totalPayments, 'millions')}</p>
+                    <button
+                      onClick={() => toggleFieldVisibility('total-payments')}
+                      className="p-1 hover:bg-gray-200 rounded transition-colors"
+                      title={isFieldHidden('total-payments') ? 'Show' : 'Hide'}
+                    >
+                      {isFieldHidden('total-payments') ? <BiHide size={20} className="text-gray-600" /> : <BiShow size={20} className="text-gray-600" />}
+                    </button>
+                  </div>
                   <p className="text-xs text-emerald-600 mt-2">↑ 8.3% from last period</p>
                 </div>
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
@@ -308,7 +335,16 @@ export default function AnalyticsPage() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Avg Payment</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">${metrics.avgPaymentAmount.toLocaleString()}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-3xl font-bold text-gray-900">{isFieldHidden('avg-payment') ? '••••••' : formatMoney(metrics.avgPaymentAmount)}</p>
+                    <button
+                      onClick={() => toggleFieldVisibility('avg-payment')}
+                      className="p-1 hover:bg-gray-200 rounded transition-colors"
+                      title={isFieldHidden('avg-payment') ? 'Show' : 'Hide'}
+                    >
+                      {isFieldHidden('avg-payment') ? <BiHide size={20} className="text-gray-600" /> : <BiShow size={20} className="text-gray-600" />}
+                    </button>
+                  </div>
                   <p className="text-xs text-emerald-600 mt-2">↑ 5.1% from last period</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -375,7 +411,7 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis />
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+                  <Tooltip formatter={(value) => isFieldHidden('payment-trend') ? '••••••' : `D${value.toLocaleString()}`} />
                   <Legend />
                   <Line type="monotone" dataKey="amount" stroke="#22c55e" strokeWidth={2} dot={{ fill: '#22c55e' }} name="Daily Amount" />
                   <Line type="monotone" dataKey="transactions" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6' }} name="Transactions" />

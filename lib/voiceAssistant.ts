@@ -7,6 +7,7 @@ export interface VoiceCommand {
   intent: 'search' | 'read' | 'analytics' | 'navigate' | 'create' | 'export' | 'read_report' | 'unknown';
   entity?: string; // what to search for
   location?: string; // page to navigate to
+  label?: string; // user-friendly label for navigation
   action?: string; // specific action
   reportType?: string; // type of report to read/export
   dateRange?: { start?: string; end?: string }; // date range for reports
@@ -46,17 +47,43 @@ const INTENT_PATTERNS = {
   ],
 };
 
-const NAVIGATION_ALIASES: Record<string, string> = {
-  pilgrims: '/dashboard/pilgrims',
-  'pilgrim list': '/dashboard/pilgrims',
-  payments: '/dashboard/payments',
-  'payment list': '/dashboard/payments',
-  banks: '/dashboard/banks',
-  'bank list': '/dashboard/banks',
-  submissions: '/dashboard/bank-submissions',
-  'bank submissions': '/dashboard/bank-submissions',
-  dashboard: '/dashboard',
-  home: '/dashboard',
+const NAVIGATION_ALIASES: Record<string, { path: string; label: string }> = {
+  // Operations
+  dashboard: { path: '/dashboard', label: 'Dashboard' },
+  home: { path: '/dashboard', label: 'Dashboard' },
+  overview: { path: '/dashboard', label: 'Dashboard' },
+  analytics: { path: '/dashboard/analytics', label: 'Analytics' },
+  'hajj universe': { path: '/dashboard/hajj-universe', label: 'Hajj Universe' },
+  universe: { path: '/dashboard/hajj-universe', label: 'Hajj Universe' },
+  pilgrims: { path: '/dashboard/pilgrims', label: 'Pilgrims' },
+  'pilgrim list': { path: '/dashboard/pilgrims', label: 'Pilgrims' },
+  'pilgrim management': { path: '/dashboard/pilgrims', label: 'Pilgrims' },
+  payments: { path: '/dashboard/payments', label: 'Payments' },
+  'payment list': { path: '/dashboard/payments', label: 'Payments' },
+  'payment tracking': { path: '/dashboard/payments', label: 'Payments' },
+  banks: { path: '/dashboard/banks', label: 'Banks' },
+  'bank list': { path: '/dashboard/banks', label: 'Banks' },
+  'bank management': { path: '/dashboard/banks', label: 'Banks' },
+  submissions: { path: '/dashboard/bank-submissions', label: 'Bank Submissions' },
+  'bank submissions': { path: '/dashboard/bank-submissions', label: 'Bank Submissions' },
+  reports: { path: '/dashboard/reports', label: 'Reports' },
+  'report section': { path: '/dashboard/reports', label: 'Reports' },
+
+  // Accommodations
+  hotels: { path: '/dashboard/accommodations/hotels', label: 'Hotels' },
+  hotel: { path: '/dashboard/accommodations/hotels', label: 'Hotels' },
+  'room assignments': { path: '/dashboard/accommodations/room-assignments', label: 'Room Assignments' },
+  rooms: { path: '/dashboard/accommodations/room-assignments', label: 'Room Assignments' },
+  'room management': { path: '/dashboard/accommodations/room-assignments', label: 'Room Assignments' },
+  flights: { path: '/dashboard/accommodations/flights', label: 'Flights' },
+  'flight list': { path: '/dashboard/accommodations/flights', label: 'Flights' },
+  'flight management': { path: '/dashboard/accommodations/flights', label: 'Flights' },
+  'flight assignments': { path: '/dashboard/accommodations/flight-assignments', label: 'Flight Assignments' },
+  'flight assignment': { path: '/dashboard/accommodations/flight-assignments', label: 'Flight Assignments' },
+
+  // System
+  settings: { path: '/dashboard/settings', label: 'Settings' },
+  preferences: { path: '/dashboard/settings', label: 'Settings' },
 };
 
 export function detectIntent(text: string): VoiceCommand {
@@ -68,12 +95,17 @@ export function detectIntent(text: string): VoiceCommand {
       const match = lowerText.match(pattern);
       if (match) {
         const entity = match[1]?.trim();
-        const location = NAVIGATION_ALIASES[entity?.toLowerCase()] || entity;
+        const entityLower = entity?.toLowerCase() || '';
+        const navigationData = NAVIGATION_ALIASES[entityLower];
+
+        const location = navigationData?.path || entity;
+        const label = navigationData?.label || entity;
 
         return {
           intent: intent as VoiceCommand['intent'],
           entity,
           location,
+          label,
           rawText: text,
         };
       }
