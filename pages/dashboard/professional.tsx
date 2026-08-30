@@ -51,25 +51,27 @@ export default function ProfessionalDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const hajjYearParam = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
+      const baseParam = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '?';
+      const paymentsParam = `${baseParam}${baseParam.includes('?') ? '&' : ''}ordering=-submitted_at`;
       const [paymentsRes, pilgrimsRes, banksRes] = await Promise.all([
-        api.get(`/bank-payment-submissions/${hajjYearParam}`),
-        api.get(`/pilgrims/${hajjYearParam}`),
+        api.get(`/bank-payment-submissions/${paymentsParam}`),
+        api.get(`/pilgrims/${baseParam}`),
         api.get('/banks/'),
       ]);
 
-      const paymentsData = paymentsRes.data.results || paymentsRes.data || [];
+      const allPaymentsData = paymentsRes.data.results || paymentsRes.data || [];
+      const recentPayments = allPaymentsData.slice(0, 10);
       const pilgrimsData = pilgrimsRes.data.results || pilgrimsRes.data || [];
       const banksData = banksRes.data.results || banksRes.data || [];
 
-      setPayments(paymentsData);
+      setPayments(recentPayments);
       setPilgrims(pilgrimsData);
       setBanks(banksData);
 
-      // Calculate real stats
+      // Calculate real stats (using ALL payments, not just recent)
       const totalPilgrims = pilgrimsData.length;
-      const totalPayments = paymentsData.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
-      const confirmedPayments = paymentsData.filter((p: any) => p.status === 'confirmed').length;
+      const totalPayments = allPaymentsData.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+      const confirmedPayments = allPaymentsData.filter((p: any) => p.status === 'confirmed').length;
       const paymentRate = totalPilgrims > 0 ? Math.round((confirmedPayments / totalPilgrims) * 100) : 0;
       const activeBanks = banksData.filter((b: any) => b.is_active).length;
 
@@ -97,7 +99,7 @@ export default function ProfessionalDashboard() {
     {
       label: 'Total Payments',
       value: `$${(stats.totalPayments / 1000000).toFixed(2)}M`,
-      caption: `${payments.length} transactions`,
+      caption: `${payments.length === 10 ? '10+ recent' : payments.length} transactions`,
       icon: <BiWallet size={15} />,
     },
     {
