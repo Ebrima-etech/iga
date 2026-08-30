@@ -8,6 +8,7 @@ import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
+import GIALogoEngravings from '@/components/GIALogoEngravings';
 import { StatCardSkeleton, ChartSkeleton, TableSkeleton } from '@/components/Common/Skeleton';
 import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh, BiShow, BiHide } from 'react-icons/bi';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
@@ -201,6 +202,7 @@ export default function ProfessionalDashboard() {
 
   return (
     <Layout>
+      <GIALogoEngravings />
       <div className="min-h-screen bg-white">
         {/* Page Header */}
         <div className="px-8 py-8 border-b border-gray-200 bg-white">
