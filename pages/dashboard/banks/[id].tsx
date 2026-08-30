@@ -288,7 +288,10 @@ export default function BankDetailPage() {
                       className="h-28 w-28 object-contain"
                       onError={(e) => {
                         console.log('Image load failed for:', (e.target as HTMLImageElement).src);
-                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<span className="text-5xl">🏦</span>';
+                        const parent = (e.target as HTMLImageElement).parentElement;
+                        if (parent) {
+                          parent.innerHTML = '<span style="font-size: 2.5rem">🏦</span>';
+                        }
                       }}
                     />
                   ) : (
