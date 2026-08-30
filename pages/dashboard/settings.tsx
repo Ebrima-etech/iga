@@ -647,6 +647,23 @@ export default function SettingsPage() {
                             <p className="text-gray-600 text-sm mt-2">{year.description}</p>
                           )}
                         </div>
+                        {!year.is_active && (
+                          <ProfessionalButton
+                            variant="secondary"
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                await api.patch(`/hajj-years/${year.id}/`, { is_active: true });
+                                toast.success(`${year.name} is now active`);
+                                fetchHajjYears();
+                              } catch (error) {
+                                toast.error('Failed to set year as active');
+                              }
+                            }}
+                          >
+                            Set as Active
+                          </ProfessionalButton>
+                        )}
                       </div>
                     </div>
                   ))
