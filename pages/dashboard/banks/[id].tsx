@@ -17,6 +17,14 @@ interface Bank {
   logo?: string | null;
   is_active: boolean;
   payment_view_access: 'date_restricted' | 'unrestricted';
+  access_restricted: boolean;
+  allowed_days: string;
+  access_start_time: string | null;
+  access_end_time: string | null;
+  location_restricted: boolean;
+  location_latitude: number | null;
+  location_longitude: number | null;
+  location_radius: number;
   created_at: string;
 }
 
@@ -44,8 +52,22 @@ export default function BankDetailPage() {
   const [togglingStatus, setTogglingStatus] = useState(false);
   const [showAccessModal, setShowAccessModal] = useState(false);
   const [accessValue, setAccessValue] = useState<'date_restricted' | 'unrestricted'>('date_restricted');
+  const [showTimeAccessModal, setShowTimeAccessModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [timeAccessData, setTimeAccessData] = useState({
+    access_restricted: false,
+    allowed_days: 'Mon,Tue,Wed,Thu,Fri',
+    access_start_time: '09:00',
+    access_end_time: '17:00',
+  });
+  const [locationData, setLocationData] = useState({
+    location_restricted: false,
+    location_latitude: 0,
+    location_longitude: 0,
+    location_radius: 1,
+  });
   const [adminFormData, setAdminFormData] = useState({
     username: '',
     email: '',
@@ -131,6 +153,58 @@ export default function BankDetailPage() {
       fetchBank();
     } catch (error) {
       toast.error('Failed to update access level');
+    }
+  };
+
+  const handleSaveTimeAccess = async () => {
+    try {
+      await api.patch(`/banks/${bankId}/`, {
+        access_restricted: timeAccessData.access_restricted,
+        allowed_days: timeAccessData.allowed_days,
+        access_start_time: timeAccessData.access_start_time,
+        access_end_time: timeAccessData.access_end_time,
+      });
+      toast.success('Time-based access updated successfully');
+      setShowTimeAccessModal(false);
+      fetchBank();
+    } catch (error) {
+      toast.error('Failed to update time access');
+    }
+  };
+
+  const handleSaveLocationAccess = async () => {
+    try {
+      await api.patch(`/banks/${bankId}/`, {
+        location_restricted: locationData.location_restricted,
+        location_latitude: locationData.location_latitude,
+        location_longitude: locationData.location_longitude,
+        location_radius: locationData.location_radius,
+      });
+      toast.success('Location-based access updated successfully');
+      setShowLocationModal(false);
+      fetchBank();
+    } catch (error) {
+      toast.error('Failed to update location access');
+    }
+  };
+
+  const handleGetCurrentLocation = async () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocationData({
+            ...locationData,
+            location_latitude: position.coords.latitude,
+            location_longitude: position.coords.longitude,
+          });
+          toast.success('Location captured successfully');
+        },
+        () => {
+          toast.error('Failed to get current location');
+        }
+      );
+    } else {
+      toast.error('Geolocation is not supported by your browser');
     }
   };
 
@@ -444,7 +518,7 @@ export default function BankDetailPage() {
             </div>
           </div>
 
-          {/* Access Modal */}
+          {/* Payment Access Modal */}
           {showAccessModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
@@ -491,6 +565,210 @@ export default function BankDetailPage() {
                     </button>
                     <button
                       onClick={() => setShowAccessModal(false)}
+                      className="flex-1 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-900 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Time-based Access Control */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Time-based Access</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {bank?.access_restricted ? `Active on ${bank?.allowed_days} (${bank?.access_start_time} - ${bank?.access_end_time})` : 'Not restricted'}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setTimeAccessData({
+                    access_restricted: bank?.access_restricted || false,
+                    allowed_days: bank?.allowed_days || 'Mon,Tue,Wed,Thu,Fri',
+                    access_start_time: bank?.access_start_time || '09:00',
+                    access_end_time: bank?.access_end_time || '17:00',
+                  });
+                  setShowTimeAccessModal(true);
+                }}
+                className="px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                Configure
+              </button>
+            </div>
+          </div>
+
+          {/* Time Access Modal */}
+          {showTimeAccessModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Configure Time-based Access</h3>
+                  <button onClick={() => setShowTimeAccessModal(false)} className="text-gray-400 hover:text-gray-600">
+                    <BiX size={24} />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={timeAccessData.access_restricted}
+                      onChange={(e) => setTimeAccessData({ ...timeAccessData, access_restricted: e.target.checked })}
+                      className="w-4 h-4"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Enable time-based restrictions</span>
+                  </label>
+                  {timeAccessData.access_restricted && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Allowed Days</label>
+                        <input
+                          type="text"
+                          value={timeAccessData.allowed_days}
+                          onChange={(e) => setTimeAccessData({ ...timeAccessData, allowed_days: e.target.value })}
+                          placeholder="Mon,Tue,Wed,Thu,Fri"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Comma-separated day names</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                        <input
+                          type="time"
+                          value={timeAccessData.access_start_time}
+                          onChange={(e) => setTimeAccessData({ ...timeAccessData, access_start_time: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+                        <input
+                          type="time"
+                          value={timeAccessData.access_end_time}
+                          onChange={(e) => setTimeAccessData({ ...timeAccessData, access_end_time: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                        />
+                      </div>
+                    </>
+                  )}
+                  <div className="flex gap-3 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={handleSaveTimeAccess}
+                      className="flex-1 px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setShowTimeAccessModal(false)}
+                      className="flex-1 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-900 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Location-based Access Control */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Location-based Access</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {bank?.location_restricted ? `Restricted (${bank?.location_radius}km radius)` : 'No location restrictions'}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setLocationData({
+                    location_restricted: bank?.location_restricted || false,
+                    location_latitude: bank?.location_latitude || 0,
+                    location_longitude: bank?.location_longitude || 0,
+                    location_radius: bank?.location_radius || 1,
+                  });
+                  setShowLocationModal(true);
+                }}
+                className="px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                Configure
+              </button>
+            </div>
+          </div>
+
+          {/* Location Modal */}
+          {showLocationModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Configure Location-based Access</h3>
+                  <button onClick={() => setShowLocationModal(false)} className="text-gray-400 hover:text-gray-600">
+                    <BiX size={24} />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={locationData.location_restricted}
+                      onChange={(e) => setLocationData({ ...locationData, location_restricted: e.target.checked })}
+                      className="w-4 h-4"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Enable location-based restrictions</span>
+                  </label>
+                  {locationData.location_restricted && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
+                        <input
+                          type="number"
+                          step="0.0001"
+                          value={locationData.location_latitude}
+                          onChange={(e) => setLocationData({ ...locationData, location_latitude: parseFloat(e.target.value) })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
+                        <input
+                          type="number"
+                          step="0.0001"
+                          value={locationData.location_longitude}
+                          onChange={(e) => setLocationData({ ...locationData, location_longitude: parseFloat(e.target.value) })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Radius (km)</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0.1"
+                          value={locationData.location_radius}
+                          onChange={(e) => setLocationData({ ...locationData, location_radius: parseFloat(e.target.value) })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                        />
+                      </div>
+                      <button
+                        onClick={handleGetCurrentLocation}
+                        className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-900 text-sm font-medium rounded-lg transition-colors"
+                      >
+                        Use Current Location
+                      </button>
+                    </>
+                  )}
+                  <div className="flex gap-3 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={handleSaveLocationAccess}
+                      className="flex-1 px-4 py-2 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setShowLocationModal(false)}
                       className="flex-1 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-900 text-sm font-medium rounded-lg transition-colors"
                     >
                       Cancel
