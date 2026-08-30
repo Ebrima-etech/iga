@@ -7,7 +7,7 @@ import PageHeader from '@/components/Dashboard/PageHeader';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
-import { BiPlus, BiPencil, BiTrash, BiX, BiSearch, BiEdit, BiClock } from 'react-icons/bi';
+import { BiPlus, BiPencil, BiTrash, BiX, BiSearch, BiEdit, BiTime } from 'react-icons/bi';
 import { TableSkeleton } from '@/components/Common/Skeleton';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -352,7 +352,7 @@ export default function BanksManagementPage() {
                     <ProfessionalButton
                       variant="ghost"
                       size="sm"
-                      icon={<BiClock size={14} />}
+                      icon={<BiTime size={14} />}
                       onClick={() => handleOpenLocationForm(row)}
                     >
                       Location
