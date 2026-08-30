@@ -283,15 +283,7 @@ export default function BankDetailPage() {
                 <div className="w-32 h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center mb-4">
                   {bank.logo ? (
                     <img
-                      src={
-                        bank.logo.startsWith('http')
-                          ? bank.logo
-                          : bank.logo.startsWith('/media')
-                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL?.split('/api/v1')[0]}${bank.logo}`
-                          : bank.logo.startsWith('/')
-                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL?.split('/api/v1')[0]}${bank.logo}`
-                          : `${process.env.NEXT_PUBLIC_API_BASE_URL?.split('/api/v1')[0]}/media/${bank.logo}`
-                      }
+                      src={bank.logo}
                       alt={bank.name}
                       className="h-28 w-28 object-contain"
                       onError={(e) => {
