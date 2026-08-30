@@ -282,7 +282,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
           break;
 
         default:
-          response = `Sorry, I didn't understand. You can say things like "search for Hassan", "read pilgrim records", "total payments", or "go to dashboard".`;
+          response = 'Pardon';
       }
 
       // Always speak full response for commands
