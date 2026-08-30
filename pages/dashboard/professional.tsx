@@ -10,6 +10,7 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
 import { StatCardSkeleton, ChartSkeleton, TableSkeleton } from '@/components/Common/Skeleton';
 import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh } from 'react-icons/bi';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import {
@@ -29,6 +30,7 @@ import {
 } from 'recharts';
 
 export default function ProfessionalDashboard() {
+  const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState('');
   const [stats, setStats] = useState({
@@ -44,14 +46,15 @@ export default function ProfessionalDashboard() {
   useEffect(() => {
     loadDashboardData();
     setCurrentTime(new Date().toLocaleTimeString());
-  }, []);
+  }, [selectedHajjYear]);
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      const hajjYearParam = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
       const [paymentsRes, pilgrimsRes, banksRes] = await Promise.all([
-        api.get('/payments/'),
-        api.get('/pilgrims/'),
+        api.get(`/payments/${hajjYearParam}`),
+        api.get(`/pilgrims/${hajjYearParam}`),
         api.get('/banks/'),
       ]);
 

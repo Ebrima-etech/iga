@@ -8,6 +8,7 @@ import Card from '@/components/Common/Card';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
 import { Pilgrim, Payment } from '@/types';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -15,6 +16,7 @@ import { BiChevronLeft, BiPhone, BiEnvelope, BiCalendar, BiMapPin, BiDollar, BiC
 
 export default function PilgrimDetailPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const { id } = router.query;
   const [loading, setLoading] = useState(true);
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
@@ -25,14 +27,20 @@ export default function PilgrimDetailPage() {
       fetchPilgrimAndPayments();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, selectedHajjYear]);
 
   const fetchPilgrimAndPayments = async () => {
     try {
       setLoading(true);
+      const paymentsParams = new URLSearchParams();
+      paymentsParams.append('pilgrim', String(id));
+      if (selectedHajjYear) {
+        paymentsParams.append('hajj_year', String(selectedHajjYear));
+      }
+
       const [pilgrimRes, paymentsRes] = await Promise.all([
         api.get(`/pilgrims/${id}/`),
-        api.get(`/bank-payment-submissions/?pilgrim=${id}`),
+        api.get(`/bank-payment-submissions/?${paymentsParams.toString()}`),
       ]);
 
       console.log('Pilgrim data:', pilgrimRes.data);

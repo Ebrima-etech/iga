@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { logout, getMe } from '@/lib/auth';
 import { User } from '@/types';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
+import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
 import toast from 'react-hot-toast';
 import {
   BiBarChartAlt2,
@@ -15,6 +17,7 @@ import {
   BiChevronDown,
   BiLogOut,
   BiHomeAlt2,
+  BiPlus,
 } from 'react-icons/bi';
 
 interface NavItem {
@@ -66,6 +69,9 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
   const router = useRouter();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [showYearDropdown, setShowYearDropdown] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { activeHajjYear, selectedHajjYear, hajjYears, setSelectedHajjYear, fetchHajjYears } = useHajjYear();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -105,7 +111,7 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         } ${isCollapsed ? 'md:w-20' : 'md:w-64'} w-64`}
       >
-        {/* Org switcher */}
+        {/* Org switcher with Hajj Year Dropdown */}
         <div className="px-3 pt-4 pb-3 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <Link href="/dashboard" className="flex-1">
@@ -117,9 +123,17 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
                   <>
                     <span className="font-semibold text-gray-900 text-sm truncate">GIA Hajj</span>
                     <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 flex-shrink-0">
-                      2026
+                      {activeHajjYear?.year || 2026}
                     </span>
-                    <BiChevronDown size={14} className="text-gray-400 ml-auto flex-shrink-0" />
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowYearDropdown(!showYearDropdown);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 ml-auto flex-shrink-0 transition-colors"
+                    >
+                      <BiChevronDown size={14} className={`transform transition-transform ${showYearDropdown ? 'rotate-180' : ''}`} />
+                    </button>
                   </>
                 )}
               </div>
@@ -132,6 +146,55 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
               <BiMenu size={18} />
             </button>
           </div>
+
+          {/* Hajj Year Dropdown */}
+          {showYearDropdown && !isCollapsed && (
+            <div className="mt-2 p-2 bg-gray-50 rounded-md border border-gray-200 space-y-1">
+              {hajjYears.map((year) => (
+                <button
+                  key={year.id}
+                  onClick={() => {
+                    setSelectedHajjYear(year.id);
+                    setShowYearDropdown(false);
+                    // Refresh page to reload data with new hajj year
+                    router.push(router.asPath);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                    selectedHajjYear === year.id
+                      ? 'bg-emerald-100 text-emerald-900 font-medium'
+                      : 'text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>Hajj {year.year}</span>
+                    {year.is_active && (
+                      <span className="text-[8px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                        ACTIVE
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))}
+
+              {/* Create New Hajj Year - only for staff */}
+              {user?.is_staff && (
+                <>
+                  <div className="border-t border-gray-200 pt-1 mt-1">
+                    <button
+                      onClick={() => {
+                        setShowCreateModal(true);
+                        setShowYearDropdown(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
+                    >
+                      <BiPlus size={14} />
+                      Create New Year
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Nav */}
@@ -199,6 +262,16 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
       >
         <BiMenu size={16} />
       </button>
+
+      {/* Create Hajj Year Modal */}
+      <HajjYearCreateModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => {
+          // Refresh hajj years list
+          fetchHajjYears();
+        }}
+      />
     </>
   );
 }

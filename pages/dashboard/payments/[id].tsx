@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import Loading from '@/components/Common/Loading';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -31,6 +32,7 @@ interface BankPaymentSubmission {
 
 export default function PaymentDetailPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const { id } = router.query;
 
   const [loading, setLoading] = useState(true);
@@ -42,7 +44,7 @@ export default function PaymentDetailPage() {
       fetchPayment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, selectedHajjYear]);
 
   const fetchPayment = async () => {
     try {

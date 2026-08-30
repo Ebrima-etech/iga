@@ -8,6 +8,7 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
 import Loading from '@/components/Common/Loading';
 import { BankPaymentSubmission, Pilgrim } from '@/types';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -17,6 +18,7 @@ import { TableSearch, TableFilter, SortableHeader, TablePagination, TableControl
 import { submissionMethodFilters, verificationStatusFilters } from '@/lib/filterConfigs';
 
 export default function BankSubmissionsPage() {
+  const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [submissions, setSubmissions] = useState<BankPaymentSubmission[]>([]);
   const [creatingPilgrim, setCreatingPilgrim] = useState<string | null>(null);
@@ -30,7 +32,7 @@ export default function BankSubmissionsPage() {
 
   useEffect(() => {
     fetchSubmissions();
-  }, []);
+  }, [selectedHajjYear]);
 
   useEffect(() => {
     tableState.handlePageChange(1);
@@ -40,7 +42,8 @@ export default function BankSubmissionsPage() {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/bank-payment-submissions/');
+      const params = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
+      const response = await api.get(`/bank-payment-submissions/${params}`);
       setSubmissions(response.data.results || response.data);
     } catch (error) {
       console.error('Failed to fetch submissions:', error);

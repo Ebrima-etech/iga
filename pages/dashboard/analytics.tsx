@@ -5,6 +5,7 @@ import Layout from '@/components/Layout';
 import Card from '@/components/Common/Card';
 import { StatCardSkeleton, ChartSkeleton, Skeleton } from '@/components/Common/Skeleton';
 import { BiDownload, BiRefresh, BiUser, BiWallet, BiCheckCircle, BiTrendingUp, BiBarChartAlt2, BiBuilding, BiTime, BiGlobe } from 'react-icons/bi';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import {
@@ -28,6 +29,7 @@ import {
 } from 'recharts';
 
 export default function AnalyticsPage() {
+  const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('30days');
   const [data, setData] = useState<any>({
@@ -53,14 +55,15 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     loadAnalyticsData();
-  }, [dateRange]);
+  }, [dateRange, selectedHajjYear]);
 
   const loadAnalyticsData = async () => {
     try {
       setLoading(true);
+      const params = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
       const [pilgrimsRes, paymentsRes, banksRes] = await Promise.all([
-        api.get('/pilgrims/'),
-        api.get('/payments/'),
+        api.get(`/pilgrims/${params}`),
+        api.get(`/payments/${params}`),
         api.get('/banks/'),
       ]);
 

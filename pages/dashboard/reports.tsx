@@ -3,6 +3,7 @@ import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -26,6 +27,7 @@ interface BankData {
 }
 
 export default function ReportsPage() {
+  const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [reportData, setReportData] = useState<ReportData | null>(null);
@@ -36,14 +38,15 @@ export default function ReportsPage() {
 
   useEffect(() => {
     fetchReportData();
-  }, []);
+  }, [selectedHajjYear]);
 
   const fetchReportData = async () => {
     try {
       setLoading(true);
+      const params = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
       const [pilgrims, payments, banks] = await Promise.all([
-        api.get('/pilgrims/').catch(() => ({ data: { results: [] } })),
-        api.get('/bank-payment-submissions/').catch(() => ({ data: { results: [] } })),
+        api.get(`/pilgrims/${params}`).catch(() => ({ data: { results: [] } })),
+        api.get(`/bank-payment-submissions/${params}`).catch(() => ({ data: { results: [] } })),
         api.get('/banks/').catch(() => ({ data: { results: [] } })),
       ]);
 

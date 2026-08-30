@@ -8,6 +8,7 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
 import { TableSkeleton } from '@/components/Common/Skeleton';
 import { Payment } from '@/types';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -26,6 +27,7 @@ type PaymentRecord = Payment & {
 
 export default function PaymentsPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [banks, setBanks] = useState<any[]>([]);
@@ -41,7 +43,7 @@ export default function PaymentsPage() {
     console.log('Payments page mounted, fetching data...');
     fetchPayments();
     fetchBanks();
-  }, []);
+  }, [selectedHajjYear]);
 
   useEffect(() => {
     tableState.handlePageChange(1);
@@ -52,7 +54,8 @@ export default function PaymentsPage() {
     try {
       console.log('Fetching payments from bank submissions...');
       setLoading(true);
-      const response = await api.get('/bank-payment-submissions/');
+      const params = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
+      const response = await api.get(`/bank-payment-submissions/${params}`);
       console.log('Payments response:', response.data);
       // Map bank_payment_submission to Payment type for compatibility
       const submissions = response.data.results || response.data;

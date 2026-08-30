@@ -15,6 +15,7 @@ import { pilgrimStatusFilters, genderFilters } from '@/lib/filterConfigs';
 import { useRouter } from 'next/router';
 import { saveDraft, getDraft, deleteDraft } from '@/lib/draftManager';
 import { TableSkeleton } from '@/components/Common/Skeleton';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import { Pilgrim } from '@/types';
 import api from '@/lib/api';
@@ -167,6 +168,7 @@ const pilgrimFormSteps = [
 
 export default function PilgrimsPage() {
   const router = useRouter();
+  const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [pilgrims, setPilgrims] = useState<Pilgrim[]>([]);
   const [showInlineForm, setShowInlineForm] = useState(false);
@@ -185,7 +187,7 @@ export default function PilgrimsPage() {
   useEffect(() => {
     fetchPilgrims();
     loadDrafts();
-  }, []);
+  }, [selectedHajjYear]);
 
   useEffect(() => {
     tableState.handlePageChange(1);
@@ -195,7 +197,8 @@ export default function PilgrimsPage() {
   const fetchPilgrims = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/pilgrims/');
+      const params = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
+      const response = await api.get(`/pilgrims/${params}`);
       setPilgrims(response.data.results || response.data);
     } catch (error) {
       console.error('Error fetching pilgrims:', error);
@@ -219,6 +222,7 @@ export default function PilgrimsPage() {
       const submitData = {
         ...formData,
         total_amount_due: parseFloat(formData.total_amount_due),
+        hajj_year: selectedHajjYear,
       };
 
       if (editingPilgrim) {
