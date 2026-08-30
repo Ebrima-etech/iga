@@ -109,21 +109,25 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             // Auto-start listening for commands immediately after response
             handleStartListeningForCommand();
           } else {
-            // Continue listening for wake word
+            // Continue listening for wake word (with continuous mode)
             setTranscript('');
-            handleStartListeningForWakeWord();
           }
         },
         (error) => {
           // Silently continue listening on error
           console.log('Wake word listening error:', error);
-          setTimeout(() => {
-            if (isAwaitingWakeWord && !isOpen) {
-              setIsListening(false);
-              handleStartListeningForWakeWord();
-            }
-          }, 1000);
-        }
+          if (isAwaitingWakeWord && !isOpen) {
+            setIsListening(false);
+            // Restart listening after a brief pause
+            setTimeout(() => {
+              if (isAwaitingWakeWord && !isOpen) {
+                handleStartListeningForWakeWord();
+              }
+            }, 300);
+          }
+        },
+        'en-US',
+        true  // Enable continuous mode for always-on listening
       );
     } catch (error) {
       console.error('Microphone access denied');
@@ -139,35 +143,42 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
 
     try {
       setIsListening(true);
+      let lastCommandTime = Date.now();
+
       stopRecordingRef.current = startSpeechRecognition(
         async (recognizedText) => {
           const text = recognizedText.toLowerCase().trim();
 
           // Check if "assistant" wake word is detected during listening
           if (text.includes('assistant')) {
-            setIsListening(false);
-            // Restart listening instead of processing
-            setTimeout(() => {
-              handleStartListeningForCommand();
-            }, 300);
-          } else {
-            setTranscript(recognizedText);
-            setIsListening(false);
-            // Process the command
-            await processCommand(recognizedText);
-            // Continue listening for next command automatically
-            setTimeout(() => {
-              handleStartListeningForCommand();
-            }, 1000);
+            // Ignore and continue listening
+            return;
+          } else if (text.length > 0) {
+            // Only process if enough time has passed since last command (debounce)
+            const now = Date.now();
+            if (now - lastCommandTime > 500) {
+              setTranscript(recognizedText);
+              lastCommandTime = now;
+              // Process the command (continuous mode keeps listening)
+              await processCommand(recognizedText);
+            }
           }
         },
         (error) => {
-          setIsListening(false);
           // Silently continue listening on error
-          setTimeout(() => {
-            handleStartListeningForCommand();
-          }, 1000);
-        }
+          console.log('Command listening error:', error);
+          if (isOpen && enabled) {
+            setIsListening(false);
+            // Restart after brief pause
+            setTimeout(() => {
+              if (isOpen && enabled) {
+                handleStartListeningForCommand();
+              }
+            }, 300);
+          }
+        },
+        'en-US',
+        true  // Enable continuous mode for uninterrupted listening
       );
     } catch (error) {
       console.error('Microphone access denied');
@@ -178,36 +189,39 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
   const handleStartListening = async () => {
     try {
       setIsListening(true);
+      let lastCommandTime = Date.now();
+
       stopRecordingRef.current = startSpeechRecognition(
         async (recognizedText) => {
           const text = recognizedText.toLowerCase().trim();
 
           // Check if "assistant" wake word is detected during manual recording
           if (text.includes('assistant')) {
-            setIsListening(false);
-            // Restart listening instead of processing
-            setTimeout(() => {
-              if (isOpen) {
-                handleStartListeningForCommand();
-              }
-            }, 300);
-          } else {
-            setTranscript(recognizedText);
-            setIsListening(false);
-            // Process the command
-            await processCommand(recognizedText);
-            // Continue listening for next command
-            setTimeout(() => {
-              if (isOpen) {
-                handleStartListeningForCommand();
-              }
-            }, 1000);
+            return; // Ignore and keep listening
+          } else if (text.length > 0) {
+            // Only process if enough time has passed since last command (debounce)
+            const now = Date.now();
+            if (now - lastCommandTime > 500) {
+              setTranscript(recognizedText);
+              lastCommandTime = now;
+              // Process the command (continuous mode keeps listening)
+              await processCommand(recognizedText);
+            }
           }
         },
         (error) => {
-          setIsListening(false);
           console.error('Microphone error:', error);
-        }
+          if (isOpen) {
+            // Restart listening on error
+            setTimeout(() => {
+              if (isOpen) {
+                handleStartListening();
+              }
+            }, 300);
+          }
+        },
+        'en-US',
+        true  // Enable continuous mode
       );
     } catch (error) {
       toast.error('Microphone access denied');

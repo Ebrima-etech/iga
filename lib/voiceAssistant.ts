@@ -143,7 +143,8 @@ export async function executeVoiceCommand(command: VoiceCommand): Promise<string
 export function startSpeechRecognition(
   onResult: (transcript: string) => void,
   onError: (error: string) => void,
-  language: string = 'en-US'
+  language: string = 'en-US',
+  continuous: boolean = false
 ): () => void {
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
@@ -154,7 +155,7 @@ export function startSpeechRecognition(
 
   const recognition = new SpeechRecognition();
   recognition.language = language;
-  recognition.continuous = false;
+  recognition.continuous = continuous;
   recognition.interimResults = true;
   recognition.maxAlternatives = 1;
 

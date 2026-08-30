@@ -7,10 +7,11 @@ import PageHeader from '@/components/Dashboard/PageHeader';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
-import { BiPlus, BiPencil, BiTrash, BiX, BiSearch, BiEdit, BiTime } from 'react-icons/bi';
+import { BiPlus, BiPencil, BiTrash, BiX, BiSearch, BiEdit, BiTime, BiImage, BiCloud } from 'react-icons/bi';
 import { TableSkeleton } from '@/components/Common/Skeleton';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 
 interface Bank {
   id: number;
@@ -18,6 +19,7 @@ interface Bank {
   is_active: boolean;
   payment_view_access: 'date_restricted' | 'unrestricted';
   created_at: string;
+  logo?: string | null;
   access_restricted?: boolean;
   allowed_days?: string;
   access_start_time?: string;
@@ -34,9 +36,12 @@ export default function BanksManagementPage() {
   const [banks, setBanks] = useState<Bank[]>([]);
   const [filteredBanks, setFilteredBanks] = useState<Bank[]>([]);
   const [showBankForm, setShowBankForm] = useState(false);
-  const [bankFormData, setBankFormData] = useState({ name: '' });
+  const [bankFormData, setBankFormData] = useState({ name: '', logo: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [imageLoadErrors, setImageLoadErrors] = useState<Set<number>>(new Set());
   const [editingAccessLevel, setEditingAccessLevel] = useState<number | null>(null);
   const [editingAccessValue, setEditingAccessValue] = useState<'date_restricted' | 'unrestricted'>('date_restricted');
   const [updatingAccess, setUpdatingAccess] = useState(false);
@@ -96,6 +101,26 @@ export default function BanksManagementPage() {
     setFilteredBanks(filtered);
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingLogo(true);
+      const preview = URL.createObjectURL(file);
+      setLogoPreview(preview);
+
+      const cloudinaryUrl = await uploadToCloudinary(file);
+      setBankFormData({ ...bankFormData, logo: cloudinaryUrl });
+      toast.success('Logo uploaded successfully!');
+    } catch (error) {
+      toast.error('Failed to upload logo to Cloudinary');
+      console.error(error);
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
   const handleCreateBank = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bankFormData.name.trim()) {
@@ -106,9 +131,11 @@ export default function BanksManagementPage() {
       await api.post('/banks/', {
         name: bankFormData.name,
         is_active: true,
+        logo: bankFormData.logo || null,
       });
       toast.success('Bank created successfully!');
-      setBankFormData({ name: '' });
+      setBankFormData({ name: '', logo: '' });
+      setLogoPreview('');
       setShowBankForm(false);
       fetchBanks();
     } catch (error: any) {
@@ -251,7 +278,11 @@ export default function BanksManagementPage() {
             variant="primary"
             size="md"
             icon={<BiPlus size={18} />}
-            onClick={() => setShowBankForm(!showBankForm)}
+            onClick={() => {
+              setBankFormData({ name: '', logo: '' });
+              setLogoPreview('');
+              setShowBankForm(!showBankForm);
+            }}
           >
             Add Bank
           </ProfessionalButton>
@@ -266,7 +297,11 @@ export default function BanksManagementPage() {
                 <p className="text-gray-600 text-sm mt-1">Add a new bank account for processing payments</p>
               </div>
               <button
-                onClick={() => setShowBankForm(false)}
+                onClick={() => {
+                  setShowBankForm(false);
+                  setBankFormData({ name: '', logo: '' });
+                  setLogoPreview('');
+                }}
                 className="text-gray-400 hover:text-gray-600 p-2 hover:bg-white rounded transition"
               >
                 <BiX size={24} />
@@ -343,26 +378,115 @@ export default function BanksManagementPage() {
           </div>
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             {loading ? (
-              <TableSkeleton rows={5} columnCount={3} />
+              <TableSkeleton rows={5} columnCount={5} />
+            ) : filteredBanks.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Logo</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Bank Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Payment Access</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Created</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredBanks.map((bank) => {
+                      const initials = bank.name
+                        .split(' ')
+                        .map((word) => word[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2);
+
+                      return (
+                        <tr key={bank.id} className="hover:bg-gray-50 transition">
+                          <td className="px-6 py-4">
+                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-white border border-gray-200 font-bold text-sm overflow-hidden">
+                              {bank.logo && !imageLoadErrors.has(bank.id) ? (
+                                <img
+                                  key={bank.logo}
+                                  src={bank.logo}
+                                  alt={bank.name}
+                                  className="w-full h-full object-contain"
+                                  onError={() => {
+                                    setImageLoadErrors(prev => new Set([...prev, bank.id]));
+                                  }}
+                                />
+                              ) : (
+                                <span className="text-gray-600">{initials}</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{bank.name}</td>
+                          <td className="px-6 py-4 text-sm">
+                            <Badge
+                              variant={bank.is_active ? 'success' : 'warning'}
+                              size="sm"
+                            >
+                              {bank.is_active ? '✓ Active' : '○ Inactive'}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            <Badge
+                              variant={
+                                bank.payment_view_access === 'unrestricted'
+                                  ? 'success'
+                                  : 'warning'
+                              }
+                              size="sm"
+                            >
+                              {bank.payment_view_access === 'unrestricted'
+                                ? '🔓 Unrestricted'
+                                : '🔒 Date Filter'}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {new Date(bank.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            <div className="flex gap-2">
+                              <ProfessionalButton
+                                variant="ghost"
+                                size="sm"
+                                icon={<BiEdit size={14} />}
+                                onClick={() => router.push(`/dashboard/banks/${bank.id}`)}
+                              >
+                                Manage
+                              </ProfessionalButton>
+                              <button
+                                onClick={() =>
+                                  handleToggleBankStatus(bank.id, bank.is_active)
+                                }
+                                disabled={togglingBank === bank.id}
+                                className="px-2 py-1 text-sm font-medium rounded border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                              >
+                                {bank.is_active ? '⊖' : '⊕'}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             ) : (
-              <ProfessionalTable
-                columns={columns}
-                data={filteredBanks}
-                loading={false}
-                emptyMessage="No banks found • Click 'Add Bank' to create one"
-                actions={(row: Bank) => (
-                  <div className="flex gap-2">
-                    <ProfessionalButton
-                      variant="ghost"
-                      size="sm"
-                      icon={<BiPencil size={14} />}
-                      onClick={() => router.push(`/dashboard/banks/${row.id}`)}
-                    >
-                      Manage
-                    </ProfessionalButton>
-                  </div>
-                )}
-              />
+              <div className="px-6 py-12 text-center">
+                <p className="text-gray-500 text-sm mb-4">
+                  No banks found • Click 'Add Bank' to create one
+                </p>
+                <ProfessionalButton
+                  variant="primary"
+                  size="md"
+                  icon={<BiPlus size={18} />}
+                  onClick={() => setShowBankForm(true)}
+                >
+                  Add First Bank
+                </ProfessionalButton>
+              </div>
             )}
           </div>
         </div>
