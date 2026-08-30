@@ -4,12 +4,29 @@ import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
-import ProfessionalButton from '@/components/Common/ProfessionalButton';
-import { BiTrendingUp, BiUsers, BiWallet, BiCalendar, BiBarChartAlt2, BiLineChart, BiGlobe, BiStar, BiArrowDown, BiArrowUp } from 'react-icons/bi';
+import { BiGlobe, BiStar, BiBarChartAlt2, BiLineChart } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { HajjYear } from '@/types';
-import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+} from 'recharts';
 
 interface YearStats {
   year: HajjYear;
