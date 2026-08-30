@@ -38,6 +38,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
   const [isAwaitingWakeWord, setIsAwaitingWakeWord] = useState(true);
   const [transcript, setTranscript] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isFirstActivation, setIsFirstActivation] = useState(true);
   const stopRecordingRef = useRef<(() => void) | null>(null);
 
   // Only show in GIA dashboard (not in bank portal)
@@ -81,6 +82,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     if (!isOpen && enabled && !isAwaitingWakeWord) {
       setIsAwaitingWakeWord(true);
       setTranscript('');
+      setIsFirstActivation(true);  // Reset so greeting plays again next time
     }
   }, [isOpen, enabled]);
 
@@ -102,8 +104,11 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             setIsAwaitingWakeWord(false);
             setIsOpen(true);
 
-            // Respond to wake word
-            await speak('Hello! How can I help you?');
+            // Only speak on first activation, stay silent on subsequent calls
+            if (isFirstActivation) {
+              await speak('Hello! How can I help you?');
+              setIsFirstActivation(false);
+            }
             setTranscript('');
 
             // Auto-start listening for commands immediately after response
@@ -159,8 +164,8 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             if (now - lastCommandTime > 500) {
               setTranscript(recognizedText);
               lastCommandTime = now;
-              // Process the command (continuous mode keeps listening)
-              await processCommand(recognizedText);
+              // Process the command silently (continuous mode keeps listening)
+              await processCommand(recognizedText, false);
             }
           }
         },
@@ -204,8 +209,8 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             if (now - lastCommandTime > 500) {
               setTranscript(recognizedText);
               lastCommandTime = now;
-              // Process the command (continuous mode keeps listening)
-              await processCommand(recognizedText);
+              // Process the command silently (continuous mode keeps listening)
+              await processCommand(recognizedText, false);
             }
           }
         },
@@ -236,7 +241,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     }
   };
 
-  const processCommand = async (text: string) => {
+  const processCommand = async (text: string, shouldSpeak: boolean = false) => {
     try {
       const command = detectIntent(text);
       let response = '';
@@ -274,9 +279,12 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
           response = `Sorry, I didn't understand. You can say things like "search for Hassan", "read pilgrim records", "total payments", or "go to dashboard".`;
       }
 
-      setIsSpeaking(true);
-      await speak(response);
-      setIsSpeaking(false);
+      // Only speak response if requested (first activation only)
+      if (shouldSpeak) {
+        setIsSpeaking(true);
+        await speak(response);
+        setIsSpeaking(false);
+      }
     } catch (error) {
       toast.error('Error processing command');
       console.error(error);
