@@ -120,9 +120,15 @@ export default function BankDetailPage() {
       const formData = new FormData();
       formData.append('logo', file);
 
+      console.log('Uploading logo:', file.name);
       const response = await api.patch(`/banks/${bankId}/`, formData);
 
+      console.log('Upload response:', response.data);
       setBank(response.data);
+
+      // Clear the file input
+      e.target.value = '';
+
       toast.success('Bank logo uploaded successfully!');
     } catch (error: any) {
       console.error('Upload error:', error);
@@ -282,18 +288,23 @@ export default function BankDetailPage() {
               <div className="flex flex-col items-center justify-start">
                 <div className="w-32 h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center mb-4">
                   {bank.logo ? (
-                    <img
-                      src={bank.logo}
-                      alt={bank.name}
-                      className="h-28 w-28 object-contain"
-                      onError={(e) => {
-                        console.log('Image load failed for:', (e.target as HTMLImageElement).src);
-                        const parent = (e.target as HTMLImageElement).parentElement;
-                        if (parent) {
-                          parent.innerHTML = '<span style="font-size: 2.5rem">🏦</span>';
-                        }
-                      }}
-                    />
+                    <>
+                      {console.log('Logo URL:', bank.logo)}
+                      <img
+                        key={bank.logo}
+                        src={bank.logo}
+                        alt={bank.name}
+                        className="h-28 w-28 object-contain"
+                        onLoad={() => console.log('Logo loaded successfully')}
+                        onError={(e) => {
+                          console.log('Image load failed for:', (e.target as HTMLImageElement).src);
+                          const parent = (e.target as HTMLImageElement).parentElement;
+                          if (parent) {
+                            parent.innerHTML = '<span style="font-size: 2.5rem">🏦</span>';
+                          }
+                        }}
+                      />
+                    </>
                   ) : (
                     <span className="text-5xl">🏦</span>
                   )}
