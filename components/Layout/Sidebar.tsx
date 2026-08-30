@@ -153,8 +153,7 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
                   onClick={() => {
                     setSelectedHajjYear(year.id);
                     setShowYearDropdown(false);
-                    // Refresh page to reload data with new hajj year
-                    router.push(router.asPath);
+                    // Don't refresh - just update state, pages listen to selectedHajjYear changes
                   }}
                   className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
                     selectedHajjYear === year.id
