@@ -149,6 +149,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     try {
       setIsListening(true);
       let lastCommandTime = Date.now();
+      let isFirstCommand = true;
 
       stopRecordingRef.current = startSpeechRecognition(
         async (recognizedText) => {
@@ -164,8 +165,9 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             if (now - lastCommandTime > 500) {
               setTranscript(recognizedText);
               lastCommandTime = now;
-              // Process the command silently (continuous mode keeps listening)
-              await processCommand(recognizedText, false);
+              // Process the command: full response on first, just "Yes" on subsequent
+              await processCommand(recognizedText, isFirstCommand);
+              isFirstCommand = false;
             }
           }
         },
@@ -195,6 +197,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     try {
       setIsListening(true);
       let lastCommandTime = Date.now();
+      let isFirstCommand = true;
 
       stopRecordingRef.current = startSpeechRecognition(
         async (recognizedText) => {
@@ -209,8 +212,9 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             if (now - lastCommandTime > 500) {
               setTranscript(recognizedText);
               lastCommandTime = now;
-              // Process the command silently (continuous mode keeps listening)
-              await processCommand(recognizedText, false);
+              // Process the command: full response on first, just "Yes" on subsequent
+              await processCommand(recognizedText, isFirstCommand);
+              isFirstCommand = false;
             }
           }
         },
@@ -241,7 +245,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     }
   };
 
-  const processCommand = async (text: string, shouldSpeak: boolean = false) => {
+  const processCommand = async (text: string, isFirstCommand: boolean = false) => {
     try {
       const command = detectIntent(text);
       let response = '';
@@ -279,12 +283,14 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
           response = `Sorry, I didn't understand. You can say things like "search for Hassan", "read pilgrim records", "total payments", or "go to dashboard".`;
       }
 
-      // Only speak response if requested (first activation only)
-      if (shouldSpeak) {
-        setIsSpeaking(true);
+      // Speak confirmation: full response on first command, just "Yes" on subsequent commands
+      setIsSpeaking(true);
+      if (isFirstCommand) {
         await speak(response);
-        setIsSpeaking(false);
+      } else {
+        await speak('Yes');
       }
+      setIsSpeaking(false);
     } catch (error) {
       toast.error('Error processing command');
       console.error(error);
