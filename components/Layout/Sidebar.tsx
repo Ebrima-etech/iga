@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { logout, getMe } from '@/lib/auth';
 import { User } from '@/types';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
-import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
 import toast from 'react-hot-toast';
 import {
   BiBarChartAlt2,
@@ -17,7 +16,6 @@ import {
   BiChevronDown,
   BiLogOut,
   BiHomeAlt2,
-  BiPlus,
 } from 'react-icons/bi';
 
 interface NavItem {
@@ -70,8 +68,7 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [showYearDropdown, setShowYearDropdown] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const { activeHajjYear, selectedHajjYear, hajjYears, setSelectedHajjYear, fetchHajjYears } = useHajjYear();
+  const { activeHajjYear, selectedHajjYear, hajjYears, setSelectedHajjYear } = useHajjYear();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -176,23 +173,6 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
                 </button>
               ))}
 
-              {/* Create New Hajj Year - only for staff */}
-              {user?.is_staff && (
-                <>
-                  <div className="border-t border-gray-200 pt-1 mt-1">
-                    <button
-                      onClick={() => {
-                        setShowCreateModal(true);
-                        setShowYearDropdown(false);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
-                    >
-                      <BiPlus size={14} />
-                      Create New Year
-                    </button>
-                  </div>
-                </>
-              )}
             </div>
           )}
         </div>
@@ -263,15 +243,6 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
         <BiMenu size={16} />
       </button>
 
-      {/* Create Hajj Year Modal */}
-      <HajjYearCreateModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSuccess={() => {
-          // Refresh hajj years list
-          fetchHajjYears();
-        }}
-      />
     </>
   );
 }

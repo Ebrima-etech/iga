@@ -8,14 +8,16 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Badge from '@/components/Common/Badge';
 import FormField from '@/components/Common/FormField';
 import Input from '@/components/Common/Input';
-import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh } from 'react-icons/bi';
+import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh, BiCalendar, BiPlus } from 'react-icons/bi';
 import toast from 'react-hot-toast';
-import { User, CurrencyCode } from '@/types';
+import { User, CurrencyCode, HajjYear } from '@/types';
 import api from '@/lib/api';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
+import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import { setCurrencyMode, startRealtimeUpdates, stopRealtimeUpdates, getCurrencyMode } from '@/lib/realtimeCurrency';
+import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
 
-type SettingsTab = 'profile' | 'currency' | 'system';
+type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years';
 
 interface CurrencyData {
   code: CurrencyCode;
@@ -47,6 +49,10 @@ export default function SettingsPage() {
     { code: 'GBP', name: 'British Pound', symbol: '£', rate: 0.013 },
     { code: 'EUR', name: 'Euro', symbol: '€', rate: 0.016 },
   ]);
+
+  // Hajj Years states
+  const { hajjYears, fetchHajjYears } = useHajjYear();
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const loadCurrencySettings = async () => {
     try {
@@ -259,6 +265,19 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-2">
                   <BiCog size={18} />
                   System
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('hajj-years')}
+                className={`pb-4 px-2 font-medium text-sm transition-all ${
+                  activeTab === 'hajj-years'
+                    ? 'border-b-2 border-indigo-600 text-indigo-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <BiCalendar size={18} />
+                  Hajj Years
                 </div>
               </button>
             </div>
@@ -577,7 +596,88 @@ export default function SettingsPage() {
               </div>
             </Card>
           )}
+
+          {/* Hajj Years Tab */}
+          {activeTab === 'hajj-years' && user?.is_staff && (
+            <Card padding="lg" shadow="none">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Manage Hajj Years</h2>
+                <ProfessionalButton
+                  variant="primary"
+                  onClick={() => setShowCreateModal(true)}
+                  className="flex items-center gap-2"
+                >
+                  <BiPlus size={18} />
+                  Create New Year
+                </ProfessionalButton>
+              </div>
+
+              <div className="space-y-4">
+                {hajjYears && hajjYears.length > 0 ? (
+                  hajjYears.map((year) => (
+                    <div
+                      key={year.id}
+                      className="p-4 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-lg font-semibold text-gray-900">{year.name}</h3>
+                            {year.is_active && (
+                              <Badge variant="success" size="sm">
+                                ACTIVE
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 text-sm">
+                            <div>
+                              <p className="text-gray-500 text-xs">Year</p>
+                              <p className="text-gray-900 font-medium">{year.year}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 text-xs">Start Date</p>
+                              <p className="text-gray-900 font-medium">{new Date(year.start_date).toLocaleDateString()}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 text-xs">End Date</p>
+                              <p className="text-gray-900 font-medium">{new Date(year.end_date).toLocaleDateString()}</p>
+                            </div>
+                          </div>
+                          {year.description && (
+                            <p className="text-gray-600 text-sm mt-2">{year.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center bg-gray-50 rounded-lg border border-gray-200">
+                    <BiCalendar size={32} className="text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600">No Hajj years created yet</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
+
+          {activeTab === 'hajj-years' && !user?.is_staff && (
+            <Card padding="lg" shadow="none">
+              <div className="text-center py-8">
+                <BiX size={32} className="text-red-400 mx-auto mb-3" />
+                <p className="text-gray-600">Only administrators can manage Hajj years</p>
+              </div>
+            </Card>
+          )}
       </div>
     </Layout>
+
+    {/* Hajj Year Create Modal */}
+    <HajjYearCreateModal
+      isOpen={showCreateModal}
+      onClose={() => setShowCreateModal(false)}
+      onSuccess={() => {
+        fetchHajjYears();
+      }}
+    />
   );
 }
