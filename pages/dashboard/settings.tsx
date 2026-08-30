@@ -668,16 +668,16 @@ export default function SettingsPage() {
               </div>
             </Card>
           )}
+
+        {/* Hajj Year Create Modal */}
+        <HajjYearCreateModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetchHajjYears();
+          }}
+        />
       </div>
     </Layout>
-
-    {/* Hajj Year Create Modal */}
-    <HajjYearCreateModal
-      isOpen={showCreateModal}
-      onClose={() => setShowCreateModal(false)}
-      onSuccess={() => {
-        fetchHajjYears();
-      }}
-    />
   );
 }
