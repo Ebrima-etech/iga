@@ -76,6 +76,14 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     }
   }, [enabled]);
 
+  // Reset to listen for wake word when dialog closes
+  React.useEffect(() => {
+    if (!isOpen && enabled && !isAwaitingWakeWord) {
+      setIsAwaitingWakeWord(true);
+      setTranscript('');
+    }
+  }, [isOpen, enabled]);
+
   const handleStartListeningForWakeWord = async () => {
     try {
       setIsListening(true);

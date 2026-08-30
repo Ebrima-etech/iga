@@ -36,6 +36,24 @@ export const getMe = async (): Promise<User> => {
   return response.data;
 };
 
+export const getUserRole = async (userId: number): Promise<string | null> => {
+  try {
+    const response = await api.get(`/user-roles/?user=${userId}`);
+    const roles = response.data.results || response.data;
+    if (roles.length > 0) {
+      return roles[0].role; // Return first role
+    }
+    return null;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const isGIAUser = async (userId: number): Promise<boolean> => {
+  const role = await getUserRole(userId);
+  return role && (role === 'hajj_admin' || role === 'hajj_staff');
+};
+
 export const isLoggedIn = (): boolean => {
   if (typeof window === 'undefined') return false;
   return !!localStorage.getItem('access_token');

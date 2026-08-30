@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { login } from '@/lib/auth';
+import { login, isGIAUser, getMe } from '@/lib/auth';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Input from '@/components/Common/Input';
 import FormField from '@/components/Common/FormField';
@@ -24,6 +24,18 @@ export default function LoginPage() {
 
     try {
       await login(username, password);
+
+      // Check if user is GIA staff/admin
+      const user = await getMe();
+      const isGIA = await isGIAUser(user.id);
+
+      if (!isGIA) {
+        // Bank staff trying to access GIA dashboard - show wrong credentials
+        setError('Invalid credentials. Please check your username and password.');
+        toast.error('Invalid credentials');
+        return;
+      }
+
       setDoorsOpen(true);
       // double rAF so the browser paints the closed doors before the
       // transition class is applied — otherwise it can jump straight
