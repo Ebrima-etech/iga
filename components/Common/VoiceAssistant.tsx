@@ -104,10 +104,12 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             setIsAwaitingWakeWord(false);
             setIsOpen(true);
 
-            // Only speak on first activation, stay silent on subsequent calls
+            // First activation: speak greeting, subsequent calls: just say "Yes"
             if (isFirstActivation) {
               await speak('Hello! How can I help you?');
               setIsFirstActivation(false);
+            } else {
+              await speak('Yes');
             }
             setTranscript('');
 
@@ -149,7 +151,6 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     try {
       setIsListening(true);
       let lastCommandTime = Date.now();
-      let isFirstCommand = true;
 
       stopRecordingRef.current = startSpeechRecognition(
         async (recognizedText) => {
@@ -165,9 +166,8 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             if (now - lastCommandTime > 500) {
               setTranscript(recognizedText);
               lastCommandTime = now;
-              // Process the command: full response on first, just "Yes" on subsequent
-              await processCommand(recognizedText, isFirstCommand);
-              isFirstCommand = false;
+              // Process the command with full response
+              await processCommand(recognizedText);
             }
           }
         },
@@ -197,7 +197,6 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     try {
       setIsListening(true);
       let lastCommandTime = Date.now();
-      let isFirstCommand = true;
 
       stopRecordingRef.current = startSpeechRecognition(
         async (recognizedText) => {
@@ -212,9 +211,8 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
             if (now - lastCommandTime > 500) {
               setTranscript(recognizedText);
               lastCommandTime = now;
-              // Process the command: full response on first, just "Yes" on subsequent
-              await processCommand(recognizedText, isFirstCommand);
-              isFirstCommand = false;
+              // Process the command with full response
+              await processCommand(recognizedText);
             }
           }
         },
@@ -245,7 +243,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     }
   };
 
-  const processCommand = async (text: string, isFirstCommand: boolean = false) => {
+  const processCommand = async (text: string) => {
     try {
       const command = detectIntent(text);
       let response = '';
@@ -283,13 +281,9 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
           response = `Sorry, I didn't understand. You can say things like "search for Hassan", "read pilgrim records", "total payments", or "go to dashboard".`;
       }
 
-      // Speak confirmation: full response on first command, just "Yes" on subsequent commands
+      // Always speak full response for commands
       setIsSpeaking(true);
-      if (isFirstCommand) {
-        await speak(response);
-      } else {
-        await speak('Yes');
-      }
+      await speak(response);
       setIsSpeaking(false);
     } catch (error) {
       toast.error('Error processing command');
