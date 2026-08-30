@@ -16,6 +16,7 @@ interface Bank {
   id: number;
   name: string;
   is_active: boolean;
+  payment_view_access: 'date_restricted' | 'unrestricted';
   created_at: string;
 }
 
@@ -28,6 +29,9 @@ export default function BanksManagementPage() {
   const [bankFormData, setBankFormData] = useState({ name: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [editingAccessLevel, setEditingAccessLevel] = useState<number | null>(null);
+  const [editingAccessValue, setEditingAccessValue] = useState<'date_restricted' | 'unrestricted'>('date_restricted');
+  const [updatingAccess, setUpdatingAccess] = useState(false);
 
   useEffect(() => {
     fetchBanks();
@@ -99,17 +103,33 @@ export default function BanksManagementPage() {
     }
   };
 
+  const handleUpdateAccessLevel = async (bankId: number) => {
+    try {
+      setUpdatingAccess(true);
+      await api.patch(`/banks/${bankId}/`, {
+        payment_view_access: editingAccessValue,
+      });
+      toast.success('Access level updated successfully');
+      setEditingAccessLevel(null);
+      fetchBanks();
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Failed to update access level');
+    } finally {
+      setUpdatingAccess(false);
+    }
+  };
+
   const columns = [
     {
       key: 'name',
       label: 'Bank Name',
-      width: '40%',
+      width: '30%',
       render: (v: string) => <span className="font-medium text-gray-900">{v}</span>,
     },
     {
       key: 'is_active',
       label: 'Status',
-      width: '30%',
+      width: '20%',
       render: (v: boolean) => (
         <Badge variant={v ? 'success' : 'warning'} size="sm">
           {v ? 'Active' : 'Inactive'}
@@ -117,9 +137,22 @@ export default function BanksManagementPage() {
       ),
     },
     {
+      key: 'payment_view_access',
+      label: 'Payment Access',
+      width: '30%',
+      render: (v: string) => (
+        <Badge
+          variant={v === 'unrestricted' ? 'success' : 'warning'}
+          size="sm"
+        >
+          {v === 'unrestricted' ? '🔓 Unrestricted' : '🔒 Date Filter Only'}
+        </Badge>
+      ),
+    },
+    {
       key: 'created_at',
       label: 'Created',
-      width: '30%',
+      width: '20%',
       render: (v: string) => <span className="text-sm text-gray-600">{new Date(v).toLocaleDateString()}</span>,
     },
   ];
@@ -242,6 +275,17 @@ export default function BanksManagementPage() {
                       variant="ghost"
                       size="sm"
                       icon={<BiPencil size={14} />}
+                      onClick={() => {
+                        setEditingAccessLevel(row.id);
+                        setEditingAccessValue(row.payment_view_access);
+                      }}
+                    >
+                      Access
+                    </ProfessionalButton>
+                    <ProfessionalButton
+                      variant="ghost"
+                      size="sm"
+                      icon={<BiPencil size={14} />}
                       onClick={() => router.push(`/dashboard/banks/${row.id}`)}
                     >
                       Manage
@@ -259,6 +303,72 @@ export default function BanksManagementPage() {
             )}
           </div>
         </div>
+
+        {/* Access Level Modal */}
+        {editingAccessLevel && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                Configure Payment Access Level
+              </h2>
+              <p className="text-sm text-gray-600 mb-6">
+                Choose what payment data this bank admin can view
+              </p>
+
+              <div className="space-y-3 mb-6">
+                <label className="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition" style={{borderColor: editingAccessValue === 'date_restricted' ? '#2563eb' : '#e5e7eb', backgroundColor: editingAccessValue === 'date_restricted' ? '#f0f9ff' : '#f9fafb'}}>
+                  <input
+                    type="radio"
+                    name="access"
+                    value="date_restricted"
+                    checked={editingAccessValue === 'date_restricted'}
+                    onChange={(e) => setEditingAccessValue(e.target.value as any)}
+                    className="mt-1"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-900">🔒 Date Filter Only</p>
+                    <p className="text-xs text-gray-600">Bank admin can only view payments using date filter - more restrictive</p>
+                  </div>
+                </label>
+
+                <label className="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition" style={{borderColor: editingAccessValue === 'unrestricted' ? '#2563eb' : '#e5e7eb', backgroundColor: editingAccessValue === 'unrestricted' ? '#f0f9ff' : '#f9fafb'}}>
+                  <input
+                    type="radio"
+                    name="access"
+                    value="unrestricted"
+                    checked={editingAccessValue === 'unrestricted'}
+                    onChange={(e) => setEditingAccessValue(e.target.value as any)}
+                    className="mt-1"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-900">🔓 Unrestricted</p>
+                    <p className="text-xs text-gray-600">Bank admin can view all payments without date filter - less restrictive</p>
+                  </div>
+                </label>
+              </div>
+
+              <div className="flex gap-3">
+                <ProfessionalButton
+                  variant="primary"
+                  size="md"
+                  onClick={() => handleUpdateAccessLevel(editingAccessLevel)}
+                  loading={updatingAccess}
+                  className="flex-1"
+                >
+                  Save
+                </ProfessionalButton>
+                <ProfessionalButton
+                  variant="secondary"
+                  size="md"
+                  onClick={() => setEditingAccessLevel(null)}
+                  className="flex-1"
+                >
+                  Cancel
+                </ProfessionalButton>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
