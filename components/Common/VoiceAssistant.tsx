@@ -106,7 +106,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
 
             // First activation: speak greeting, subsequent calls: just say "Yes"
             if (isFirstActivation) {
-              await speak('Hello! How can I help you?');
+              await speak('Yes boss how can I help you?');
               setIsFirstActivation(false);
             } else {
               await speak('Yes');
