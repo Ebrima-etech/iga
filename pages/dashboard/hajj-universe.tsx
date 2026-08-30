@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
-import { BiGlobe, BiStar, BiBarChartAlt2, BiLineChart } from 'react-icons/bi';
+import { BiGlobe, BiStar, BiBarChartAlt2, BiLineChart, BiArrowUp, BiArrowDown } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { HajjYear } from '@/types';
