@@ -407,8 +407,8 @@ export default function HajjUniverse() {
                             <p className="text-purple-200">✅ Payment Success: <span className="text-purple-400 font-bold">{stat.paymentRate}%</span></p>
                             {prev && (
                               <>
-                                <p className="text-purple-200">📈 Pilgrim Growth: <span className={pilgrimGrowth >= 0 ? 'text-green-400' : 'text-red-400'} className="font-bold">{pilgrimGrowth.toFixed(1)}%</span></p>
-                                <p className="text-purple-200">💵 Revenue Growth: <span className={revenueGrowth >= 0 ? 'text-green-400' : 'text-red-400'} className="font-bold">{revenueGrowth.toFixed(1)}%</span></p>
+                                <p className="text-purple-200">📈 Pilgrim Growth: <span className={`${pilgrimGrowth >= 0 ? 'text-green-400' : 'text-red-400'} font-bold`}>{pilgrimGrowth.toFixed(1)}%</span></p>
+                                <p className="text-purple-200">💵 Revenue Growth: <span className={`${revenueGrowth >= 0 ? 'text-green-400' : 'text-red-400'} font-bold`}>{revenueGrowth.toFixed(1)}%</span></p>
                               </>
                             )}
                           </div>
