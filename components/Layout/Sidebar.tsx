@@ -120,7 +120,7 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
                   <>
                     <span className="font-semibold text-gray-900 text-sm truncate">GIA Hajj</span>
                     <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 flex-shrink-0">
-                      {activeHajjYear?.year || 2026}
+                      {selectedHajjYear ? hajjYears.find(y => y.id === selectedHajjYear)?.year : activeHajjYear?.year || 2026}
                     </span>
                     <button
                       onClick={(e) => {
