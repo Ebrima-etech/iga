@@ -38,6 +38,7 @@ const navSections: NavSection[] = [
       { label: 'Analytics', href: '/dashboard/analytics', icon: <BiLineChart size={18} /> },
       { label: 'Hajj Universe', href: '/dashboard/hajj-universe', icon: <BiGlobe size={18} /> },
       { label: 'Intelligence', href: '/dashboard/hajj-intelligence', icon: <BiBarChartAlt2 size={18} /> },
+      { label: 'Deep Analytics', href: '/dashboard/hajj-analytics', icon: <BiLineChart size={18} /> },
       { label: 'Pilgrims', href: '/dashboard/pilgrims', icon: <BiUser size={18} /> },
       { label: 'Payments', href: '/dashboard/payments', icon: <BiWallet size={18} /> },
       { label: 'Banks', href: '/dashboard/banks', icon: <BiBuilding size={18} /> },
