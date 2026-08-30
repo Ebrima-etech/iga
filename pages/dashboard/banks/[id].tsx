@@ -85,6 +85,8 @@ export default function BankDetailPage() {
   const fetchBank = async () => {
     try {
       const response = await api.get(`/banks/${bankId}/`);
+      console.log('Bank data:', response.data);
+      console.log('Logo value:', response.data.logo);
       setBank(response.data);
     } catch (error) {
       console.error('Error fetching bank:', error);
@@ -281,11 +283,20 @@ export default function BankDetailPage() {
                 <div className="w-32 h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center mb-4">
                   {bank.logo ? (
                     <img
-                      src={bank.logo.startsWith('http') ? bank.logo : `http://localhost:8000${bank.logo}`}
+                      src={
+                        bank.logo.startsWith('http')
+                          ? bank.logo
+                          : bank.logo.startsWith('/media')
+                          ? `http://localhost:8000${bank.logo}`
+                          : bank.logo.startsWith('/')
+                          ? `http://localhost:8000${bank.logo}`
+                          : `http://localhost:8000/media/${bank.logo}`
+                      }
                       alt={bank.name}
                       className="h-28 w-28 object-contain"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' font-size='50' fill='%23999'%3E🏦%3C/text%3E%3C/svg%3E`;
+                        console.log('Image load failed for:', (e.target as HTMLImageElement).src);
+                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<span className="text-5xl">🏦</span>';
                       }}
                     />
                   ) : (
