@@ -16,6 +16,7 @@ import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import { setCurrencyMode, startRealtimeUpdates, stopRealtimeUpdates, getCurrencyMode } from '@/lib/realtimeCurrency';
 import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
+import HajjYearDetailModal from '@/components/Common/HajjYearDetailModal';
 
 type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years';
 
@@ -53,6 +54,8 @@ export default function SettingsPage() {
   // Hajj Years states
   const { hajjYears, fetchHajjYears } = useHajjYear();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<HajjYear | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   const loadCurrencySettings = async () => {
     try {
@@ -643,27 +646,55 @@ export default function SettingsPage() {
                               <p className="text-gray-900 font-medium">{new Date(year.end_date).toLocaleDateString()}</p>
                             </div>
                           </div>
+                          {year.first_deposit_amount || year.total_package_fee ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3 text-sm bg-blue-50 p-3 rounded">
+                              {year.first_deposit_amount && (
+                                <div>
+                                  <p className="text-gray-500 text-xs">First Deposit</p>
+                                  <p className="text-gray-900 font-medium">${parseFloat(String(year.first_deposit_amount)).toLocaleString()}</p>
+                                </div>
+                              )}
+                              {year.total_package_fee && (
+                                <div>
+                                  <p className="text-gray-500 text-xs">Package Fee</p>
+                                  <p className="text-gray-900 font-medium">${parseFloat(String(year.total_package_fee)).toLocaleString()}</p>
+                                </div>
+                              )}
+                            </div>
+                          ) : null}
                           {year.description && (
                             <p className="text-gray-600 text-sm mt-2">{year.description}</p>
                           )}
                         </div>
-                        {!year.is_active && (
+                        <div className="flex gap-2">
                           <ProfessionalButton
                             variant="secondary"
                             size="sm"
-                            onClick={async () => {
-                              try {
-                                await api.patch(`/hajj-years/${year.id}/`, { is_active: true });
-                                toast.success(`${year.name} is now active`);
-                                fetchHajjYears();
-                              } catch (error) {
-                                toast.error('Failed to set year as active');
-                              }
+                            onClick={() => {
+                              setSelectedYear(year);
+                              setShowDetailModal(true);
                             }}
                           >
-                            Set as Active
+                            View Details
                           </ProfessionalButton>
-                        )}
+                          {!year.is_active && (
+                            <ProfessionalButton
+                              variant="primary"
+                              size="sm"
+                              onClick={async () => {
+                                try {
+                                  await api.patch(`/hajj-years/${year.id}/`, { is_active: true });
+                                  toast.success(`${year.name} is now active`);
+                                  fetchHajjYears();
+                                } catch (error) {
+                                  toast.error('Failed to set year as active');
+                                }
+                              }}
+                            >
+                              Set as Active
+                            </ProfessionalButton>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))
@@ -690,6 +721,19 @@ export default function SettingsPage() {
         <HajjYearCreateModal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetchHajjYears();
+          }}
+        />
+
+        {/* Hajj Year Detail Modal */}
+        <HajjYearDetailModal
+          isOpen={showDetailModal}
+          year={selectedYear}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedYear(null);
+          }}
           onSuccess={() => {
             fetchHajjYears();
           }}

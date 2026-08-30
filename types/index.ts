@@ -16,6 +16,9 @@ export interface HajjYear {
   start_date: string;
   end_date: string;
   is_active: boolean;
+  first_deposit_amount?: number | string | null;
+  total_package_fee?: number | string | null;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }
