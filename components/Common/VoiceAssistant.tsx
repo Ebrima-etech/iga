@@ -51,8 +51,8 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange }:
         async (recognizedText) => {
           const text = recognizedText.toLowerCase().trim();
 
-          // Check for wake word "aja"
-          if (text.includes('aja')) {
+          // Check for wake word "assistant"
+          if (text.includes('assistant')) {
             setIsListening(false);
             setIsAwaitingWakeWord(false);
             setIsOpen(true);
