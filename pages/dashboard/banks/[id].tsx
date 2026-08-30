@@ -56,6 +56,7 @@ export default function BankDetailPage() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [imageLoadError, setImageLoadError] = useState(false);
   const [timeAccessData, setTimeAccessData] = useState({
     access_restricted: false,
     allowed_days: 'Mon,Tue,Wed,Thu,Fri',
@@ -88,6 +89,7 @@ export default function BankDetailPage() {
       console.log('Bank data:', response.data);
       console.log('Logo value:', response.data.logo);
       setBank(response.data);
+      setImageLoadError(false);
     } catch (error) {
       console.error('Error fetching bank:', error);
       toast.error('Failed to load bank');
@@ -287,24 +289,18 @@ export default function BankDetailPage() {
               {/* Logo Section */}
               <div className="flex flex-col items-center justify-start">
                 <div className="w-32 h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center mb-4">
-                  {bank.logo ? (
-                    <>
-                      {console.log('Logo URL:', bank.logo)}
-                      <img
-                        key={bank.logo}
-                        src={bank.logo}
-                        alt={bank.name}
-                        className="h-28 w-28 object-contain"
-                        onLoad={() => console.log('Logo loaded successfully')}
-                        onError={(e) => {
-                          console.log('Image load failed for:', (e.target as HTMLImageElement).src);
-                          const parent = (e.target as HTMLImageElement).parentElement;
-                          if (parent) {
-                            parent.innerHTML = '<span style="font-size: 2.5rem">🏦</span>';
-                          }
-                        }}
-                      />
-                    </>
+                  {bank.logo && !imageLoadError ? (
+                    <img
+                      key={bank.logo}
+                      src={bank.logo}
+                      alt={bank.name}
+                      className="h-28 w-28 object-contain"
+                      onLoad={() => console.log('Logo loaded successfully')}
+                      onError={() => {
+                        console.log('Image load failed for:', bank.logo);
+                        setImageLoadError(true);
+                      }}
+                    />
                   ) : (
                     <span className="text-5xl">🏦</span>
                   )}
