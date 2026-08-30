@@ -48,8 +48,11 @@ const INTENT_PATTERNS = {
     /(?:show|display)\s+(.+)/i,
   ],
   create: [
-    /(?:create|add|new|make)\s+(?:a\s+)?(.+)/i,
+    /(?:create|add|new|make|register)\s+(?:a\s+)?(?:new\s+)?(.+)/i,
     /(?:register|add)\s+(?:new\s+)?(.+)/i,
+    /(?:create|add)\s+(?:pilgrim|payment|bank|hotel|flight|room|accommodation)/i,
+    /(?:submit|create)\s+(?:new\s+)?payment/i,
+    /(?:assign|add)\s+(?:room|flight)/i,
   ],
 };
 

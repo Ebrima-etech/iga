@@ -363,12 +363,29 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
   };
 
   const handleCreate = async (entity: string): Promise<string> => {
-    if (entity.includes('pilgrim')) {
+    const lowerEntity = entity.toLowerCase();
+
+    if (lowerEntity.includes('pilgrim')) {
       router.push('/dashboard/pilgrims');
       return 'Opening pilgrim registration form.';
-    } else if (entity.includes('bank')) {
+    } else if (lowerEntity.includes('payment')) {
+      router.push('/dashboard/payments');
+      return 'Opening payment submission form.';
+    } else if (lowerEntity.includes('bank')) {
       router.push('/dashboard/banks');
       return 'Opening bank management.';
+    } else if (lowerEntity.includes('hotel') || lowerEntity.includes('accommodation')) {
+      router.push('/dashboard/accommodations/hotels');
+      return 'Opening hotel management.';
+    } else if (lowerEntity.includes('flight')) {
+      router.push('/dashboard/accommodations/flights');
+      return 'Opening flight management.';
+    } else if (lowerEntity.includes('room')) {
+      router.push('/dashboard/accommodations/room-assignments');
+      return 'Opening room assignment form.';
+    } else if (lowerEntity.includes('report')) {
+      router.push('/dashboard/reports');
+      return 'Opening reports section.';
     }
     return 'Opening records for you.';
   };
@@ -462,17 +479,13 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
 
       // Calculate payment stats
       const totalAmount = todaysPayments.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
-      const verifiedPayments = todaysPayments.filter((p: any) => p.status === 'verified').length;
-      const pendingPayments = todaysPayments.filter((p: any) => p.status === 'pending').length;
 
       // Build report
       let report = `Today's Report for ${new Date().toLocaleDateString()}. `;
 
-      report += `Pilgrims registered today: ${todaysPilgrims.length}. `;
-
-      report += `Payment submissions today: ${todaysPayments.length} total. `;
-      report += `Total amount: ${totalAmount.toLocaleString()} GMD. `;
-      report += `Verified: ${verifiedPayments}, Pending: ${pendingPayments}. `;
+      report += `Pilgrims registered: ${todaysPilgrims.length}. `;
+      report += `Payment submissions: ${todaysPayments.length}. `;
+      report += `Total amount: ${totalAmount.toLocaleString()} GMD.`;
 
       if (todaysPilgrims.length === 0 && todaysPayments.length === 0) {
         report = `Today's Report for ${new Date().toLocaleDateString()}. No new pilgrims or payments recorded today.`;
