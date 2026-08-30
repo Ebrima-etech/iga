@@ -68,7 +68,7 @@ export default function ProfessionalDashboard() {
 
       // Calculate real stats
       const totalPilgrims = pilgrimsData.length;
-      const totalPayments = paymentsData.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
+      const totalPayments = paymentsData.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
       const confirmedPayments = paymentsData.filter((p: any) => p.status === 'confirmed').length;
       const paymentRate = totalPilgrims > 0 ? Math.round((confirmedPayments / totalPilgrims) * 100) : 0;
       const activeBanks = banksData.filter((b: any) => b.is_active).length;
