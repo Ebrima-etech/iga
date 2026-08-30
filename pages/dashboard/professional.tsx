@@ -53,7 +53,7 @@ export default function ProfessionalDashboard() {
       setLoading(true);
       const hajjYearParam = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
       const [paymentsRes, pilgrimsRes, banksRes] = await Promise.all([
-        api.get(`/payments/${hajjYearParam}`),
+        api.get(`/bank-payment-submissions/${hajjYearParam}`),
         api.get(`/pilgrims/${hajjYearParam}`),
         api.get('/banks/'),
       ]);
