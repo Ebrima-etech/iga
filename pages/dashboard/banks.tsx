@@ -43,6 +43,7 @@ export default function BanksManagementPage() {
   const [showAccessTimeForm, setShowAccessTimeForm] = useState(false);
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [selectedBankId, setSelectedBankId] = useState<number | null>(null);
+  const [togglingBank, setTogglingBank] = useState<number | null>(null);
   const [bankAccessTimeData, setBankAccessTimeData] = useState({
     access_restricted: false,
     allowed_days: 'Mon,Tue,Wed,Thu,Fri',
@@ -112,6 +113,19 @@ export default function BanksManagementPage() {
       fetchBanks();
     } catch (error: any) {
       toast.error(error.response?.data?.detail || 'Failed to create bank');
+    }
+  };
+
+  const handleToggleBankStatus = async (id: number, currentStatus: boolean) => {
+    try {
+      setTogglingBank(id);
+      await api.patch(`/banks/${id}/`, { is_active: !currentStatus });
+      toast.success(`Bank ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
+      fetchBanks();
+    } catch (error) {
+      toast.error('Failed to toggle bank status');
+    } finally {
+      setTogglingBank(null);
     }
   };
 
@@ -338,6 +352,14 @@ export default function BanksManagementPage() {
                 emptyMessage="No banks found • Click 'Add Bank' to create one"
                 actions={(row: Bank) => (
                   <div className="flex gap-2">
+                    <ProfessionalButton
+                      variant={row.is_active ? 'ghost' : 'danger'}
+                      size="sm"
+                      onClick={() => handleToggleBankStatus(row.id, row.is_active)}
+                      loading={togglingBank === row.id}
+                    >
+                      {row.is_active ? 'Deactivate' : 'Activate'}
+                    </ProfessionalButton>
                     <ProfessionalButton
                       variant="ghost"
                       size="sm"
