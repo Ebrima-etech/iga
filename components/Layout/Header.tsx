@@ -32,12 +32,30 @@ export default function Header({
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
   const current = pageTitles[router.pathname] || 'Dashboard';
+
+  const placeholders = [
+    'Search pilgrims...',
+    'Search payments...',
+    'Search banks...',
+    'Search by ID...',
+    'Search by name...',
+  ];
 
   useEffect(() => {
     getMe()
       .then(setUser)
       .catch(() => {});
+  }, []);
+
+  // Cycle through placeholders
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Handle Ctrl+K keyboard shortcut
@@ -54,26 +72,45 @@ export default function Header({
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
-      <div className="flex items-center justify-between gap-4 h-14 px-6">
-        <div className="flex items-center gap-1.5 text-sm flex-shrink-0">
-          <span className="text-gray-500">GIA Hajj</span>
-          <span className="text-gray-300 mx-1">/</span>
-          <span className="font-medium text-gray-900">{current}</span>
-        </div>
+    <>
+      <style>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .header-placeholder {
+          animation: slideUp 0.8s ease-out;
+        }
+      `}</style>
 
-        <div className="flex-1 max-w-sm hidden sm:block">
-          <div
-            onClick={() => setSearchOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 text-gray-400 hover:border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
-          >
-            <BiSearch size={15} />
-            <span className="text-sm flex-1">Search pilgrims, payments, banks...</span>
-            <kbd className="text-[10px] font-mono font-semibold border border-gray-200 rounded px-1.5 py-0.5 text-gray-400">
-              Ctrl K
-            </kbd>
+      <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+        <div className="flex items-center justify-between gap-4 h-14 px-6">
+          <div className="flex items-center gap-1.5 text-sm flex-shrink-0">
+            <span className="text-gray-500">GIA Hajj</span>
+            <span className="text-gray-300 mx-1">/</span>
+            <span className="font-medium text-gray-900">{current}</span>
           </div>
-        </div>
+
+          <div className="flex-1 max-w-sm hidden sm:block">
+            <div
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 text-gray-400 hover:border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <BiSearch size={15} />
+              <span className="text-sm flex-1 header-placeholder" key={currentPlaceholderIndex}>
+                {placeholders[currentPlaceholderIndex]}
+              </span>
+              <kbd className="text-[10px] font-mono font-semibold border border-gray-200 rounded px-1.5 py-0.5 text-gray-400">
+                Ctrl K
+              </kbd>
+            </div>
+          </div>
 
         <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
@@ -109,5 +146,6 @@ export default function Header({
         </div>
       </div>
     </header>
+    </>
   );
 }

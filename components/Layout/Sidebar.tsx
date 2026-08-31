@@ -70,6 +70,7 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [showYearDropdown, setShowYearDropdown] = useState(false);
+  const [cyclingYearIndex, setCyclingYearIndex] = useState(0);
   const { activeHajjYear, selectedHajjYear, hajjYears, setSelectedHajjYear } = useHajjYear();
 
   useEffect(() => {
@@ -84,6 +85,15 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
     fetchUser();
   }, []);
 
+  // Cycle through years and logo display
+  useEffect(() => {
+    if (hajjYears.length === 0) return;
+    const interval = setInterval(() => {
+      setCyclingYearIndex((prev) => (prev + 1) % (hajjYears.length * 2)); // Multiply by 2 to alternate
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [hajjYears.length]);
+
   const handleLogout = () => {
     logout();
     toast.success('Logged out successfully');
@@ -96,6 +106,44 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
 
   return (
     <>
+      <style>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes borderShift {
+          0%, 100% {
+            border-color: rgb(5, 150, 105);
+            box-shadow: 0 0 8px rgba(5, 150, 105, 0.4);
+          }
+          25% {
+            border-color: rgb(16, 185, 129);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+          }
+          50% {
+            border-color: rgb(59, 130, 246);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+          }
+          75% {
+            border-color: rgb(139, 92, 246);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+          }
+        }
+        .sidebar-header-content {
+          animation: slideUp 0.8s ease-out;
+        }
+        .year-badge {
+          border: 1px solid rgb(5, 150, 105);
+          animation: borderShift 6s ease-in-out infinite;
+        }
+      `}</style>
+
       {/* Mobile sidebar overlay */}
       {isMobileOpen && (
         <div
@@ -113,30 +161,36 @@ export default function Sidebar({ isCollapsed = false, onCollapsedChange }: Side
         {/* Org switcher with Hajj Year Dropdown */}
         <div className="px-3 pt-4 pb-3 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Link href="/dashboard" className="flex-1">
-              <div className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 cursor-pointer transition-colors">
-                <div className="w-6 h-6 rounded-md bg-emerald-600 flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-xs">G</span>
-                </div>
+            <div
+              onClick={() => setShowYearDropdown(!showYearDropdown)}
+              className="flex-1"
+            >
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 cursor-pointer transition-colors sidebar-header-content h-10" key={cyclingYearIndex}>
                 {!isCollapsed && (
                   <>
-                    <span className="font-semibold text-gray-900 text-sm truncate">GIA Hajj</span>
-                    <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 flex-shrink-0">
-                      {selectedHajjYear ? hajjYears.find(y => y.id === selectedHajjYear)?.year : activeHajjYear?.year || 2026}
-                    </span>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setShowYearDropdown(!showYearDropdown);
-                      }}
-                      className="text-gray-400 hover:text-gray-600 ml-auto flex-shrink-0 transition-colors"
-                    >
-                      <BiChevronDown size={14} className={`transform transition-transform ${showYearDropdown ? 'rotate-180' : ''}`} />
-                    </button>
+                    {cyclingYearIndex % 2 === 0 ? (
+                      <>
+                        <div className="w-6 h-6 rounded-md bg-emerald-600 flex items-center justify-center flex-shrink-0">
+                          <span className="text-white font-bold text-xs">G</span>
+                        </div>
+                        <span className="font-semibold text-gray-900 text-sm truncate">GIA Hajj</span>
+                        <span
+                          className="text-[10px] font-medium text-emerald-700 bg-emerald-50 rounded-full px-2 py-0.5 flex-shrink-0 year-badge"
+                        >
+                          {hajjYears.length > 0 ? hajjYears[Math.floor(cyclingYearIndex / 2)]?.year : 2026}
+                        </span>
+                      </>
+                    ) : (
+                      <img
+                        src="/gia-logo.svg"
+                        alt="GIA"
+                        className="h-full flex-shrink-0"
+                      />
+                    )}
                   </>
                 )}
               </div>
-            </Link>
+            </div>
             <button
               onClick={() => onCollapsedChange && onCollapsedChange(!isCollapsed)}
               className="hidden md:flex items-center justify-center p-1.5 rounded-md hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"

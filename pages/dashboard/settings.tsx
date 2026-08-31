@@ -57,6 +57,10 @@ export default function SettingsPage() {
   const [selectedYear, setSelectedYear] = useState<HajjYear | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
 
+  // Hajj Package Price state
+  const [hajjPackagePrice, setHajjPackagePrice] = useState<number>(0);
+  const [editingPrice, setEditingPrice] = useState(false);
+
   const loadCurrencySettings = async () => {
     try {
       const currencyStore = useCurrencyStore.getState();
@@ -83,9 +87,25 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchUserData();
     loadCurrencySettings();
+    loadHajjPackagePrice();
     const mode = getCurrencyMode();
     setCurrencyModeState(mode);
   }, []);
+
+  const loadHajjPackagePrice = async () => {
+    try {
+      const response = await api.get('/settings/hajj-package-price/');
+      setHajjPackagePrice(response.data.price || 0);
+      localStorage.setItem('hajj_package_price', response.data.price || 0);
+    } catch (error) {
+      // Fallback to localStorage
+      const stored = localStorage.getItem('hajj_package_price');
+      if (stored) {
+        setHajjPackagePrice(parseFloat(stored));
+      }
+      console.warn('Using localStorage fallback for hajj package price');
+    }
+  };
 
   const fetchUserData = async () => {
     try {
@@ -120,6 +140,20 @@ export default function SettingsPage() {
     const updated = [...currencies];
     updated[index] = { ...updated[index], [field]: value };
     setCurrencies(updated);
+  };
+
+  const handleSaveHajjPackagePrice = async () => {
+    try {
+      await api.post('/settings/hajj-package-price/', { price: hajjPackagePrice });
+      localStorage.setItem('hajj_package_price', hajjPackagePrice.toString());
+      setEditingPrice(false);
+      toast.success('Hajj package price updated successfully!');
+    } catch (error) {
+      // Save to localStorage as fallback
+      localStorage.setItem('hajj_package_price', hajjPackagePrice.toString());
+      setEditingPrice(false);
+      toast.success('Price saved locally (backend not yet configured)');
+    }
   };
 
   const handleSaveCurrencyRates = async () => {
@@ -561,6 +595,36 @@ export default function SettingsPage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-6">System Configuration</h2>
               <div className="space-y-6">
                 <div className="p-4 bg-white rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Hajj Package Price</p>
+                      <p className="text-2xl font-semibold text-gray-900 mt-1.5">
+                        {currencies.find(c => c.code === defaultCurrency)?.symbol} {hajjPackagePrice.toLocaleString()}
+                      </p>
+                    </div>
+                    <ProfessionalButton
+                      variant={editingPrice ? 'primary' : 'secondary'}
+                      size="sm"
+                      onClick={() => editingPrice ? handleSaveHajjPackagePrice() : setEditingPrice(true)}
+                      icon={editingPrice ? <BiSave size={16} /> : <BiPencil size={16} />}
+                    >
+                      {editingPrice ? 'Save' : 'Edit'}
+                    </ProfessionalButton>
+                  </div>
+                  {editingPrice && (
+                    <div className="mt-4">
+                      <Input
+                        type="number"
+                        value={hajjPackagePrice.toString()}
+                        onChange={(e) => setHajjPackagePrice(parseFloat(e.target.value) || 0)}
+                        placeholder="Enter package price"
+                        label="Price"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 bg-white rounded-lg border border-gray-200">
                   <p className="text-sm font-medium text-gray-500">System Version</p>
                   <p className="text-2xl font-semibold text-gray-900 mt-1.5 font-mono">v1.0.0</p>
                 </div>
@@ -615,12 +679,35 @@ export default function SettingsPage() {
                 </ProfessionalButton>
               </div>
 
+              <style>{`
+                @keyframes borderShift {
+                  0% {
+                    background-position: 0% 0%;
+                  }
+                  100% {
+                    background-position: 200% 200%;
+                  }
+                }
+                .active-year-border {
+                  position: relative;
+                  background:
+                    linear-gradient(white, white) padding-box,
+                    linear-gradient(90deg, rgb(16 185 129), rgb(34 197 94), rgb(59 130 246), rgb(168 85 247), rgb(34 197 94), rgb(16 185 129)) border-box;
+                  background-size: 200% 200%;
+                  animation: borderShift 6s linear infinite;
+                  border: 1px solid transparent;
+                }
+              `}</style>
               <div className="space-y-4">
                 {hajjYears && hajjYears.length > 0 ? (
                   hajjYears.map((year) => (
                     <div
                       key={year.id}
-                      className="p-4 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors"
+                      className={`p-4 bg-white rounded-lg border transition-colors ${
+                        year.is_active
+                          ? 'border-emerald-500 active-year-border'
+                          : 'border-gray-200 hover:border-indigo-300'
+                      }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">

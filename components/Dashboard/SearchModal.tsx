@@ -27,6 +27,15 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
+
+  const placeholders = [
+    'Search pilgrims...',
+    'Search payments...',
+    'Search banks...',
+    'Search by ID...',
+    'Search by name...',
+  ];
 
   // Search across all resources
   useEffect(() => {
@@ -116,6 +125,17 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     }
   }, [isOpen]);
 
+  // Cycle through placeholders
+  useEffect(() => {
+    if (!isOpen || query.length > 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isOpen, query]);
+
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -143,6 +163,25 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   return (
     <>
+      <style>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .search-result-item {
+          animation: slideUp 0.3s ease-out forwards;
+        }
+        .placeholder-text {
+          animation: slideUp 0.8s ease-out;
+        }
+      `}</style>
+
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
@@ -161,8 +200,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Search pilgrims, payments, banks..."
-              className="flex-1 bg-transparent outline-none text-sm font-medium"
+              placeholder={placeholders[currentPlaceholderIndex]}
+              className="flex-1 bg-transparent outline-none text-sm font-medium placeholder-text"
+              key={currentPlaceholderIndex}
             />
             <button
               onClick={onClose}
@@ -184,11 +224,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                   <button
                     key={result.id}
                     onClick={() => handleSelectResult(result)}
-                    className={`w-full px-4 py-3 flex items-center justify-between transition-colors ${
+                    className={`w-full px-4 py-3 flex items-center justify-between transition-colors search-result-item ${
                       idx === selectedIndex
                         ? 'bg-emerald-50 text-emerald-900'
                         : 'hover:bg-gray-50'
                     }`}
+                    style={{ animationDelay: `${idx * 0.05}s` }}
                   >
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <span className="text-lg mt-0.5">{result.icon}</span>

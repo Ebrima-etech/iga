@@ -285,10 +285,23 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
           response = 'Pardon';
       }
 
-      // Always speak full response for commands
+      // Stop listening before speaking to avoid picking up own voice
+      if (stopRecordingRef.current) {
+        stopRecordingRef.current();
+        setIsListening(false);
+      }
+
+      // Speak response
       setIsSpeaking(true);
       await speak(response);
       setIsSpeaking(false);
+
+      // Resume listening after speaking
+      if (isOpen && enabled) {
+        setTimeout(() => {
+          handleStartListening();
+        }, 100);
+      }
     } catch (error) {
       toast.error('Error processing command');
       console.error(error);
@@ -366,22 +379,22 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     const lowerEntity = entity.toLowerCase();
 
     if (lowerEntity.includes('pilgrim')) {
-      router.push('/dashboard/pilgrims');
+      router.push('/dashboard/pilgrims?showCreateForm=true');
       return 'Opening pilgrim registration form.';
     } else if (lowerEntity.includes('payment')) {
-      router.push('/dashboard/payments');
+      router.push('/dashboard/payments?showCreateForm=true');
       return 'Opening payment submission form.';
     } else if (lowerEntity.includes('bank')) {
-      router.push('/dashboard/banks');
-      return 'Opening bank management.';
+      router.push('/dashboard/banks?showCreateForm=true');
+      return 'Opening bank creation form.';
     } else if (lowerEntity.includes('hotel') || lowerEntity.includes('accommodation')) {
-      router.push('/dashboard/accommodations/hotels');
-      return 'Opening hotel management.';
+      router.push('/dashboard/accommodations/hotels?showCreateForm=true');
+      return 'Opening hotel management form.';
     } else if (lowerEntity.includes('flight')) {
-      router.push('/dashboard/accommodations/flights');
-      return 'Opening flight management.';
+      router.push('/dashboard/accommodations/flights?showCreateForm=true');
+      return 'Opening flight management form.';
     } else if (lowerEntity.includes('room')) {
-      router.push('/dashboard/accommodations/room-assignments');
+      router.push('/dashboard/accommodations/room-assignments?showCreateForm=true');
       return 'Opening room assignment form.';
     } else if (lowerEntity.includes('report')) {
       router.push('/dashboard/reports');

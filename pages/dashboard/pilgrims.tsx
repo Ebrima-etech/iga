@@ -177,6 +177,7 @@ export default function PilgrimsPage() {
   const [draftsList, setDraftsList] = useState<any[]>([]);
   const [editingPilgrim, setEditingPilgrim] = useState<Pilgrim | null>(null);
   const [pageSize, setPageSize] = useState(10);
+  const [hajjPackagePrice, setHajjPackagePrice] = useState(0);
 
   // Use the new table state hook
   const tableState = useTableState<Pilgrim>(pilgrims, {
@@ -187,12 +188,46 @@ export default function PilgrimsPage() {
   useEffect(() => {
     fetchPilgrims();
     loadDrafts();
+    loadHajjPackagePrice();
   }, [selectedHajjYear]);
+
+  const loadHajjPackagePrice = async () => {
+    try {
+      const response = await api.get('/settings/hajj-package-price/');
+      setHajjPackagePrice(response.data.price || 0);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('hajj_package_price', response.data.price || 0);
+      }
+    } catch (error) {
+      // Fallback to localStorage
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('hajj_package_price');
+        if (stored) {
+          setHajjPackagePrice(parseFloat(stored));
+        }
+      }
+      console.warn('Using localStorage fallback for hajj package price');
+    }
+  };
 
   useEffect(() => {
     tableState.handlePageChange(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize]);
+
+  // Auto-open form when voice command passes showCreateForm query param
+  useEffect(() => {
+    if (router.isReady && router.query.showCreateForm === 'true') {
+      console.log('Opening form from voice command');
+      setShowInlineForm(true);
+      setEditingPilgrim(null);
+      setDraftData({});
+      // Remove query param after opening form
+      setTimeout(() => {
+        router.replace('/dashboard/pilgrims', undefined, { shallow: true });
+      }, 100);
+    }
+  }, [router.isReady, router.query]);
 
   const fetchPilgrims = async () => {
     try {
@@ -221,7 +256,7 @@ export default function PilgrimsPage() {
     try {
       const submitData = {
         ...formData,
-        total_amount_due: parseFloat(formData.total_amount_due),
+        total_amount_due: formData.total_amount_due ? parseFloat(formData.total_amount_due) : hajjPackagePrice,
         hajj_year: selectedHajjYear,
       };
 

@@ -8,7 +8,7 @@ import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
-import GIALogoEngravings from '@/components/GIALogoEngravings';
+{/* GIA Logo Engravings - Inline */}
 import { StatCardSkeleton, ChartSkeleton, TableSkeleton } from '@/components/Common/Skeleton';
 import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh, BiShow, BiHide } from 'react-icons/bi';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
@@ -203,10 +203,17 @@ export default function ProfessionalDashboard() {
   return (
     <Layout>
       <div className="relative">
-        <GIALogoEngravings />
+        {/* GIA Logo Engravings */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+          <img src="https://strapi.yolcu360.com/gambia_airlines_logo_1_ebe63e51ad.png" alt="GIA" className="absolute top-12 left-12 w-20 h-20 object-contain opacity-50" />
+          <img src="https://strapi.yolcu360.com/gambia_airlines_logo_1_ebe63e51ad.png" alt="GIA" className="absolute top-20 right-24 w-16 h-16 object-contain opacity-50" style={{ transform: 'rotate(15deg)' }} />
+          <img src="https://strapi.yolcu360.com/gambia_airlines_logo_1_ebe63e51ad.png" alt="GIA" className="absolute top-1/2 left-1/2 w-32 h-32 object-contain opacity-50" style={{ transform: 'translate(-50%, -50%) rotate(-10deg)' }} />
+          <img src="https://strapi.yolcu360.com/gambia_airlines_logo_1_ebe63e51ad.png" alt="GIA" className="absolute bottom-20 left-16 w-24 h-24 object-contain opacity-50" style={{ transform: 'rotate(8deg)' }} />
+          <img src="https://strapi.yolcu360.com/gambia_airlines_logo_1_ebe63e51ad.png" alt="GIA" className="absolute bottom-16 right-20 w-28 h-28 object-contain opacity-50" style={{ transform: 'rotate(-12deg)' }} />
+        </div>
         <div className="min-h-screen bg-white/95 relative z-10">
           {/* Page Header */}
-        <div className="px-8 py-8 border-b border-gray-200 bg-white">
+          <div className="px-8 py-8 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
@@ -231,254 +238,254 @@ export default function ProfessionalDashboard() {
               </ProfessionalButton>
             </div>
           </div>
-        </div>
+          </div>
 
-        <div className="p-8">
+          <div className="p-8">
 
-        {/* Stats Panel - with shimmer loading */}
-        <div className="mb-8">
-          {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => <StatCardSkeleton key={i} />)}
+            {/* Stats Panel - with shimmer loading */}
+            <div className="mb-8">
+              {loading ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, i) => <StatCardSkeleton key={i} />)}
+                </div>
+              ) : (
+                <MetricsPanel title="Season overview" metrics={statCards} onToggleField={toggleFieldVisibility} />
+              )}
             </div>
-          ) : (
-            <MetricsPanel title="Season overview" metrics={statCards} onToggleField={toggleFieldVisibility} />
-          )}
-        </div>
 
-        {/* Charts Grid - with shimmer loading */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Pilgrim Registration Trend */}
-          <div className="lg:col-span-2">
-            {loading ? (
-              <ChartSkeleton />
-            ) : (
-              <Card padding="lg" shadow="none">
-                <h3 className="text-sm font-semibold text-gray-900 mb-4">Pilgrim Registration Trend</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={pilgrimTrendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                  <XAxis dataKey="week" stroke="var(--text-secondary)" />
-                  <YAxis stroke="var(--text-secondary)" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--bg-primary)',
-                      border: `1px solid var(--border-color)`,
-                      borderRadius: '8px',
-                    }}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="pilgrims"
-                    stroke="#2563eb"
-                    strokeWidth={2}
-                    dot={{ fill: '#2563eb', r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-              </Card>
-            )}
-          </div>
-
-          {/* Payment Status Breakdown */}
-          <div>
-            {loading ? (
-              <ChartSkeleton />
-            ) : (
-              <Card padding="lg" shadow="none">
-                <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Status</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={paymentStatusData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name} (${value})`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {paymentStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              </Card>
-            )}
-          </div>
-        </div>
-
-        {/* Bank Comparison Chart */}
-        <div className="mb-8">
-          {loading ? (
-            <ChartSkeleton />
-          ) : (
-            <Card padding="lg" shadow="none">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Bank Payment Comparison</h3>
-            <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={bankComparisonData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-              <XAxis dataKey="bank" stroke="var(--text-secondary)" />
-              <YAxis stroke="var(--text-secondary)" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'var(--bg-primary)',
-                  border: `1px solid var(--border-color)`,
-                  borderRadius: '8px',
-                }}
-              />
-              <Bar dataKey="amount" fill="#111827" radius={[4, 4, 0, 0]} />
-            </BarChart>
-            </ResponsiveContainer>
-            </Card>
-          )}
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Payments Table - spans 2 columns (with shimmer loading) */}
-          <div className="lg:col-span-2">
-            {loading ? (
-              <TableSkeleton rows={5} columnCount={6} />
-            ) : (
-              <ProfessionalTable
-                columns={paymentColumns}
-                data={payments.slice(0, 10)}
-                loading={false}
-                emptyMessage="No recent payments"
-                actions={(row) => (
-                  <div className="flex gap-2">
-                    <ProfessionalButton variant="ghost" size="sm">
-                      View
-                    </ProfessionalButton>
-                  </div>
+            {/* Charts Grid - with shimmer loading */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              {/* Pilgrim Registration Trend */}
+              <div className="lg:col-span-2">
+                {loading ? (
+                  <ChartSkeleton />
+                ) : (
+                  <Card padding="lg" shadow="none">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-4">Pilgrim Registration Trend</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={pilgrimTrendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                        <XAxis dataKey="week" stroke="var(--text-secondary)" />
+                        <YAxis stroke="var(--text-secondary)" />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'var(--bg-primary)',
+                            border: `1px solid var(--border-color)`,
+                            borderRadius: '8px',
+                          }}
+                        />
+                        <Legend />
+                        <Line
+                          type="monotone"
+                          dataKey="pilgrims"
+                          stroke="#2563eb"
+                          strokeWidth={2}
+                          dot={{ fill: '#2563eb', r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </Card>
                 )}
-              />
-            )}
-          </div>
-
-          {/* Right Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Stats */}
-            <Card padding="lg" shadow="none">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Summary</h3>
-              <div className="space-y-4">
-                {/* Total Amount */}
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-blue-700 font-medium">Total Amount</span>
-                    <button
-                      onClick={() => toggleFieldVisibility('payments-total-amount')}
-                      className="p-1 hover:bg-blue-200 rounded transition-colors"
-                      title={isFieldHidden('payments-total-amount') ? 'Show' : 'Hide'}
-                    >
-                      {isFieldHidden('payments-total-amount') ? <BiHide size={14} className="text-blue-600" /> : <BiShow size={14} className="text-blue-600" />}
-                    </button>
-                  </div>
-                  <p className="text-lg font-semibold text-blue-900 mt-2">
-                    {isFieldHidden('payments-total-amount') ? '••••••' : `D${(payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) / 1000000).toFixed(2)}M`}
-                  </p>
-                </div>
-
-                {(() => {
-                  const confirmed = payments.filter((p: any) => p.status === 'confirmed').length;
-                  const pending = payments.filter((p: any) => p.status === 'pending').length;
-                  const failed = payments.filter((p: any) => p.status === 'failed').length;
-                  const total = confirmed + pending + failed;
-                  const confirmedWidth = total > 0 ? Math.round((confirmed / total) * 100) : 0;
-                  const pendingWidth = total > 0 ? Math.round((pending / total) * 100) : 0;
-                  const failedWidth = total > 0 ? Math.round((failed / total) * 100) : 0;
-
-                  return (
-                    <>
-                      <div>
-                        <div className="flex justify-between items-center mb-1.5">
-                          <span className="text-sm text-gray-600">Confirmed</span>
-                          <span className="font-mono font-semibold text-gray-900">{confirmed}</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
-                          <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${confirmedWidth}%` }}></div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between items-center mb-1.5">
-                          <span className="text-sm text-gray-600">Pending</span>
-                          <span className="font-mono font-semibold text-gray-900">{pending}</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
-                          <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${pendingWidth}%` }}></div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between items-center mb-1.5">
-                          <span className="text-sm text-gray-600">Failed</span>
-                          <span className="font-mono font-semibold text-gray-900">{failed}</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
-                          <div className="bg-red-500 h-1.5 rounded-full" style={{ width: `${failedWidth}%` }}></div>
-                        </div>
-                      </div>
-                    </>
-                  );
-                })()}
               </div>
-            </Card>
 
-            {/* Top Banks */}
-            <Card padding="lg" shadow="none">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Banks</h3>
-              <div className="space-y-1">
-                {bankComparisonData.map((bank: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between py-2 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center text-white text-[10px] font-semibold">
-                        {idx + 1}
+              {/* Payment Status Breakdown */}
+              <div>
+                {loading ? (
+                  <ChartSkeleton />
+                ) : (
+                  <Card padding="lg" shadow="none">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Status</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={paymentStatusData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, value }) => `${name} (${value})`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {paymentStatusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </Card>
+                )}
+              </div>
+            </div>
+
+            {/* Bank Comparison Chart */}
+            <div className="mb-8">
+              {loading ? (
+                <ChartSkeleton />
+              ) : (
+                <Card padding="lg" shadow="none">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-4">Bank Payment Comparison</h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={bankComparisonData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                      <XAxis dataKey="bank" stroke="var(--text-secondary)" />
+                      <YAxis stroke="var(--text-secondary)" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'var(--bg-primary)',
+                          border: `1px solid var(--border-color)`,
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Bar dataKey="amount" fill="#111827" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Card>
+              )}
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Payments Table - spans 2 columns (with shimmer loading) */}
+              <div className="lg:col-span-2">
+                {loading ? (
+                  <TableSkeleton rows={5} columnCount={6} />
+                ) : (
+                  <ProfessionalTable
+                    columns={paymentColumns}
+                    data={payments.slice(0, 10)}
+                    loading={false}
+                    emptyMessage="No recent payments"
+                    actions={(row) => (
+                      <div className="flex gap-2">
+                        <ProfessionalButton variant="ghost" size="sm">
+                          View
+                        </ProfessionalButton>
                       </div>
-                      <span className="text-sm text-gray-900">{bank.bank}</span>
+                    )}
+                  />
+                )}
+              </div>
+
+              {/* Right Sidebar */}
+              <div className="space-y-6">
+                {/* Quick Stats */}
+                <Card padding="lg" shadow="none">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Summary</h3>
+                  <div className="space-y-4">
+                    {/* Total Amount */}
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-blue-700 font-medium">Total Amount</span>
+                        <button
+                          onClick={() => toggleFieldVisibility('payments-total-amount')}
+                          className="p-1 hover:bg-blue-200 rounded transition-colors"
+                          title={isFieldHidden('payments-total-amount') ? 'Show' : 'Hide'}
+                        >
+                          {isFieldHidden('payments-total-amount') ? <BiHide size={14} className="text-blue-600" /> : <BiShow size={14} className="text-blue-600" />}
+                        </button>
+                      </div>
+                      <p className="text-lg font-semibold text-blue-900 mt-2">
+                        {isFieldHidden('payments-total-amount') ? '••••••' : `D${(payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) / 1000000).toFixed(2)}M`}
+                      </p>
                     </div>
-                    <span className="text-sm font-mono font-medium text-gray-700">${(bank.amount / 1000).toFixed(0)}K</span>
-                  </div>
-                ))}
-                {bankComparisonData.length === 0 && (
-                  <p className="text-sm text-gray-500 py-4">No payment data yet</p>
-                )}
-              </div>
-            </Card>
 
-            {/* System Status */}
-            <Card padding="lg" shadow="none">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">System Status</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">API Status</span>
-                  <Badge variant={!loading ? 'success' : 'warning'} size="sm">
-                    {!loading ? 'Online' : 'Loading'}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Data Loaded</span>
-                  <Badge variant={payments.length > 0 && pilgrims.length > 0 ? 'success' : 'warning'} size="sm">
-                    {payments.length > 0 && pilgrims.length > 0 ? 'Yes' : 'Syncing'}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Last Updated</span>
-                  <span className="text-sm font-mono font-medium text-gray-900">{currentTime || '—'}</span>
-                </div>
+                    {(() => {
+                      const confirmed = payments.filter((p: any) => p.status === 'confirmed').length;
+                      const pending = payments.filter((p: any) => p.status === 'pending').length;
+                      const failed = payments.filter((p: any) => p.status === 'failed').length;
+                      const total = confirmed + pending + failed;
+                      const confirmedWidth = total > 0 ? Math.round((confirmed / total) * 100) : 0;
+                      const pendingWidth = total > 0 ? Math.round((pending / total) * 100) : 0;
+                      const failedWidth = total > 0 ? Math.round((failed / total) * 100) : 0;
+
+                      return (
+                        <>
+                          <div>
+                            <div className="flex justify-between items-center mb-1.5">
+                              <span className="text-sm text-gray-600">Confirmed</span>
+                              <span className="font-mono font-semibold text-gray-900">{confirmed}</span>
+                            </div>
+                            <div className="w-full bg-gray-100 rounded-full h-1.5">
+                              <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${confirmedWidth}%` }}></div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="flex justify-between items-center mb-1.5">
+                              <span className="text-sm text-gray-600">Pending</span>
+                              <span className="font-mono font-semibold text-gray-900">{pending}</span>
+                            </div>
+                            <div className="w-full bg-gray-100 rounded-full h-1.5">
+                              <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${pendingWidth}%` }}></div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="flex justify-between items-center mb-1.5">
+                              <span className="text-sm text-gray-600">Failed</span>
+                              <span className="font-mono font-semibold text-gray-900">{failed}</span>
+                            </div>
+                            <div className="w-full bg-gray-100 rounded-full h-1.5">
+                              <div className="bg-red-500 h-1.5 rounded-full" style={{ width: `${failedWidth}%` }}></div>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </Card>
+
+                {/* Top Banks */}
+                <Card padding="lg" shadow="none">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Banks</h3>
+                  <div className="space-y-1">
+                    {bankComparisonData.map((bank: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between py-2 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center text-white text-[10px] font-semibold">
+                            {idx + 1}
+                          </div>
+                          <span className="text-sm text-gray-900">{bank.bank}</span>
+                        </div>
+                        <span className="text-sm font-mono font-medium text-gray-700">${(bank.amount / 1000).toFixed(0)}K</span>
+                      </div>
+                    ))}
+                    {bankComparisonData.length === 0 && (
+                      <p className="text-sm text-gray-500 py-4">No payment data yet</p>
+                    )}
+                  </div>
+                </Card>
+
+                {/* System Status */}
+                <Card padding="lg" shadow="none">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-4">System Status</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">API Status</span>
+                      <Badge variant={!loading ? 'success' : 'warning'} size="sm">
+                        {!loading ? 'Online' : 'Loading'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Data Loaded</span>
+                      <Badge variant={payments.length > 0 && pilgrims.length > 0 ? 'success' : 'warning'} size="sm">
+                        {payments.length > 0 && pilgrims.length > 0 ? 'Yes' : 'Syncing'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Last Updated</span>
+                      <span className="text-sm font-mono font-medium text-gray-900">{currentTime || '—'}</span>
+                    </div>
+                  </div>
+                </Card>
               </div>
-            </Card>
+            </div>
+            </div>
           </div>
         </div>
-        </div>
-      </div>
-      </div>
     </Layout>
   );
 }

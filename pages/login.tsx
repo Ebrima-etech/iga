@@ -251,13 +251,18 @@ export default function LoginPage() {
 
       <style jsx>{`
         .hajj-plane-track {
-          animation: hajjFlyPage 22s linear infinite;
+          animation: hajjFlyPage 26s ease-in-out infinite;
         }
         @keyframes hajjFlyPage {
-          0% { transform: translate(-10%, 0); opacity: 0; }
-          8% { opacity: 1; }
-          92% { opacity: 1; }
-          100% { transform: translate(340%, -6px); opacity: 0; }
+          0% { transform: translate(-10%, 100%) rotateZ(0deg) rotateY(-8deg) rotateX(5deg); opacity: 0; }
+          5% { opacity: 0.3; }
+          12% { opacity: 1; transform: translate(20%, 60%) rotateZ(-2deg) rotateY(-9deg) rotateX(6deg); }
+          25% { transform: translate(85%, 10%) rotateZ(-10deg) rotateY(-11deg) rotateX(8deg); }
+          40% { transform: translate(150%, -120px) rotateZ(-16deg) rotateY(-13deg) rotateX(10deg); }
+          60% { transform: translate(220%, -240px) rotateZ(-22deg) rotateY(-15deg) rotateX(12deg); }
+          80% { transform: translate(290%, -340px) rotateZ(-28deg) rotateY(-17deg) rotateX(14deg); }
+          90% { opacity: 1; }
+          100% { transform: translate(340%, -400px) rotateZ(-30deg) rotateY(-18deg) rotateX(15deg); opacity: 0; }
         }
 
         .door-stage {
