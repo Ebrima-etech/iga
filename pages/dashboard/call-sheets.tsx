@@ -332,8 +332,21 @@ export default function CallSheetsPage() {
               size="sm"
               onClick={() => {
                 if (selectedSheet) {
-                  handleDeleteSheet(selectedSheet.id);
-                  router.back();
+                  const currentIdx = sheets.findIndex((s) => s.id === selectedSheet.id);
+                  const updatedSheets = sheets.filter((s) => s.id !== selectedSheet.id);
+
+                  // Update sheets list
+                  setSheets(updatedSheets);
+                  localStorage.setItem('call_sheets', JSON.stringify(updatedSheets));
+
+                  // Switch to next sheet or previous if it was last
+                  if (updatedSheets.length > 0) {
+                    const nextIdx = currentIdx < updatedSheets.length ? currentIdx : currentIdx - 1;
+                    setSelectedSheet(updatedSheets[nextIdx]);
+                  } else {
+                    setSelectedSheet(null);
+                    setSheetData(null);
+                  }
                 }
               }}
             >
