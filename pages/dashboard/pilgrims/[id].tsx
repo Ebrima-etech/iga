@@ -13,7 +13,7 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { BiChevronLeft, BiPhone, BiEnvelope, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp } from 'react-icons/bi';
+import { BiChevronLeft, BiPhone, BiEnvelope, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp, BiChevronDown } from 'react-icons/bi';
 
 export default function PilgrimDetailPage() {
   const router = useRouter();
@@ -22,6 +22,7 @@ export default function PilgrimDetailPage() {
   const [loading, setLoading] = useState(true);
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [showPersonalInfo, setShowPersonalInfo] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -94,7 +95,10 @@ export default function PilgrimDetailPage() {
 
         {/* Pilgrim Info Section */}
         <div className="mb-8">
-          <div className="flex items-start justify-between mb-6">
+          <div
+            className="flex items-start justify-between mb-6 cursor-pointer p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+            onClick={() => setShowPersonalInfo(!showPersonalInfo)}
+          >
             <div>
               <h1 className="text-4xl font-bold text-gray-900">{pilgrim.full_name}</h1>
               <div className="flex items-center gap-2 mt-2">
@@ -117,18 +121,14 @@ export default function PilgrimDetailPage() {
                 </span>
               </div>
             </div>
-            <ProfessionalButton
-              variant="primary"
-              size="md"
-              onClick={() => {
-                // Navigate to edit
-              }}
-            >
-              Edit Details
-            </ProfessionalButton>
+            <BiChevronDown
+              size={24}
+              className={`text-gray-400 transition-transform flex-shrink-0 ${showPersonalInfo ? 'rotate-180' : ''}`}
+            />
           </div>
 
-          {/* Info Cards Grid */}
+          {/* Info Cards Grid - Collapsible */}
+          {showPersonalInfo && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card padding="lg" shadow="none" className="border border-gray-200">
               <div className="flex items-start gap-3">
@@ -170,11 +170,23 @@ export default function PilgrimDetailPage() {
               </div>
             </Card>
           </div>
+          )}
         </div>
 
         {/* Address Information */}
-        <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Address Information</h2>
+        <div className="mb-8 border border-gray-200 rounded-lg overflow-hidden">
+          <div
+            className="p-6 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors flex justify-between items-center"
+            onClick={() => setShowPersonalInfo(!showPersonalInfo)}
+          >
+            <h2 className="text-lg font-semibold text-gray-900">Address Information</h2>
+            <BiChevronDown
+              size={20}
+              className={`text-gray-400 transition-transform ${showPersonalInfo ? 'rotate-180' : ''}`}
+            />
+          </div>
+          {showPersonalInfo && (
+          <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
             <div>
               <p className="font-medium text-gray-900">{pilgrim.address}</p>
@@ -187,6 +199,7 @@ export default function PilgrimDetailPage() {
               <p className="text-gray-600 font-mono">{pilgrim.emergency_contact_phone}</p>
             </div>
           </div>
+          )}
         </div>
 
         {/* Payment Summary */}
