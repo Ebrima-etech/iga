@@ -414,70 +414,30 @@ export default function ProfessionalDashboard() {
 
               {/* Right Sidebar */}
               <div className="space-y-6">
-                {/* Quick Stats */}
+                {/* Top Payments This Week */}
                 <Card padding="lg" shadow="none">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Summary</h3>
-                  <div className="space-y-4">
-                    {/* Total Amount */}
-                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-blue-700 font-medium">Total Amount</span>
-                        <button
-                          onClick={() => toggleFieldVisibility('payments-total-amount')}
-                          className="p-1 hover:bg-blue-200 rounded transition-colors"
-                          title={isFieldHidden('payments-total-amount') ? 'Show' : 'Hide'}
-                        >
-                          {isFieldHidden('payments-total-amount') ? <BiHide size={14} className="text-blue-600" /> : <BiShow size={14} className="text-blue-600" />}
-                        </button>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Payments This Week</h3>
+                  <div className="space-y-2">
+                    {payments.slice(0, 10).map((payment: any, idx: number) => (
+                      <div key={payment.id} className="flex items-center justify-between py-2 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{payment.pilgrim_name || 'N/A'}</p>
+                          <p className="text-xs text-gray-500">{payment.bank_name}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-gray-900">D{parseFloat(payment.amount || 0).toLocaleString()}</p>
+                          <p className={`text-xs font-medium ${
+                            payment.status === 'verified' || payment.status === 'confirmed' ? 'text-emerald-600' :
+                            payment.status === 'pending' ? 'text-amber-600' : 'text-red-600'
+                          }`}>
+                            {payment.status?.charAt(0).toUpperCase() + payment.status?.slice(1)}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-lg font-semibold text-blue-900 mt-2">
-                        {isFieldHidden('payments-total-amount') ? '••••••' : `D${(payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) / 1000000).toFixed(2)}M`}
-                      </p>
-                    </div>
-
-                    {(() => {
-                      const confirmed = payments.filter((p: any) => p.status === 'confirmed').length;
-                      const pending = payments.filter((p: any) => p.status === 'pending').length;
-                      const failed = payments.filter((p: any) => p.status === 'failed').length;
-                      const total = confirmed + pending + failed;
-                      const confirmedWidth = total > 0 ? Math.round((confirmed / total) * 100) : 0;
-                      const pendingWidth = total > 0 ? Math.round((pending / total) * 100) : 0;
-                      const failedWidth = total > 0 ? Math.round((failed / total) * 100) : 0;
-
-                      return (
-                        <>
-                          <div>
-                            <div className="flex justify-between items-center mb-1.5">
-                              <span className="text-sm text-gray-600">Confirmed</span>
-                              <span className="font-mono font-semibold text-gray-900">{confirmed}</span>
-                            </div>
-                            <div className="w-full bg-gray-100 rounded-full h-1.5">
-                              <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${confirmedWidth}%` }}></div>
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="flex justify-between items-center mb-1.5">
-                              <span className="text-sm text-gray-600">Pending</span>
-                              <span className="font-mono font-semibold text-gray-900">{pending}</span>
-                            </div>
-                            <div className="w-full bg-gray-100 rounded-full h-1.5">
-                              <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${pendingWidth}%` }}></div>
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="flex justify-between items-center mb-1.5">
-                              <span className="text-sm text-gray-600">Failed</span>
-                              <span className="font-mono font-semibold text-gray-900">{failed}</span>
-                            </div>
-                            <div className="w-full bg-gray-100 rounded-full h-1.5">
-                              <div className="bg-red-500 h-1.5 rounded-full" style={{ width: `${failedWidth}%` }}></div>
-                            </div>
-                          </div>
-                        </>
-                      );
-                    })()}
+                    ))}
+                    {payments.length === 0 && (
+                      <p className="text-sm text-gray-500 text-center py-4">No payments recorded</p>
+                    )}
                   </div>
                 </Card>
 
