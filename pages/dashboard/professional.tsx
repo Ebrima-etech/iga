@@ -222,7 +222,12 @@ export default function ProfessionalDashboard() {
       key: 'pilgrim_name',
       label: 'Pilgrim',
       width: '25%',
-      render: (value: string) => <span className="font-medium text-gray-900">{value}</span>,
+      render: (value: string, row?: any) => {
+        const pilgrimName = value ||
+          `${row?.pilgrim_first_name || ''} ${row?.pilgrim_last_name || ''}`.trim() ||
+          'N/A';
+        return <span className="font-medium text-gray-900">{pilgrimName}</span>;
+      },
     },
     {
       key: 'amount',
