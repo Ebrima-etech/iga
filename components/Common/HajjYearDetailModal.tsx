@@ -41,7 +41,13 @@ export default function HajjYearDetailModal({ isOpen, year, onClose, onSuccess }
 
     try {
       setLoading(true);
-      await api.patch(`/hajj-years/${year.id}/`, {
+      await api.put(`/hajj-years/${year.id}/`, {
+        year: year.year,
+        name: year.name,
+        description: year.description || '',
+        start_date: year.start_date,
+        end_date: year.end_date,
+        is_active: year.is_active,
         first_deposit_amount: formData.first_deposit_amount ? parseFloat(formData.first_deposit_amount) : null,
         total_package_fee: formData.total_package_fee ? parseFloat(formData.total_package_fee) : null,
         notes: formData.notes,
