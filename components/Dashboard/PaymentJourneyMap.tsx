@@ -92,6 +92,7 @@ export default function PaymentJourneyMap({
                   </div>
                   <div className="text-center text-xs">
                     <p className="font-medium text-gray-700">{formatCurrency(payment.amount)}</p>
+                    <p className="text-gray-500">{payment.bank_name}</p>
                     <p className="text-gray-500">{new Date(payment.payment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                   </div>
                 </div>
