@@ -67,8 +67,8 @@ export default function CallSheetsPage() {
   const fetchSheetData = async (sheet: Sheet) => {
     try {
       setLoading(true);
-      // Fetch with high limit to get all results
-      const response = await api.get(`/${sheet.dataSource}/?limit=10000`);
+      // Fetch with high limit and no status filter to get all results
+      const response = await api.get(`/${sheet.dataSource}/?limit=10000&status=`);
       let data = response.data.results || response.data || [];
 
       // If API returns paginated response, fetch all pages
