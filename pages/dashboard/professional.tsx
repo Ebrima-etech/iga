@@ -468,21 +468,21 @@ export default function ProfessionalDashboard() {
               <div className="space-y-6">
                 {/* Top Payments This Week */}
                 <Card padding="lg" shadow="none">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Payments This Week</h3>
-                  <div className="space-y-2">
+                  <h3 className="text-xs font-semibold text-gray-900 mb-2">Top Payments This Week</h3>
+                  <div className="space-y-1">
                     {payments.slice(0, 10).map((payment: any, idx: number) => {
                       const pilgrimName = payment.pilgrim_name ||
                         `${payment.pilgrim_first_name || ''} ${payment.pilgrim_last_name || ''}`.trim() ||
                         'N/A';
                       return (
-                      <div key={payment.id} className="flex items-center justify-between py-2 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
+                      <div key={payment.id} className="flex items-center justify-between py-1 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{pilgrimName}</p>
-                          <p className="text-xs text-gray-500">{payment.bank_name}</p>
+                          <p className="text-xs font-medium text-gray-900 truncate">{pilgrimName}</p>
+                          <p className="text-xs text-gray-500 leading-tight">{payment.bank_name}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold text-gray-900">D{parseFloat(payment.amount || 0).toLocaleString()}</p>
-                          <p className={`text-xs font-medium ${
+                          <p className="text-xs font-semibold text-gray-900">D{parseFloat(payment.amount || 0).toLocaleString()}</p>
+                          <p className={`text-xs font-medium leading-tight ${
                             payment.status === 'verified' || payment.status === 'confirmed' ? 'text-emerald-600' :
                             payment.status === 'pending' ? 'text-amber-600' : 'text-red-600'
                           }`}>
@@ -493,7 +493,7 @@ export default function ProfessionalDashboard() {
                     );
                     })}
                     {payments.length === 0 && (
-                      <p className="text-sm text-gray-500 text-center py-4">No payments recorded</p>
+                      <p className="text-xs text-gray-500 text-center py-2">No payments recorded</p>
                     )}
                   </div>
                 </Card>
