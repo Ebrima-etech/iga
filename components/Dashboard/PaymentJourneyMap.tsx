@@ -38,6 +38,7 @@ export default function PaymentJourneyMap({
   });
 
   const progressPercentage = packagePrice > 0 ? Math.min((totalPaid / packagePrice) * 100, 100) : 0;
+  const totalWaypoints = paymentPoints.length + 2; // Start + payments + end
 
   return (
     <div className="mb-6">
@@ -53,23 +54,22 @@ export default function PaymentJourneyMap({
           </div>
         </div>
 
-        {/* Timeline */}
-        <div className="px-4 py-4 overflow-x-hidden">
-          <div className="relative" style={{ minHeight: '100px' }}>
+        {/* Timeline - Scrollable */}
+        <div className="px-4 py-6 overflow-x-auto">
+          <div className="relative min-w-min" style={{ minWidth: `${Math.max(totalWaypoints * 120, 100)}%` }}>
             {/* Horizontal Line */}
             <svg className="absolute w-full pointer-events-none" style={{ height: '90px', top: '0' }}>
               <line x1="0" y1="35" x2="100%" y2="35" stroke="#e5e7eb" strokeWidth="1" />
             </svg>
 
             {/* Waypoints Container */}
-            <div style={{ position: 'relative', height: '90px' }}>
+            <div className="flex gap-12 relative h-24">
               {/* Start */}
               <div
-                className="absolute flex flex-col items-center"
-                style={{ left: '0', top: '0', width: '60px' }}
+                className="flex flex-col items-center flex-shrink-0 cursor-pointer"
                 onClick={() => setSelectedPoint(0)}
               >
-                <div className="mb-2 z-10">
+                <div className="mb-3 z-10">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${
                     selectedPoint === 0
                       ? 'bg-blue-50 border-blue-500 text-blue-600'
@@ -78,46 +78,39 @@ export default function PaymentJourneyMap({
                     1
                   </div>
                 </div>
-                <div className="text-center text-xs whitespace-nowrap">
+                <div className="text-center text-xs">
                   <p className="font-medium text-gray-700">Start</p>
                   <p className="text-gray-500 text-xs">{new Date(registrationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                 </div>
               </div>
 
               {/* Payments */}
-              {paymentPoints.map((payment, idx) => {
-                const paymentPosition = ((payment.cumulative / packagePrice) * 100);
-                return (
-                  <div
-                    key={payment.id}
-                    className="absolute flex flex-col items-center"
-                    style={{ left: `${paymentPosition}%`, top: '0', width: '60px', transform: 'translateX(-50%)' }}
-                    onClick={() => setSelectedPoint(idx + 1)}
-                  >
-                    <div className="mb-2 z-10">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${
-                        selectedPoint === idx + 1
-                          ? 'bg-blue-50 border-blue-500 text-blue-600'
-                          : 'bg-white border-gray-300 text-gray-500'
-                      }`}>
-                        {idx + 2}
-                      </div>
-                    </div>
-                    <div className="text-center text-xs whitespace-nowrap">
-                      <p className="font-medium text-gray-700">{formatCurrency(payment.amount)}</p>
-                      <p className="text-gray-500 text-xs">{payment.bank_name}</p>
-                      <p className="text-gray-500 text-xs">{new Date(payment.payment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+              {paymentPoints.map((payment, idx) => (
+                <div
+                  key={payment.id}
+                  className="flex flex-col items-center flex-shrink-0 cursor-pointer"
+                  onClick={() => setSelectedPoint(idx + 1)}
+                >
+                  <div className="mb-3 z-10">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${
+                      selectedPoint === idx + 1
+                        ? 'bg-blue-50 border-blue-500 text-blue-600'
+                        : 'bg-white border-gray-300 text-gray-500'
+                    }`}>
+                      {idx + 2}
                     </div>
                   </div>
-                );
-              })}
+                  <div className="text-center text-xs">
+                    <p className="font-medium text-gray-700">{formatCurrency(payment.amount)}</p>
+                    <p className="text-gray-500 text-xs">{payment.bank_name}</p>
+                    <p className="text-gray-500 text-xs">{new Date(payment.payment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                  </div>
+                </div>
+              ))}
 
-              {/* Pending/Done - Position at the end (100%) as the goal */}
-              <div
-                className="absolute flex flex-col items-center"
-                style={{ left: '100%', top: '0', width: '60px', transform: 'translateX(-50%)' }}
-              >
-                <div className="mb-2 z-10">
+              {/* Pending/Done - End goal */}
+              <div className="flex flex-col items-center flex-shrink-0">
+                <div className="mb-3 z-10">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 ${
                     amountRemaining > 0
                       ? 'bg-white border-gray-300 text-gray-500'
@@ -126,7 +119,7 @@ export default function PaymentJourneyMap({
                     ✓
                   </div>
                 </div>
-                <div className="text-center text-xs whitespace-nowrap">
+                <div className="text-center text-xs">
                   <p className="font-medium text-gray-700">{amountRemaining > 0 ? 'Pending' : 'Done'}</p>
                   <p className="text-gray-500 text-xs">{formatCurrency(amountRemaining)}</p>
                 </div>
