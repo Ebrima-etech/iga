@@ -186,19 +186,20 @@ export default function PilgrimDetailPage() {
             />
           </div>
           {showPersonalInfo && (
-          <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
-            <div>
-              <p className="font-medium text-gray-900">{pilgrim.address}</p>
-              <p className="text-gray-600">{pilgrim.city}, {pilgrim.state} {pilgrim.postal_code}</p>
-              <p className="text-gray-600">{pilgrim.country}</p>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                <div>
+                  <p className="font-medium text-gray-900">{pilgrim.address}</p>
+                  <p className="text-gray-600">{pilgrim.city}, {pilgrim.state} {pilgrim.postal_code}</p>
+                  <p className="text-gray-600">{pilgrim.country}</p>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900 mb-2">Passport: {pilgrim.passport_number}</p>
+                  <p className="text-gray-600 mb-3">Emergency Contact: {pilgrim.emergency_contact_name}</p>
+                  <p className="text-gray-600 font-mono">{pilgrim.emergency_contact_phone}</p>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="font-medium text-gray-900 mb-2">Passport: {pilgrim.passport_number}</p>
-              <p className="text-gray-600 mb-3">Emergency Contact: {pilgrim.emergency_contact_name}</p>
-              <p className="text-gray-600 font-mono">{pilgrim.emergency_contact_phone}</p>
-            </div>
-          </div>
           )}
         </div>
 
