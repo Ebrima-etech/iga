@@ -60,131 +60,19 @@ export default function AnalyticsPage() {
     try {
       setLoading(true);
       const params = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
-      const [pilgrimsRes, paymentsRes, banksRes] = await Promise.all([
-        api.get(`/pilgrims/${params}`),
-        api.get(`/payments/${params}`),
-        api.get('/banks/'),
-      ]);
 
-      const pilgrims = pilgrimsRes.data.results || pilgrimsRes.data || [];
-      const payments = paymentsRes.data.results || paymentsRes.data || [];
-      const banks = banksRes.data.results || banksRes.data || [];
+      // Fetch comprehensive analytics data from backend
+      const analyticsRes = await api.get(`/dashboard/summary/analytics/${params}`);
+      const analyticsData = analyticsRes.data;
 
-      // Process pilgrim trend by registration date
-      const pilgrimsByDate = pilgrims.reduce((acc: Record<string, any>, p: any) => {
-        const date = p.created_at ? new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Unknown';
-        if (!acc[date]) {
-          acc[date] = { registrations: 0, completed: 0 };
-        }
-        acc[date].registrations += 1;
-        if ((p.amount_remaining || 0) === 0) {
-          acc[date].completed += 1;
-        }
-        return acc;
-      }, {});
-
-      const pilgrimTrendData = Object.entries(pilgrimsByDate)
-        .slice(-15)
-        .map(([name, data]: [string, any]) => ({
-          name,
-          registrations: data.registrations,
-          completed: data.completed,
-        }));
-
-      // Process payment trend by payment date
-      const paymentsByDate = payments.reduce((acc: Record<string, any>, p: any) => {
-        const date = p.payment_date ? new Date(p.payment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Unknown';
-        if (!acc[date]) {
-          acc[date] = { amount: 0, transactions: 0 };
-        }
-        acc[date].amount += (p.amount || 0);
-        acc[date].transactions += 1;
-        return acc;
-      }, {});
-
-      const paymentTrendData = Object.entries(paymentsByDate)
-        .slice(-15)
-        .map(([date, data]: [string, any]) => ({
-          date,
-          amount: Math.floor(data.amount),
-          transactions: data.transactions,
-        }));
-
-      // Bank distribution
-      const bankDistData = banks.slice(0, 8).map((b: any) => ({
-        name: b.name,
-        value: payments.filter((p: any) => p.bank === b.id).length,
-      }));
-
-      // Payment status breakdown - Completed vs Uncompleted
-      const completedCount = pilgrims.filter((p: any) => (p.amount_remaining || 0) === 0).length;
-      const uncompletedCount = pilgrims.filter((p: any) => (p.amount_remaining || 0) > 0).length;
-
-      const paymentStatusData = [
-        { name: 'Completed', value: completedCount, color: '#22c55e' },
-        { name: 'Uncompleted', value: uncompletedCount, color: '#eab308' },
-      ];
-
-      // Region distribution (real data from database)
-      const regionCounts = pilgrims.reduce((acc: Record<string, number>, p: any) => {
-        const region = p.region || 'Unknown';
-        acc[region] = (acc[region] || 0) + 1;
-        return acc;
-      }, {});
-
-      const regionData = Object.entries(regionCounts)
-        .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => (b.value as number) - (a.value as number));
-
-      // Age distribution (real data from database)
-      const ageRanges: Record<string, number> = {
-        '18-25': 0,
-        '26-35': 0,
-        '36-45': 0,
-        '46-55': 0,
-        '56-65': 0,
-        '65+': 0,
-      };
-
-      pilgrims.forEach((p: any) => {
-        if (p.date_of_birth) {
-          const today = new Date();
-          const birthDate = new Date(p.date_of_birth);
-          let age = today.getFullYear() - birthDate.getFullYear();
-          const monthDiff = today.getMonth() - birthDate.getMonth();
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-          }
-
-          if (age >= 18 && age <= 25) ageRanges['18-25']++;
-          else if (age >= 26 && age <= 35) ageRanges['26-35']++;
-          else if (age >= 36 && age <= 45) ageRanges['36-45']++;
-          else if (age >= 46 && age <= 55) ageRanges['46-55']++;
-          else if (age >= 56 && age <= 65) ageRanges['56-65']++;
-          else if (age > 65) ageRanges['65+']++;
-        }
-      });
-
-      const ageData = Object.entries(ageRanges).map(([range, count]) => ({
-        range,
-        count,
-      }));
-
-      // Payment breakdown by bank (real data from database)
-      const paymentsByBank = payments.reduce((acc: Record<string, number>, p: any) => {
-        const bankName = p.bank_name || 'Unknown';
-        acc[bankName] = (acc[bankName] || 0) + 1;
-        return acc;
-      }, {});
-
-      const BANK_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#22c55e', '#06b6d4', '#f97316', '#6366f1'];
-      const methodData = Object.entries(paymentsByBank)
-        .map(([name, value], index) => ({
-          name,
-          value,
-          color: BANK_COLORS[index % BANK_COLORS.length],
-        }))
-        .sort((a, b) => (b.value as number) - (a.value as number));
+      // Use data from backend analytics endpoint
+      const pilgrimTrendData = analyticsData.pilgrimTrend || [];
+      const paymentTrendData = analyticsData.paymentTrend || [];
+      const bankDistData = analyticsData.bankDistribution || [];
+      const paymentStatusData = analyticsData.paymentStatus || [];
+      const regionData = analyticsData.regionDistribution || [];
+      const ageData = analyticsData.ageDistribution || [];
+      const methodData = analyticsData.bankDistribution || [];
 
       setData({
         pilgrimTrend: pilgrimTrendData,
@@ -196,18 +84,14 @@ export default function AnalyticsPage() {
         paymentMethodBreakdown: methodData,
       });
 
-      // Calculate metrics from real data
-      const totalPayments = payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
-      const avgPayment = payments.length > 0 ? totalPayments / payments.length : 0;
-      const completionRate = pilgrims.length > 0 ? (completedCount / pilgrims.length) * 100 : 0;
-
+      // Use metrics from backend
       setMetrics({
-        totalPilgrims: pilgrims.length,
-        totalPayments: totalPayments,
-        avgPaymentAmount: Math.floor(avgPayment),
-        paymentCompletionRate: Math.round(completionRate),
-        activeBanks: banks.filter((b: any) => b.is_active).length,
-        totalRegions: new Set(pilgrims.map((p: any) => p.region)).size,
+        totalPilgrims: analyticsData.metrics?.totalPilgrims || 0,
+        totalPayments: analyticsData.metrics?.totalPayment || 0,
+        avgPaymentAmount: analyticsData.metrics?.avgPaymentAmount || 0,
+        paymentCompletionRate: analyticsData.metrics?.paymentCompletionRate || 0,
+        activeBanks: analyticsData.metrics?.activeBanks || 0,
+        totalRegions: analyticsData.metrics?.totalRegions || 0,
       });
     } catch (error) {
       console.error('Failed to load analytics:', error);
