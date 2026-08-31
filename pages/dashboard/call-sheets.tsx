@@ -52,40 +52,38 @@ const ShimmerLoader = () => (
       }
     `}</style>
 
-    {/* Grid cells */}
-    <div className="flex-1 overflow-hidden">
-      <div className="w-full h-full">
-        {/* Column Headers */}
-        <div className="flex border-b-2 border-green-500 sticky top-0 bg-white">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={`header-${i}`}
-              className="flex-1 min-w-48 h-10 px-3 py-2 border-r-2 cell-border border-green-500"
-            >
-              <div className="h-4 w-24 shimmer rounded" />
-            </div>
-          ))}
-        </div>
+    {/* Grid cells - fills entire remaining space */}
+    <div className="flex-1 overflow-auto flex flex-col">
+      {/* Column Headers */}
+      <div className="flex border-b-2 border-green-500 sticky top-0 bg-white flex-shrink-0">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div
+            key={`header-${i}`}
+            className="flex-1 min-w-48 h-10 px-3 py-2 border-r-2 cell-border border-green-500"
+          >
+            <div className="h-4 w-24 shimmer rounded" />
+          </div>
+        ))}
+      </div>
 
-        {/* Data Rows */}
-        <div className="overflow-y-auto">
-          {Array(15).fill(0).map((_, rowIdx) => (
-            <div key={`row-${rowIdx}`} className="flex border-b border-gray-200">
-              {Array(6).fill(0).map((_, colIdx) => (
-                <div
-                  key={`cell-${rowIdx}-${colIdx}`}
-                  className="flex-1 min-w-48 h-9 px-3 py-2 border-r border-gray-200 cell-border"
-                  style={{
-                    borderRight: '2px solid #10b981',
-                    animation: `borderGlow 3s ease-in-out infinite ${(rowIdx + colIdx) * 0.1}s`
-                  }}
-                >
-                  <div className="h-4 w-32 shimmer rounded" />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+      {/* Data Rows - fills all remaining space */}
+      <div className="flex-1">
+        {Array(30).fill(0).map((_, rowIdx) => (
+          <div key={`row-${rowIdx}`} className="flex border-b border-gray-200">
+            {Array(6).fill(0).map((_, colIdx) => (
+              <div
+                key={`cell-${rowIdx}-${colIdx}`}
+                className="flex-1 min-w-48 h-9 px-3 py-2 border-r border-gray-200 cell-border"
+                style={{
+                  borderRight: '2px solid #10b981',
+                  animation: `borderGlow 3s ease-in-out infinite ${(rowIdx + colIdx) * 0.1}s`
+                }}
+              >
+                <div className="h-4 w-32 shimmer rounded" />
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   </div>
