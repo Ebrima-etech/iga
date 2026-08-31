@@ -7,6 +7,7 @@ import Badge from '@/components/Common/Badge';
 import Card from '@/components/Common/Card';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
+import PaymentJourneyMap from '@/components/Dashboard/PaymentJourneyMap';
 import { Pilgrim, Payment } from '@/types';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
@@ -221,9 +222,22 @@ export default function PilgrimDetailPage() {
           </Card>
         </div>
 
-        {/* Payment Journey Map */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Payment Journey Map</h2>
+        {/* Payment Journey Map - Google Maps Style */}
+        {pilgrim && (
+          <PaymentJourneyMap
+            pilgrimName={pilgrim.full_name}
+            registrationDate={pilgrim.created_at}
+            registrationId={pilgrim.registration_id}
+            payments={payments}
+            totalPaid={totalPaid}
+            packagePrice={pilgrim.total_amount_due || 0}
+            amountRemaining={amountRemaining}
+          />
+        )}
+
+        {/* Old Timeline - Hidden for now */}
+        <div className="mb-8 hidden">
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">Payment Timeline</h2>
           <div className="bg-white border border-gray-200 rounded-lg p-8">
             {/* Progress visualization */}
             <div className="mb-8">
