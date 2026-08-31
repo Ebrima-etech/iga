@@ -18,6 +18,7 @@ import {
   BiHomeAlt2,
   BiGlobe,
   BiTable,
+  BiReceipt,
 } from 'react-icons/bi';
 
 interface NavItem {
@@ -41,6 +42,7 @@ const navSections: NavSection[] = [
       { label: 'Pilgrims', href: '/dashboard/pilgrims', icon: <BiUser size={18} /> },
       { label: 'Payments', href: '/dashboard/payments', icon: <BiWallet size={18} /> },
       { label: 'Banks', href: '/dashboard/banks', icon: <BiBuilding size={18} /> },
+      { label: 'Receipts', href: '/dashboard/receipts', icon: <BiReceipt size={18} /> },
       { label: 'Reports', href: '/dashboard/reports', icon: <BiLineChart size={18} /> },
       { label: 'Call Sheets', href: '/dashboard/call-sheets', icon: <BiTable size={18} /> },
     ],
