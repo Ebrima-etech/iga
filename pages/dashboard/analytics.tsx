@@ -420,19 +420,67 @@ export default function AnalyticsPage() {
             {/* Payment Status */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-6">Payment Status Distribution</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data.paymentStatus}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#3b82f6">
-                    {data.paymentStatus.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              {data.paymentStatus.length > 0 ? (
+                <div>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                      <Pie
+                        data={data.paymentStatus}
+                        cx="50%"
+                        cy="45%"
+                        labelLine={true}
+                        label={({ name, value }) => {
+                          const total = data.paymentStatus.reduce((sum: number, item: any) => sum + item.value, 0);
+                          const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                          return `${name} ${value}`;
+                        }}
+                        outerRadius={70}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {data.paymentStatus.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value: any) => {
+                          const total = data.paymentStatus.reduce((sum: number, item: any) => sum + item.value, 0);
+                          const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                          return `${value} pilgrims (${percentage}%)`;
+                        }}
+                        contentStyle={{
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '8px',
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* Legend */}
+                  <div className="mt-6 grid grid-cols-2 gap-4">
+                    {data.paymentStatus.map((item: any, index: number) => {
+                      const total = data.paymentStatus.reduce((sum: number, i: any) => sum + i.value, 0);
+                      const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
+                      return (
+                        <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <div
+                            className="w-4 h-4 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                            <p className="text-xs text-gray-600">{item.value} ({percentage}%)</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-80 text-gray-500">
+                  <p>No payment data available</p>
+                </div>
+              )}
             </Card>
           </div>
 

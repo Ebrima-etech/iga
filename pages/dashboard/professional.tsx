@@ -296,34 +296,68 @@ export default function ProfessionalDashboard() {
                   <ChartSkeleton />
                 ) : (
                   <Card padding="lg" shadow="none">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-4">Payment Status</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={paymentStatusData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, value }) => {
-                            const total = paymentStatusData.reduce((sum, item) => sum + item.value, 0);
-                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                            return `${name}: ${value} (${percentage}%)`;
-                          }}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {paymentStatusData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => {
-                          const total = paymentStatusData.reduce((sum, item) => sum + item.value, 0);
-                          const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                          return `${value} pilgrims (${percentage}%)`;
-                        }} />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-6">Payment Status</h3>
+                    {paymentStatusData.length > 0 ? (
+                      <div>
+                        <ResponsiveContainer width="100%" height={280}>
+                          <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                            <Pie
+                              data={paymentStatusData}
+                              cx="50%"
+                              cy="45%"
+                              labelLine={true}
+                              label={({ name, value }) => {
+                                const total = paymentStatusData.reduce((sum, item) => sum + item.value, 0);
+                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                return `${name} ${value}`;
+                              }}
+                              outerRadius={70}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {paymentStatusData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              formatter={(value) => {
+                                const total = paymentStatusData.reduce((sum, item) => sum + item.value, 0);
+                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                return `${value} pilgrims (${percentage}%)`;
+                              }}
+                              contentStyle={{
+                                backgroundColor: 'var(--bg-primary)',
+                                border: `1px solid var(--border-color)`,
+                                borderRadius: '8px',
+                              }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        {/* Legend */}
+                        <div className="mt-6 grid grid-cols-2 gap-4">
+                          {paymentStatusData.map((item, index) => {
+                            const total = paymentStatusData.reduce((sum, i) => sum + i.value, 0);
+                            const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
+                            return (
+                              <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                <div
+                                  className="w-4 h-4 rounded-full flex-shrink-0"
+                                  style={{ backgroundColor: item.color }}
+                                />
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                                  <p className="text-xs text-gray-600">{item.value} ({percentage}%)</p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-80 text-gray-500">
+                        <p>No payment data available</p>
+                      </div>
+                    )}
                   </Card>
                 )}
               </div>
