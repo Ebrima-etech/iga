@@ -170,11 +170,23 @@ export default function PilgrimDetailPage() {
               </div>
             </Card>
           </div>
+          )}
+        </div>
 
-          {/* Address Information - Same collapse */}
+        {/* Address Information */}
+        <div className="mb-8 border border-gray-200 rounded-lg overflow-hidden">
+          <div
+            className="p-6 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors flex justify-between items-center"
+            onClick={() => setShowPersonalInfo(!showPersonalInfo)}
+          >
+            <h2 className="text-lg font-semibold text-gray-900">Address Information</h2>
+            <BiChevronDown
+              size={20}
+              className={`text-gray-400 transition-transform ${showPersonalInfo ? 'rotate-180' : ''}`}
+            />
+          </div>
           {showPersonalInfo && (
-            <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Address Information</h3>
+            <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
                 <div>
                   <p className="font-medium text-gray-900">{pilgrim.address}</p>
