@@ -32,7 +32,13 @@ const DATA_SOURCES = [
 ];
 
 const ShimmerLoader = () => (
-  <div className="fixed inset-0 bg-white flex flex-col z-50 overflow-hidden">
+  <div
+    className="fixed inset-0 bg-white flex flex-col z-50 overflow-hidden animate-fadeOut"
+    style={{
+      animation: 'fadeOut 0.8s ease-out forwards',
+      animationDelay: '0.5s'
+    }}
+  >
     <style>{`
       @keyframes shimmer {
         0% { background-position: -1000px 0; }
@@ -41,6 +47,10 @@ const ShimmerLoader = () => (
       @keyframes borderGlow {
         0%, 100% { border-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
         50% { border-color: #059669; box-shadow: 0 0 12px rgba(5, 150, 105, 0.5); }
+      }
+      @keyframes fadeOut {
+        0% { opacity: 1; }
+        100% { opacity: 0; pointer-events: none; }
       }
       .shimmer {
         background: linear-gradient(90deg, #f0fdf4 0%, #f9fdf6 50%, #f0fdf4 100%);
