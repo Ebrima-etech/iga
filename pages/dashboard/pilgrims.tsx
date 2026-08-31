@@ -544,9 +544,12 @@ export default function PilgrimsPage() {
                             <span className="font-mono text-xs text-gray-500">{pilgrim.registration_id}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="font-medium text-gray-900">
-                              {pilgrim.gender === 'M' ? 'Alagie' : pilgrim.gender === 'F' ? 'Aja' : ''} {pilgrim.first_name}
-                            </span>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-xs font-semibold text-gray-600 italic">
+                                {pilgrim.gender === 'M' ? 'Alagie' : pilgrim.gender === 'F' ? 'Aja' : ''}
+                              </span>
+                              <span className="font-medium text-gray-900">{pilgrim.first_name}</span>
+                            </div>
                           </td>
                           <td className="px-6 py-4">
                             <span className="font-medium text-gray-900">{pilgrim.last_name}</span>
