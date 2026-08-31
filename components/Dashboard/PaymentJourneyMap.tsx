@@ -59,7 +59,7 @@ export default function PaymentJourneyMap({
           <div className="relative">
             {/* Horizontal Line */}
             <svg className="absolute w-full pointer-events-none" style={{ height: '90px', top: '0' }}>
-              <line x1="0" y1="35" x2="100%" y2="35" stroke="#e5e7eb" strokeWidth="1" />
+              <line x1="0" y1="16" x2="100%" y2="16" stroke="#e5e7eb" strokeWidth="1" />
             </svg>
 
             {/* Waypoints Container */}
