@@ -54,16 +54,16 @@ export default function PaymentJourneyMap({
           </div>
         </div>
 
-        {/* Timeline - Scrollable */}
-        <div className="px-4 py-6 overflow-x-auto">
-          <div className="relative min-w-min" style={{ minWidth: `${Math.max(totalWaypoints * 120, 100)}%` }}>
+        {/* Timeline */}
+        <div className="px-4 py-6">
+          <div className="relative">
             {/* Horizontal Line */}
             <svg className="absolute w-full pointer-events-none" style={{ height: '90px', top: '0' }}>
               <line x1="0" y1="35" x2="100%" y2="35" stroke="#e5e7eb" strokeWidth="1" />
             </svg>
 
             {/* Waypoints Container */}
-            <div className="flex gap-12 relative h-24">
+            <div className="flex justify-between relative h-24">
               {/* Start */}
               <div
                 className="flex flex-col items-center flex-shrink-0 cursor-pointer"
