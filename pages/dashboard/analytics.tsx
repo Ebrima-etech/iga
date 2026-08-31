@@ -92,15 +92,13 @@ export default function AnalyticsPage() {
         value: payments.filter((p: any) => p.bank === b.id).length,
       }));
 
-      // Payment status breakdown
-      const confirmedCount = payments.filter((p: any) => p.status === 'confirmed').length;
-      const pendingCount = payments.filter((p: any) => p.status === 'pending').length;
-      const failedCount = payments.filter((p: any) => p.status === 'failed').length;
+      // Payment status breakdown - Completed vs Uncompleted
+      const completedCount = pilgrims.filter((p: any) => (p.amount_remaining || 0) === 0).length;
+      const uncompletedCount = pilgrims.filter((p: any) => (p.amount_remaining || 0) > 0).length;
 
       const paymentStatusData = [
-        { name: 'Confirmed', value: confirmedCount, color: '#22c55e' },
-        { name: 'Pending', value: pendingCount, color: '#eab308' },
-        { name: 'Failed', value: failedCount, color: '#ef4444' },
+        { name: 'Completed', value: completedCount, color: '#22c55e' },
+        { name: 'Uncompleted', value: uncompletedCount, color: '#eab308' },
       ];
 
       // Country distribution (simulated)
