@@ -17,8 +17,9 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import { setCurrencyMode, startRealtimeUpdates, stopRealtimeUpdates, getCurrencyMode } from '@/lib/realtimeCurrency';
 import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
 import HajjYearDetailModal from '@/components/Common/HajjYearDetailModal';
+import SignatorySettingsForm from '@/components/Dashboard/SignatorySettingsForm';
 
-type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years';
+type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years' | 'signatory';
 
 interface CurrencyData {
   code: CurrencyCode;
@@ -317,6 +318,21 @@ export default function SettingsPage() {
                   Hajj Years
                 </div>
               </button>
+              {user?.is_staff && (
+                <button
+                  onClick={() => setActiveTab('signatory')}
+                  className={`pb-4 px-2 font-medium text-sm transition-all ${
+                    activeTab === 'signatory'
+                      ? 'border-b-2 border-indigo-600 text-indigo-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <BiCog size={18} />
+                    Signatory
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 
@@ -800,6 +816,28 @@ export default function SettingsPage() {
               <div className="text-center py-8">
                 <BiX size={32} className="text-red-400 mx-auto mb-3" />
                 <p className="text-gray-600">Only administrators can manage Hajj years</p>
+              </div>
+            </Card>
+          )}
+
+          {/* Signatory Tab */}
+          {activeTab === 'signatory' && user?.is_staff && (
+            <Card padding="lg">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Signatory Settings</h2>
+                <p className="text-gray-600 mt-2">
+                  Manage digital signatures and official stamps for receipt generation
+                </p>
+              </div>
+              <SignatorySettingsForm onSave={() => {}} />
+            </Card>
+          )}
+
+          {activeTab === 'signatory' && !user?.is_staff && (
+            <Card padding="lg" shadow="none">
+              <div className="text-center py-8">
+                <BiX size={32} className="text-red-400 mx-auto mb-3" />
+                <p className="text-gray-600">Only administrators can manage signatory settings</p>
               </div>
             </Card>
           )}
