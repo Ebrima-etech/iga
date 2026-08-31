@@ -192,20 +192,32 @@ export default function PilgrimDetailPage() {
         {/* Payment Summary */}
         <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card padding="lg" shadow="none" className="border border-gray-200">
-            <p className="text-xs text-gray-600 font-medium uppercase">Package Price</p>
-            <p className="text-2xl font-bold text-gray-900 mt-3 font-mono">{formatCurrency(pilgrim.total_amount_due)}</p>
+            <p className="text-xs text-gray-600 font-medium uppercase">Verified Payments</p>
+            <p className="text-2xl font-bold text-gray-900 mt-3 font-mono">
+              {payments.filter(p => p.status === 'verified' || p.status === 'confirmed').length}
+            </p>
+            <p className="text-xs text-gray-500 mt-2">
+              {payments.length > 0 ? `From ${payments.length} total` : 'No payments yet'}
+            </p>
           </Card>
 
           <Card padding="lg" shadow="none" className="border border-gray-200">
             <p className="text-xs text-gray-600 font-medium uppercase">Total Paid</p>
             <p className="text-2xl font-bold text-emerald-600 mt-3 font-mono">{formatCurrency(totalPaid)}</p>
-            <p className="text-xs text-gray-500 mt-2">{payments.filter(p => p.status === 'confirmed' || p.status === 'verified').length} verified</p>
+            <p className="text-xs text-gray-500 mt-2">
+              {payments.length > 0
+                ? `Last: ${formatDate(payments[0].payment_date)}`
+                : 'No payments received'}
+            </p>
           </Card>
 
           <Card padding="lg" shadow="none" className="border border-gray-200">
             <p className="text-xs text-gray-600 font-medium uppercase">Amount Remaining</p>
             <p className={`text-2xl font-bold mt-3 font-mono ${amountRemaining > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
               {formatCurrency(amountRemaining)}
+            </p>
+            <p className={`text-xs mt-2 ${amountRemaining > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+              {amountRemaining > 0 ? 'Outstanding' : 'Paid in full ✓'}
             </p>
           </Card>
         </div>
