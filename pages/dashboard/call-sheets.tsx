@@ -189,6 +189,22 @@ export default function CallSheetsPage() {
     toast.success('Data exported successfully');
   };
 
+  const handleSheetReorder = (e: React.DragEvent<HTMLDivElement>, targetId: string) => {
+    e.preventDefault();
+    const sourceId = e.dataTransfer.getData('sheetId');
+    if (sourceId === targetId) return;
+
+    const sourceIdx = sheets.findIndex((s) => s.id === sourceId);
+    const targetIdx = sheets.findIndex((s) => s.id === targetId);
+
+    const updated = [...sheets];
+    const [movedSheet] = updated.splice(sourceIdx, 1);
+    updated.splice(targetIdx, 0, movedSheet);
+
+    setSheets(updated);
+    localStorage.setItem('call_sheets', JSON.stringify(updated));
+  };
+
   const filteredData = getFilteredAndSortedData();
 
   if (selectedSheet && sheetData) {
@@ -196,14 +212,14 @@ export default function CallSheetsPage() {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col">
         {/* Top Bar */}
-        <div className="bg-white border-b border-gray-300 px-6 py-3 flex items-center justify-between shadow-sm">
+        <div className="bg-white border-b-2 border-green-500 px-6 py-4 flex items-center justify-between shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{selectedSheet.name}</h1>
-            <p className="text-xs text-gray-600">
+            <h1 className="text-2xl font-bold text-gray-900">{selectedSheet.name}</h1>
+            <p className="text-xs text-green-600 mt-1 font-medium">
               {DATA_SOURCES.find((d) => d.value === selectedSheet.dataSource)?.label}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <ProfessionalButton
               variant="secondary"
               size="sm"
@@ -214,7 +230,7 @@ export default function CallSheetsPage() {
             </ProfessionalButton>
             <button
               onClick={() => setSelectedSheet(null)}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition"
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition"
             >
               <BiX size={20} />
             </button>
@@ -222,7 +238,7 @@ export default function CallSheetsPage() {
         </div>
 
         {/* Sheet Content */}
-        <div className="flex-1 overflow-hidden bg-gray-100 p-4">
+        <div className="flex-1 overflow-hidden bg-gray-100 p-4 flex flex-col">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <Loading />
@@ -311,7 +327,7 @@ export default function CallSheetsPage() {
               </div>
 
               {/* Footer */}
-              <div className="bg-gray-50 px-6 py-3 border-t border-gray-300 text-xs text-gray-600">
+              <div className="bg-gray-50 px-6 py-2 border-t border-gray-300 text-xs text-gray-600">
                 Showing {filteredData.length} of {sheetData.rows.length} rows
               </div>
             </div>
@@ -320,6 +336,57 @@ export default function CallSheetsPage() {
               <p className="text-sm">No data available</p>
             </div>
           )}
+        </div>
+
+        {/* Sheet Tabs at Bottom */}
+        <div className="bg-white border-t border-gray-300 px-4 py-2 flex items-center gap-2 overflow-x-auto">
+          <div className="flex items-center gap-1">
+            {sheets.map((sheet) => (
+              <div
+                key={sheet.id}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.effectAllowed = 'move';
+                  e.dataTransfer.setData('sheetId', sheet.id);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'move';
+                }}
+                onDrop={(e) => handleSheetReorder(e, sheet.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-t-lg cursor-pointer border-b-2 transition ${
+                  selectedSheet.id === sheet.id
+                    ? 'bg-white border-b-green-500 text-green-600 font-semibold shadow-sm'
+                    : 'bg-gray-50 border-b-gray-300 text-gray-700 hover:bg-gray-100'
+                }`}
+                onClick={() => setSelectedSheet(sheet)}
+                title={sheet.name}
+              >
+                <span className="text-sm truncate max-w-32 font-medium">{sheet.name}</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteSheet(sheet.id);
+                  }}
+                  className="text-gray-400 hover:text-red-500 flex-shrink-0 opacity-0 group-hover:opacity-100 transition"
+                >
+                  <BiX size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Add New Sheet Button */}
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center justify-center w-8 h-8 rounded hover:bg-green-100 text-green-600 font-bold text-lg transition flex-shrink-0"
+            title="Add new sheet"
+          >
+            +
+          </button>
+
+          {/* Spacer */}
+          <div className="flex-1" />
         </div>
       </div>
     );
