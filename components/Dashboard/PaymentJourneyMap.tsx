@@ -118,23 +118,6 @@ export default function PaymentJourneyMap({
           </div>
         </div>
 
-        {/* Summary */}
-        <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 grid grid-cols-3 gap-4 text-sm">
-          <div>
-            <p className="text-gray-500 text-xs">Total Paid</p>
-            <p className="font-semibold text-gray-900">{formatCurrency(totalPaid)}</p>
-          </div>
-          <div>
-            <p className="text-gray-500 text-xs">Package</p>
-            <p className="font-semibold text-gray-900">{formatCurrency(packagePrice)}</p>
-          </div>
-          <div>
-            <p className="text-gray-500 text-xs">Remaining</p>
-            <p className={`font-semibold ${amountRemaining > 0 ? 'text-amber-600' : 'text-green-600'}`}>
-              {formatCurrency(amountRemaining)}
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
