@@ -101,7 +101,7 @@ export default function PilgrimDetailPage() {
           >
             <div>
               <div className="flex items-baseline gap-2">
-                <span className="text-lg font-semibold text-gray-600 italic">
+                <span className="text-lg font-semibold text-gray-600">
                   {pilgrim.gender === 'M' ? 'Alagie' : 'Aja'}
                 </span>
                 <h1 className="text-4xl font-bold text-gray-900">{pilgrim.full_name}</h1>
