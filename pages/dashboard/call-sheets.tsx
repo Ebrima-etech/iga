@@ -26,10 +26,58 @@ interface SheetData {
 
 const DATA_SOURCES = [
   { value: 'pilgrims', label: 'Pilgrims' },
-  { value: 'payments', label: 'Payments' },
-  { value: 'bank-submissions', label: 'Bank Submissions' },
+  { value: 'bank-payment-submissions', label: 'Payments' },
+  { value: 'bank-payment-submissions', label: 'Bank Submissions' },
   { value: 'banks', label: 'Banks' },
 ];
+
+const ShimmerLoader = () => (
+  <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
+    <style>{`
+      @keyframes shimmer {
+        0% { background-position: -1000px 0; }
+        100% { background-position: 1000px 0; }
+      }
+      .shimmer {
+        background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+        background-size: 1000px 100%;
+        animation: shimmer 2s infinite;
+      }
+    `}</style>
+    <div className="w-full h-full max-w-6xl">
+      {/* Header shimmer */}
+      <div className="h-20 bg-white border-b border-gray-300 px-6 py-4">
+        <div className="shimmer h-6 w-48 rounded mb-2" />
+        <div className="shimmer h-3 w-32 rounded" />
+      </div>
+
+      {/* Content shimmer */}
+      <div className="p-4 space-y-4">
+        <div className="bg-white rounded-lg border border-gray-300 p-4 space-y-3">
+          {/* Filter row */}
+          <div className="flex gap-3 pb-4 border-b">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex-1">
+                <div className="shimmer h-8 rounded" />
+              </div>
+            ))}
+          </div>
+
+          {/* Table rows */}
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="flex gap-3">
+              {[1, 2, 3, 4, 5].map((j) => (
+                <div key={j} className="flex-1">
+                  <div className="shimmer h-9 rounded" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 export default function CallSheetsPage() {
   const router = useRouter();
@@ -267,9 +315,7 @@ export default function CallSheetsPage() {
         {/* Sheet Content */}
         <div className="flex-1 overflow-hidden bg-gray-100 p-4 flex flex-col">
           {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <Loading />
-            </div>
+            <ShimmerLoader />
           ) : sheetData.rows.length > 0 ? (
             <div className="bg-white rounded-lg border border-gray-300 overflow-hidden flex flex-col h-full shadow-lg">
               {/* Filter Row */}
