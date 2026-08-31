@@ -32,43 +32,61 @@ const DATA_SOURCES = [
 ];
 
 const ShimmerLoader = () => (
-  <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
+  <div className="fixed inset-0 bg-white flex flex-col z-50 overflow-hidden">
     <style>{`
       @keyframes shimmer {
         0% { background-position: -1000px 0; }
         100% { background-position: 1000px 0; }
       }
+      @keyframes borderGlow {
+        0%, 100% { border-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
+        50% { border-color: #059669; box-shadow: 0 0 12px rgba(5, 150, 105, 0.5); }
+      }
       .shimmer {
-        background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+        background: linear-gradient(90deg, #f0fdf4 0%, #f9fdf6 50%, #f0fdf4 100%);
         background-size: 1000px 100%;
         animation: shimmer 2s infinite;
       }
+      .cell-border {
+        animation: borderGlow 3s ease-in-out infinite;
+      }
     `}</style>
-    <div className="w-full h-full max-w-6xl">
-      {/* Header shimmer */}
-      <div className="h-20 bg-white border-b border-gray-300 px-6 py-4">
-        <div className="shimmer h-6 w-48 rounded mb-2" />
-        <div className="shimmer h-3 w-32 rounded" />
-      </div>
 
-      {/* Content shimmer */}
-      <div className="p-4 space-y-4">
-        <div className="bg-white rounded-lg border border-gray-300 p-4 space-y-3">
-          {/* Filter row */}
-          <div className="flex gap-3 pb-4 border-b">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex-1">
-                <div className="shimmer h-8 rounded" />
-              </div>
-            ))}
-          </div>
+    {/* Header */}
+    <div className="bg-white border-b-2 border-green-500 px-4 py-3 flex-shrink-0">
+      <div className="h-6 w-64 shimmer rounded mb-2" />
+      <div className="h-3 w-48 shimmer rounded" />
+    </div>
 
-          {/* Table rows */}
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="flex gap-3">
-              {[1, 2, 3, 4, 5].map((j) => (
-                <div key={j} className="flex-1">
-                  <div className="shimmer h-9 rounded" />
+    {/* Grid cells */}
+    <div className="flex-1 overflow-hidden">
+      <div className="w-full h-full">
+        {/* Column Headers */}
+        <div className="flex border-b-2 border-green-500 sticky top-0 bg-white">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={`header-${i}`}
+              className="flex-1 min-w-48 h-10 px-3 py-2 border-r-2 cell-border border-green-500"
+            >
+              <div className="h-4 w-24 shimmer rounded" />
+            </div>
+          ))}
+        </div>
+
+        {/* Data Rows */}
+        <div className="overflow-y-auto">
+          {Array(15).fill(0).map((_, rowIdx) => (
+            <div key={`row-${rowIdx}`} className="flex border-b border-gray-200">
+              {Array(6).fill(0).map((_, colIdx) => (
+                <div
+                  key={`cell-${rowIdx}-${colIdx}`}
+                  className="flex-1 min-w-48 h-9 px-3 py-2 border-r border-gray-200 cell-border"
+                  style={{
+                    borderRight: '2px solid #10b981',
+                    animation: `borderGlow 3s ease-in-out infinite ${(rowIdx + colIdx) * 0.1}s`
+                  }}
+                >
+                  <div className="h-4 w-32 shimmer rounded" />
                 </div>
               ))}
             </div>
