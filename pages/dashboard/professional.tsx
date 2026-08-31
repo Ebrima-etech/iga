@@ -103,6 +103,10 @@ export default function ProfessionalDashboard() {
 
   const isFieldHidden = (fieldId: string) => hiddenFields.has(fieldId);
 
+  const navigateToPayments = () => {
+    router.push('/dashboard/payments');
+  };
+
   const exportDashboardData = () => {
     try {
       // Prepare CSV data
@@ -467,10 +471,15 @@ export default function ProfessionalDashboard() {
               {/* Right Sidebar */}
               <div className="space-y-6">
                 {/* Top Payments This Week */}
-                <Card padding="lg" shadow="none">
+                <Card
+                  padding="lg"
+                  shadow="none"
+                  className="cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={navigateToPayments}
+                >
                   <h3 className="text-xs font-semibold text-gray-900 mb-2">Top Payments This Week</h3>
                   <div className="space-y-1">
-                    {payments.slice(0, 10).map((payment: any, idx: number) => {
+                    {payments.slice(0, 5).map((payment: any, idx: number) => {
                       const pilgrimName = payment.pilgrim_name ||
                         `${payment.pilgrim_first_name || ''} ${payment.pilgrim_last_name || ''}`.trim() ||
                         'N/A';
