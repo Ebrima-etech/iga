@@ -151,8 +151,8 @@ export default function ProfessionalDashboard() {
   const bankComparisonData = banks.map((bank: any) => ({
     bank: bank.name,
     amount: payments
-      .filter((p: any) => p.bank === bank.id)
-      .reduce((sum: number, p: any) => sum + (p.amount || 0), 0),
+      .filter((p: any) => p.bank_name === bank.name)
+      .reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0),
   })).filter(item => item.amount > 0).sort((a, b) => b.amount - a.amount).slice(0, 5);
 
   const paymentColumns = [
