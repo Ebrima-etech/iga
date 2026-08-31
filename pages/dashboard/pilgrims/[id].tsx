@@ -189,7 +189,6 @@ export default function PilgrimDetailPage() {
               </div>
             </div>
           )}
-          )}
         </div>
 
         {/* Payment Summary */}
