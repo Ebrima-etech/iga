@@ -45,7 +45,7 @@ export default function SignatoriesManagement() {
     try {
       setLoading(true);
       const [signatariesRes, settingsRes] = await Promise.all([
-        api.get('/signatories/'),
+        api.get('/settings/signatories/'),
         api.get('/settings/signatory/'),
       ]);
       setSignatories(signatariesRes.data);
@@ -59,7 +59,7 @@ export default function SignatoriesManagement() {
 
   const handleSetActive = async (id: number) => {
     try {
-      await api.put(`/signatories/${id}/`, { is_active: true });
+      await api.put(`/settings/signatories/${id}/`, { is_active: true });
       setSignatories(prev =>
         prev.map(s => ({
           ...s,
@@ -75,7 +75,7 @@ export default function SignatoriesManagement() {
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this signatory?')) return;
     try {
-      await api.delete(`/signatories/${id}/`);
+      await api.delete(`/settings/signatories/${id}/`);
       setSignatories(prev => prev.filter(s => s.id !== id));
       toast.success('Signatory deleted');
     } catch (error) {
@@ -324,12 +324,12 @@ function SignatoryDetailModal({
       });
 
       if (isCreating) {
-        await api.post('/signatories/', formData, {
+        await api.post('/settings/signatories/', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         toast.success('Signatory created');
       } else {
-        await api.put(`/signatories/${signatory?.id}/`, formData, {
+        await api.put(`/settings/signatories/${signatory?.id}/`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         toast.success('Signatory updated');
