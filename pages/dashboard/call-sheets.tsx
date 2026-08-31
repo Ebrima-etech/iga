@@ -52,12 +52,6 @@ const ShimmerLoader = () => (
       }
     `}</style>
 
-    {/* Header */}
-    <div className="bg-white border-b-2 border-green-500 px-4 py-3 flex-shrink-0">
-      <div className="h-6 w-64 shimmer rounded mb-2" />
-      <div className="h-3 w-48 shimmer rounded" />
-    </div>
-
     {/* Grid cells */}
     <div className="flex-1 overflow-hidden">
       <div className="w-full h-full">
