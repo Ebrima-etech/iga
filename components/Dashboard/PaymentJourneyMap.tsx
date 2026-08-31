@@ -52,7 +52,7 @@ export default function PaymentJourneyMap({
         </div>
 
         {/* Timeline */}
-        <div className="px-4 py-4 overflow-x-auto">
+        <div className="px-4 py-4 overflow-x-hidden">
           <div className="relative min-w-min">
             {/* Horizontal Line */}
             <svg className="absolute w-full pointer-events-none" style={{ height: '90px', top: '0' }}>

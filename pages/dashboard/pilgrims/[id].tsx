@@ -390,7 +390,6 @@ export default function PilgrimDetailPage() {
               )}
             </div>
           </div>
-        )}
 
         {/* Payment History */}
         <div>
