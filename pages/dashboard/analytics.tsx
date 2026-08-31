@@ -38,7 +38,7 @@ export default function AnalyticsPage() {
     paymentTrend: [],
     bankDistribution: [],
     paymentStatus: [],
-    registrationByCountry: [],
+    registrationByRegion: [],
     ageDistribution: [],
     paymentMethodBreakdown: [],
   });
@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
     activeBanks: 0,
     conversionRate: 0,
     avgRegistrationTime: 0,
-    totalCountries: 0,
+    totalRegions: 0,
   });
 
   useEffect(() => {
@@ -101,16 +101,16 @@ export default function AnalyticsPage() {
         { name: 'Uncompleted', value: uncompletedCount, color: '#eab308' },
       ];
 
-      // Country distribution (simulated)
-      const countryData = [
-        { name: 'Saudi Arabia', value: Math.floor(pilgrims.length * 0.3) },
-        { name: 'Egypt', value: Math.floor(pilgrims.length * 0.2) },
-        { name: 'Pakistan', value: Math.floor(pilgrims.length * 0.15) },
-        { name: 'Bangladesh', value: Math.floor(pilgrims.length * 0.12) },
-        { name: 'Indonesia', value: Math.floor(pilgrims.length * 0.1) },
-        { name: 'Nigeria', value: Math.floor(pilgrims.length * 0.08) },
-        { name: 'Others', value: Math.floor(pilgrims.length * 0.05) },
-      ];
+      // Region distribution (real data from database)
+      const regionCounts = pilgrims.reduce((acc: Record<string, number>, p: any) => {
+        const region = p.region || 'Unknown';
+        acc[region] = (acc[region] || 0) + 1;
+        return acc;
+      }, {});
+
+      const regionData = Object.entries(regionCounts)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => (b.value as number) - (a.value as number));
 
       // Age distribution (simulated)
       const ageData = [
@@ -135,7 +135,7 @@ export default function AnalyticsPage() {
         paymentTrend: paymentTrendData,
         bankDistribution: bankDistData,
         paymentStatus: paymentStatusData,
-        registrationByCountry: countryData,
+        registrationByRegion: regionData,
         ageDistribution: ageData,
         paymentMethodBreakdown: methodData,
       });
@@ -143,7 +143,7 @@ export default function AnalyticsPage() {
       // Calculate metrics
       const totalPayments = payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
       const avgPayment = payments.length > 0 ? totalPayments / payments.length : 0;
-      const completionRate = pilgrims.length > 0 ? (confirmedCount / pilgrims.length) * 100 : 0;
+      const completionRate = pilgrims.length > 0 ? (completedCount / pilgrims.length) * 100 : 0;
 
       setMetrics({
         totalPilgrims: pilgrims.length,
@@ -153,7 +153,7 @@ export default function AnalyticsPage() {
         activeBanks: banks.filter((b: any) => b.is_active).length,
         conversionRate: Math.round(Math.random() * 40 + 60),
         avgRegistrationTime: Math.round(Math.random() * 30 + 15),
-        totalCountries: new Set(pilgrims.map((p: any) => p.country)).size,
+        totalRegions: new Set(pilgrims.map((p: any) => p.region)).size,
       });
     } catch (error) {
       console.error('Failed to load analytics:', error);
@@ -516,17 +516,17 @@ export default function AnalyticsPage() {
             </Card>
           </div>
 
-          {/* Country Distribution */}
+          {/* Region Distribution */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Pilgrim Distribution by Country</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Pilgrim Distribution by Region</h3>
             <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={data.registrationByCountry}>
+              <BarChart data={data.registrationByRegion}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="value" fill="#06b6d4" name="Pilgrims">
-                  {data.registrationByCountry.map((entry: any, index: number) => (
+                  {data.registrationByRegion.map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Bar>
@@ -580,9 +580,9 @@ export default function AnalyticsPage() {
             <Card className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Countries Represented</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalCountries}</p>
-                  <p className="text-xs text-gray-500 mt-2">Global participation</p>
+                  <p className="text-sm text-gray-600 font-medium">Regions Represented</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalRegions}</p>
+                  <p className="text-xs text-gray-500 mt-2">Geographic coverage</p>
                 </div>
                 <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <BiGlobe size={20} className="text-indigo-600" />
