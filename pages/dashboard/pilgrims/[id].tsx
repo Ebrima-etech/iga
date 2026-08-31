@@ -70,11 +70,12 @@ export default function PilgrimDetailPage() {
   if (loading) return <Layout><Loading /></Layout>;
   if (!pilgrim) return <Layout><div className="p-8 text-center text-gray-500">Pilgrim not found</div></Layout>;
 
+  // Use verified status (when bank records payment) or confirmed for legacy payments
   const totalPaid = payments
-    .filter(p => p.status === 'confirmed')
+    .filter(p => p.status === 'verified' || p.status === 'confirmed')
     .reduce((sum, p) => sum + p.amount, 0);
   // Use backend calculated amount_remaining (package price - total paid)
-  const amountRemaining = Math.max(0, pilgrim.amount_remaining || 0);
+  const amountRemaining = Math.max(0, totalPaid ? (pilgrim.total_amount_due || 0) - totalPaid : pilgrim.amount_remaining || 0);
 
   return (
     <Layout>
