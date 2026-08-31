@@ -26,8 +26,8 @@ interface SheetData {
 
 const DATA_SOURCES = [
   { value: 'pilgrims', label: 'Pilgrims' },
-  { value: 'bank-payment-submissions', label: 'Payments' },
-  { value: 'bank-payment-submissions', label: 'Bank Submissions' },
+  { value: 'bank_payment_submissions', label: 'Payments' },
+  { value: 'bank_payment_submissions', label: 'Bank Submissions' },
   { value: 'banks', label: 'Banks' },
 ];
 
