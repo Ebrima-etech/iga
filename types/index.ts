@@ -41,9 +41,11 @@ export interface Pilgrim {
   postal_code: string;
   country: string;
   status: 'registered' | 'paid' | 'departed' | 'returned';
+  hajj_year?: number | HajjYear;
   total_amount_due: number;
   total_amount_paid: number;
-  amount_remaining: number;
+  amount_remaining: number; // Calculated: package_price - total_paid
+  current_due?: number; // Alias for amount_remaining
   emergency_contact_name: string;
   emergency_contact_phone: string;
   emergency_contact_email: string;

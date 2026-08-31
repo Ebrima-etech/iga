@@ -73,7 +73,8 @@ export default function PilgrimDetailPage() {
   const totalPaid = payments
     .filter(p => p.status === 'confirmed')
     .reduce((sum, p) => sum + p.amount, 0);
-  const amountRemaining = Math.max(0, pilgrim.total_amount_due - totalPaid);
+  // Use backend calculated amount_remaining (package price - total paid)
+  const amountRemaining = Math.max(0, pilgrim.amount_remaining || 0);
 
   return (
     <Layout>
