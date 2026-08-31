@@ -73,8 +73,8 @@ export default function ProfessionalDashboard() {
       // Calculate real stats (using ALL payments, not just recent)
       const totalPilgrims = pilgrimsData.length;
       const totalPayments = allPaymentsData.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
-      const confirmedPayments = allPaymentsData.filter((p: any) => p.status === 'confirmed').length;
-      const paymentRate = totalPilgrims > 0 ? Math.round((confirmedPayments / totalPilgrims) * 100) : 0;
+      const completedCount = pilgrimsData.filter((p: any) => (p.amount_remaining || 0) === 0).length;
+      const paymentRate = totalPilgrims > 0 ? Math.round((completedCount / totalPilgrims) * 100) : 0;
       const activeBanks = banksData.filter((b: any) => b.is_active).length;
 
       setStats({
@@ -121,9 +121,9 @@ export default function ProfessionalDashboard() {
       isHidden: isFieldHidden('dashboard-total-payments'),
     },
     {
-      label: 'Payment Rate',
+      label: 'Completion Rate',
       value: `${stats.paymentRate}%`,
-      caption: `${payments.filter((p: any) => p.status === 'confirmed').length} confirmed`,
+      caption: `${pilgrims.filter((p: any) => (p.amount_remaining || 0) === 0).length} completed`,
       icon: <BiTrendingUp size={15} />,
       isFinancial: false,
     },
