@@ -281,6 +281,11 @@ export default function CallSheetsPage() {
 
   const filteredData = getFilteredAndSortedData();
 
+  // Show initial shimmer on first load
+  if (loading && !sheetData) {
+    return <ShimmerLoader />;
+  }
+
   if (selectedSheet && sheetData) {
     // Full-screen sheet view
     return (
@@ -314,9 +319,7 @@ export default function CallSheetsPage() {
 
         {/* Sheet Content */}
         <div className="flex-1 overflow-hidden bg-gray-100 p-4 flex flex-col">
-          {loading ? (
-            <ShimmerLoader />
-          ) : sheetData.rows.length > 0 ? (
+          {sheetData.rows.length > 0 ? (
             <div className="bg-white rounded-lg border border-gray-300 overflow-hidden flex flex-col h-full shadow-lg">
               {/* Filter Row */}
               <div className="bg-gray-50 border-b border-gray-300 overflow-x-auto">
