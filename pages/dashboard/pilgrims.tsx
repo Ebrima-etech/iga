@@ -519,7 +519,7 @@ export default function PilgrimsPage() {
                       />
                       <SortableHeader
                         label="Amount Due"
-                        sortKey="total_amount_due"
+                        sortKey="total_amount_paid"
                         currentSort={tableState.sortConfig}
                         onSort={tableState.handleSort}
                       />
@@ -564,7 +564,7 @@ export default function PilgrimsPage() {
                           </td>
                           <td className="px-6 py-4">
                             <span className="text-gray-900 font-mono font-medium">
-                              ${(pilgrim.total_amount_due || 0).toLocaleString()}
+                              ${(pilgrim.amount_remaining || 0).toLocaleString()}
                             </span>
                           </td>
                           <td className="px-6 py-4">
