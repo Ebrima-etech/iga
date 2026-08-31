@@ -235,7 +235,10 @@ export default function PilgrimsPage() {
       setLoading(true);
       const params = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '';
       const response = await api.get(`/pilgrims/${params}`);
-      setPilgrims(response.data.results || response.data);
+      const pilgrims = response.data.results || response.data;
+      console.log('Fetched pilgrims:', pilgrims);
+      console.log('First pilgrim gender field:', pilgrims?.[0]?.gender);
+      setPilgrims(pilgrims);
     } catch (error) {
       console.error('Error fetching pilgrims:', error);
       toast.error('Failed to load pilgrims');
