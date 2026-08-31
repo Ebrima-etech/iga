@@ -72,7 +72,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             searchResults.push({
               id: `pilgrim-${p.id}`,
               type: 'pilgrim',
-              title: p.full_name || 'Unknown',
+              title: `${p.gender === 'M' ? 'Alagie' : 'Aja'} ${p.full_name || 'Unknown'}`,
               subtitle: `ID: ${p.registration_id || 'N/A'} • ${p.email || 'N/A'}`,
               icon: '👤',
               href: `/dashboard/pilgrims/${p.id}`,

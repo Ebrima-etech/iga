@@ -64,6 +64,7 @@ export default function PaymentsPage() {
         id: sub.id,
         pilgrim_id: sub.pilgrim_id,
         pilgrim_name: `${sub.pilgrim_first_name} ${sub.pilgrim_last_name}`.trim(),
+        gender: sub.pilgrim_gender,
         bank: sub.bank,
         bank_name: sub.bank_name,
         amount: sub.amount,
@@ -270,7 +271,9 @@ export default function PaymentsPage() {
                             className="hover:bg-emerald-50 transition-colors cursor-pointer"
                           >
                             <td className="px-4 py-3.5 font-mono text-xs text-gray-500">{payment.reference_number}</td>
-                            <td className="px-4 py-3.5 text-sm text-gray-900 font-medium">{payment.pilgrim_name}</td>
+                            <td className="px-4 py-3.5 text-sm text-gray-900 font-medium">
+                              {payment.gender === 'M' ? 'Alagie' : payment.gender === 'F' ? 'Aja' : ''} {payment.pilgrim_name}
+                            </td>
                             <td className="px-4 py-3.5 text-sm text-gray-600">{payment.bank_name}</td>
                             <td className="px-4 py-3.5 text-sm font-mono font-medium text-gray-900">
                               {formatCurrency(payment.amount)}

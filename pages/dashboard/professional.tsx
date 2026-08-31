@@ -226,7 +226,8 @@ export default function ProfessionalDashboard() {
         const pilgrimName = value ||
           `${row?.pilgrim_first_name || ''} ${row?.pilgrim_last_name || ''}`.trim() ||
           'N/A';
-        return <span className="font-medium text-gray-900">{pilgrimName}</span>;
+        const title = row?.gender === 'M' ? 'Alagie' : row?.gender === 'F' ? 'Aja' : '';
+        return <span className="font-medium text-gray-900">{title && `${title} `}{pilgrimName}</span>;
       },
     },
     {
@@ -488,10 +489,11 @@ export default function ProfessionalDashboard() {
                       const pilgrimName = payment.pilgrim_name ||
                         `${payment.pilgrim_first_name || ''} ${payment.pilgrim_last_name || ''}`.trim() ||
                         'N/A';
+                      const title = payment.gender === 'M' ? 'Alagie' : payment.gender === 'F' ? 'Aja' : '';
                       return (
                       <div key={payment.id} className="flex items-center justify-between py-1 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-gray-900 truncate">{pilgrimName}</p>
+                          <p className="text-xs font-medium text-gray-900 truncate">{title && `${title} `}{pilgrimName}</p>
                           <p className="text-xs text-gray-500 leading-tight">{payment.bank_name}</p>
                         </div>
                         <div className="text-right">
