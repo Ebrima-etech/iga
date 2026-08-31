@@ -17,7 +17,7 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import { setCurrencyMode, startRealtimeUpdates, stopRealtimeUpdates, getCurrencyMode } from '@/lib/realtimeCurrency';
 import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
 import HajjYearDetailModal from '@/components/Common/HajjYearDetailModal';
-import SignatorySettingsForm from '@/components/Dashboard/SignatorySettingsForm';
+import SignatoriesManagement from '@/components/Dashboard/SignatoriesManagement';
 
 type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years' | 'signatory';
 
@@ -822,15 +822,15 @@ export default function SettingsPage() {
 
           {/* Signatory Tab */}
           {activeTab === 'signatory' && user?.is_staff && (
-            <Card padding="lg">
+            <div>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Signatory Settings</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Signatory Management</h2>
                 <p className="text-gray-600 mt-2">
-                  Manage digital signatures and official stamps for receipt generation
+                  Manage multiple signatories with digital signatures and official stamps
                 </p>
               </div>
-              <SignatorySettingsForm onSave={() => {}} />
-            </Card>
+              <SignatoriesManagement />
+            </div>
           )}
 
           {activeTab === 'signatory' && !user?.is_staff && (
