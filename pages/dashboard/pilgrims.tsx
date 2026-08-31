@@ -150,11 +150,12 @@ const pilgrimFormSteps = [
     fields: [
       {
         name: 'total_amount_due',
-        label: 'Total Amount Due (D)',
+        label: 'Package Price (D)',
         type: 'number' as const,
         required: true,
         placeholder: '5000',
         voiceInput: true,
+        description: 'Total package price (will auto-fill from system default if left empty)',
       },
     ],
   },
@@ -518,7 +519,7 @@ export default function PilgrimsPage() {
                         onSort={tableState.handleSort}
                       />
                       <SortableHeader
-                        label="Amount Due"
+                        label="Amount Remaining"
                         sortKey="total_amount_paid"
                         currentSort={tableState.sortConfig}
                         onSort={tableState.handleSort}

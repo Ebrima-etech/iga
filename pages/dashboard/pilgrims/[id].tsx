@@ -192,18 +192,18 @@ export default function PilgrimDetailPage() {
         {/* Payment Summary */}
         <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card padding="lg" shadow="none" className="border border-gray-200">
-            <p className="text-xs text-gray-600 font-medium uppercase">Total Due</p>
+            <p className="text-xs text-gray-600 font-medium uppercase">Package Price</p>
             <p className="text-2xl font-bold text-gray-900 mt-3 font-mono">{formatCurrency(pilgrim.total_amount_due)}</p>
           </Card>
 
           <Card padding="lg" shadow="none" className="border border-gray-200">
             <p className="text-xs text-gray-600 font-medium uppercase">Total Paid</p>
             <p className="text-2xl font-bold text-emerald-600 mt-3 font-mono">{formatCurrency(totalPaid)}</p>
-            <p className="text-xs text-gray-500 mt-2">{payments.filter(p => p.status === 'confirmed').length} confirmed</p>
+            <p className="text-xs text-gray-500 mt-2">{payments.filter(p => p.status === 'confirmed' || p.status === 'verified').length} verified</p>
           </Card>
 
           <Card padding="lg" shadow="none" className="border border-gray-200">
-            <p className="text-xs text-gray-600 font-medium uppercase">Remaining</p>
+            <p className="text-xs text-gray-600 font-medium uppercase">Amount Remaining</p>
             <p className={`text-2xl font-bold mt-3 font-mono ${amountRemaining > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
               {formatCurrency(amountRemaining)}
             </p>
@@ -220,13 +220,13 @@ export default function PilgrimDetailPage() {
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-medium text-gray-700">Payment Progress</p>
                   <p className="text-sm font-medium text-gray-700">
-                    {Math.round((totalPaid / pilgrim.total_amount_due) * 100)}%
+                    {Math.round((totalPaid / (pilgrim.total_amount_due || 1)) * 100)}%
                   </p>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                   <div
                     className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min((totalPaid / pilgrim.total_amount_due) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((totalPaid / (pilgrim.total_amount_due || 1)) * 100, 100)}%` }}
                   ></div>
                 </div>
               </div>
