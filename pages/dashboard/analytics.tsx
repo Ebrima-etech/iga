@@ -49,8 +49,6 @@ export default function AnalyticsPage() {
     avgPaymentAmount: 0,
     paymentCompletionRate: 0,
     activeBanks: 0,
-    conversionRate: 0,
-    avgRegistrationTime: 0,
     totalRegions: 0,
   });
 
@@ -203,35 +201,12 @@ export default function AnalyticsPage() {
       const avgPayment = payments.length > 0 ? totalPayments / payments.length : 0;
       const completionRate = pilgrims.length > 0 ? (completedCount / pilgrims.length) * 100 : 0;
 
-      // Conversion rate: percentage of pilgrims with at least one payment
-      const pilgrimsWithPayments = new Set(payments.map((p: any) => p.pilgrim || p.pilgrim_id)).size;
-      const conversionRate = pilgrims.length > 0 ? (pilgrimsWithPayments / pilgrims.length) * 100 : 0;
-
-      // Average registration to payment time (in days)
-      let totalDays = 0;
-      let countWithPayment = 0;
-      pilgrims.forEach((pilgrim: any) => {
-        const pilgrimPayments = payments.filter((p: any) => (p.pilgrim || p.pilgrim_id) === pilgrim.id);
-        if (pilgrimPayments.length > 0 && pilgrim.created_at) {
-          const firstPaymentDate = new Date(pilgrimPayments[0].payment_date || pilgrimPayments[0].created_at);
-          const regDate = new Date(pilgrim.created_at);
-          const days = Math.floor((firstPaymentDate.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24));
-          if (days >= 0) {
-            totalDays += days;
-            countWithPayment++;
-          }
-        }
-      });
-      const avgRegistrationTime = countWithPayment > 0 ? Math.round(totalDays / countWithPayment) : 0;
-
       setMetrics({
         totalPilgrims: pilgrims.length,
         totalPayments: totalPayments,
         avgPaymentAmount: Math.floor(avgPayment),
         paymentCompletionRate: Math.round(completionRate),
         activeBanks: banks.filter((b: any) => b.is_active).length,
-        conversionRate: Math.round(conversionRate),
-        avgRegistrationTime: avgRegistrationTime,
         totalRegions: new Set(pilgrims.map((p: any) => p.region)).size,
       });
     } catch (error) {
@@ -614,18 +589,19 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* Additional Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Conversion Rate</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.conversionRate}%</p>
+                  <p className="text-sm text-gray-600 font-medium">Payment Completion Rate</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.paymentCompletionRate}%</p>
+                  <p className="text-xs text-gray-500 mt-2">Pilgrims with full payment</p>
                   <div className="mt-4 bg-gray-200 rounded-full h-2">
-                    <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${metrics.conversionRate}%` }} />
+                    <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${metrics.paymentCompletionRate}%` }} />
                   </div>
                 </div>
                 <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <BiBarChartAlt2 size={20} className="text-emerald-600" />
+                  <BiCheckCircle size={20} className="text-emerald-600" />
                 </div>
               </div>
             </Card>
@@ -639,19 +615,6 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <BiBuilding size={20} className="text-blue-600" />
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 font-medium">Avg Registration Time</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.avgRegistrationTime}m</p>
-                  <p className="text-xs text-gray-500 mt-2">Minutes per pilgrim</p>
-                </div>
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <BiTime size={20} className="text-orange-600" />
                 </div>
               </div>
             </Card>
