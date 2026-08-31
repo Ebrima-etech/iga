@@ -41,7 +41,7 @@ export default function SettingsPage() {
   });
 
   // Currency states
-  const [defaultCurrency, setDefaultCurrency] = useState<CurrencyCode>('USD');
+  const [defaultCurrency, setDefaultCurrency] = useState<CurrencyCode>('GMD');
   const [editingRates, setEditingRates] = useState(false);
   const [currencyMode, setCurrencyModeState] = useState<'manual' | 'realtime'>('manual');
   const [currencies, setCurrencies] = useState<CurrencyData[]>([

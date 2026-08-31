@@ -150,7 +150,7 @@ const pilgrimFormSteps = [
     fields: [
       {
         name: 'total_amount_due',
-        label: 'Total Amount Due ($)',
+        label: 'Total Amount Due (D)',
         type: 'number' as const,
         required: true,
         placeholder: '5000',

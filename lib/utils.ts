@@ -13,11 +13,10 @@ export const formatCurrency = (amount: number | string, currency?: string): stri
     }
   }
 
-  // Default to USD
-  // Currency selection will be applied at component level via CurrencyProvider
+  // Default to GMD (Gambian Dalasi)
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'GMD',
   }).format(num);
 };
 
