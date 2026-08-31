@@ -67,30 +67,36 @@ export default function CallSheetsPage() {
   const fetchSheetData = async (sheet: Sheet) => {
     try {
       setLoading(true);
-      // Fetch with high limit and no status filter to get all results
-      const response = await api.get(`/${sheet.dataSource}/?limit=10000&status=`);
-      let data = response.data.results || response.data || [];
+      let allData: any[] = [];
+      let url = `/${sheet.dataSource}/?limit=100`;
+      let pageCount = 0;
 
-      // If API returns paginated response, fetch all pages
-      if (response.data.results && response.data.next) {
-        let nextUrl = response.data.next;
-        while (nextUrl) {
-          try {
-            const nextResponse = await api.get(nextUrl);
-            data = [...data, ...nextResponse.data.results];
-            nextUrl = nextResponse.data.next;
-          } catch (err) {
-            console.warn('Failed to fetch next page:', err);
-            break;
-          }
+      // Fetch all pages
+      while (url && pageCount < 1000) {
+        pageCount++;
+        const response = await api.get(url);
+
+        const pageData = response.data.results || (Array.isArray(response.data) ? response.data : []);
+        allData = [...allData, ...pageData];
+
+        console.log(`Page ${pageCount}: fetched ${pageData.length} items, total: ${allData.length}`);
+
+        // Check for next page
+        url = response.data.next || null;
+
+        // If not paginated format, break
+        if (!response.data.results) {
+          break;
         }
       }
 
-      if (Array.isArray(data) && data.length > 0) {
-        const columns = Object.keys(data[0]);
+      console.log(`Finished fetching: ${allData.length} total items`);
+
+      if (Array.isArray(allData) && allData.length > 0) {
+        const columns = Object.keys(allData[0]);
         setSheetData({
           columns,
-          rows: data,
+          rows: allData,
         });
       } else {
         setSheetData({ columns: [], rows: [] });
