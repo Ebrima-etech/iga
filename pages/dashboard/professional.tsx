@@ -142,10 +142,11 @@ export default function ProfessionalDashboard() {
     pilgrims: i + 1,
   }));
 
+  const completedPilgrims = pilgrims.filter((p: any) => (p.amount_remaining || 0) === 0).length;
+  const uncompletedPilgrims = pilgrims.filter((p: any) => (p.amount_remaining || 0) > 0).length;
   const paymentStatusData = [
-    { name: 'Confirmed', value: payments.filter((p: any) => p.status === 'confirmed').length, color: '#22c55e' },
-    { name: 'Pending', value: payments.filter((p: any) => p.status === 'pending').length, color: '#eab308' },
-    { name: 'Failed', value: payments.filter((p: any) => p.status === 'failed').length, color: '#ef4444' },
+    { name: 'Completed', value: completedPilgrims, color: '#22c55e' },
+    { name: 'Uncompleted', value: uncompletedPilgrims, color: '#eab308' },
   ].filter(item => item.value > 0);
 
   const bankComparisonData = banks.map((bank: any) => ({
@@ -303,7 +304,11 @@ export default function ProfessionalDashboard() {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, value }) => `${name} (${value})`}
+                          label={({ name, value }) => {
+                            const total = paymentStatusData.reduce((sum, item) => sum + item.value, 0);
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return `${name}: ${value} (${percentage}%)`;
+                          }}
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
@@ -312,7 +317,11 @@ export default function ProfessionalDashboard() {
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip formatter={(value) => {
+                          const total = paymentStatusData.reduce((sum, item) => sum + item.value, 0);
+                          const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                          return `${value} pilgrims (${percentage}%)`;
+                        }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </Card>
