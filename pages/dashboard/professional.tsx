@@ -54,14 +54,31 @@ export default function ProfessionalDashboard() {
     try {
       setLoading(true);
       const baseParam = selectedHajjYear ? `?hajj_year=${selectedHajjYear}` : '?';
-      const paymentsParam = `${baseParam}${baseParam.includes('?') ? '&' : ''}ordering=-submitted_at`;
-      const [paymentsRes, pilgrimsRes, banksRes] = await Promise.all([
-        api.get(`/bank-payment-submissions/${paymentsParam}`),
+
+      // Fetch all bank payment submissions with pagination
+      let allPaymentsData: any[] = [];
+      let page = 1;
+      let hasMore = true;
+
+      while (hasMore) {
+        const paymentsParam = `${baseParam}${baseParam.includes('?') ? '&' : ''}limit=100&offset=${(page - 1) * 100}&ordering=-submitted_at`;
+        const paymentsRes = await api.get(`/bank-payment-submissions/${paymentsParam}`);
+        const pageData = paymentsRes.data.results || paymentsRes.data || [];
+
+        if (Array.isArray(pageData)) {
+          allPaymentsData = [...allPaymentsData, ...pageData];
+          hasMore = pageData.length === 100;
+          page++;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      const [pilgrimsRes, banksRes] = await Promise.all([
         api.get(`/pilgrims/${baseParam}`),
         api.get('/banks/'),
       ]);
 
-      const allPaymentsData = paymentsRes.data.results || paymentsRes.data || [];
       const recentPayments = allPaymentsData.slice(0, 10);
       const pilgrimsData = pilgrimsRes.data.results || pilgrimsRes.data || [];
       const banksData = banksRes.data.results || banksRes.data || [];
@@ -72,7 +89,10 @@ export default function ProfessionalDashboard() {
 
       // Calculate real stats (using ALL payments, not just recent)
       const totalPilgrims = pilgrimsData.length;
-      const totalPayments = allPaymentsData.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+      const totalPayments = allPaymentsData.reduce((sum: number, p: any) => {
+        const amount = parseFloat(p.amount) || 0;
+        return sum + amount;
+      }, 0);
       const completedCount = pilgrimsData.filter((p: any) => (p.amount_remaining || 0) === 0).length;
       const paymentRate = totalPilgrims > 0 ? Math.round((completedCount / totalPilgrims) * 100) : 0;
       const activeBanks = banksData.filter((b: any) => b.is_active).length;
@@ -167,9 +187,9 @@ export default function ProfessionalDashboard() {
       isFinancial: false,
     },
     {
-      label: 'Total Payments',
-      value: `D${(stats.totalPayments / 1000000).toFixed(2)}M`,
-      caption: `${payments.length === 10 ? '10+ recent' : payments.length} transactions`,
+      label: 'Total Payment',
+      value: stats.totalPayments > 0 ? `D${(stats.totalPayments / 1000000).toFixed(2)}M` : 'D0.00M',
+      caption: `${payments.length} transactions`,
       icon: <BiWallet size={15} />,
       isFinancial: true,
       fieldId: 'dashboard-total-payments',
