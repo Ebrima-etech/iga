@@ -233,8 +233,9 @@ export default function CallSheetsPage() {
               Export
             </ProfessionalButton>
             <button
-              onClick={() => setSelectedSheet(null)}
+              onClick={() => router.back()}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition"
+              title="Go back"
             >
               <BiX size={20} />
             </button>
@@ -392,6 +393,73 @@ export default function CallSheetsPage() {
           {/* Spacer */}
           <div className="flex-1" />
         </div>
+
+        {/* Create Sheet Modal */}
+        {showCreateModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg border border-gray-400 shadow-lg w-full max-w-md">
+              <div className="bg-gray-100 px-6 py-4 border-b border-gray-300 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Create New Sheet</h3>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <BiX size={20} />
+                </button>
+              </div>
+
+              <div className="px-6 py-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Sheet Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newSheetName}
+                    onChange={(e) => setNewSheetName(e.target.value)}
+                    placeholder="e.g., December Pilgrims"
+                    className="w-full px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Data Source
+                  </label>
+                  <select
+                    value={selectedDataSource}
+                    onChange={(e) => setSelectedDataSource(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="">Select a data source...</option>
+                    {DATA_SOURCES.map((source) => (
+                      <option key={source.value} value={source.value}>
+                        {source.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex gap-3 pt-6">
+                  <ProfessionalButton
+                    variant="secondary"
+                    className="flex-1"
+                    onClick={() => setShowCreateModal(false)}
+                  >
+                    Cancel
+                  </ProfessionalButton>
+                  <ProfessionalButton
+                    variant="primary"
+                    className="flex-1"
+                    onClick={handleCreateSheet}
+                  >
+                    Create
+                  </ProfessionalButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
