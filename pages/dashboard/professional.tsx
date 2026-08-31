@@ -103,6 +103,52 @@ export default function ProfessionalDashboard() {
 
   const isFieldHidden = (fieldId: string) => hiddenFields.has(fieldId);
 
+  const exportDashboardData = () => {
+    try {
+      // Prepare CSV data
+      const headers = ['Pilgrim Name', 'Amount', 'Bank', 'Status', 'Date', 'Reference Number'];
+      const rows = payments.map((p: any) => [
+        p.pilgrim_name || 'N/A',
+        p.amount || 0,
+        p.bank_name || 'N/A',
+        p.status || 'N/A',
+        new Date(p.payment_date).toLocaleDateString(),
+        p.reference_number || 'N/A',
+      ]);
+
+      // Create CSV content
+      const csvContent = [
+        ['DASHBOARD EXPORT', new Date().toLocaleString()].join(','),
+        '',
+        ['STATISTICS'].join(','),
+        ['Metric', 'Value'].join(','),
+        ['Total Pilgrims', stats.totalPilgrims].join(','),
+        ['Total Payments', `D${stats.totalPayments.toLocaleString()}`].join(','),
+        ['Completion Rate', `${stats.paymentRate}%`].join(','),
+        ['Banks Connected', stats.activeBanks].join(','),
+        '',
+        ['RECENT PAYMENTS'].join(','),
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+      ].join('\n');
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `dashboard-export-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Dashboard data exported successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export dashboard data');
+    }
+  };
+
   const statCards = [
     {
       label: 'Total Pilgrims',
@@ -234,6 +280,7 @@ export default function ProfessionalDashboard() {
                 variant="primary"
                 size="md"
                 icon={<BiDownload size={16} />}
+                onClick={exportDashboardData}
               >
                 Export
               </ProfessionalButton>
