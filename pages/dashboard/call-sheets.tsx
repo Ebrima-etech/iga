@@ -327,6 +327,18 @@ export default function CallSheetsPage() {
             >
               Export
             </ProfessionalButton>
+            <ProfessionalButton
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                if (selectedSheet) {
+                  handleDeleteSheet(selectedSheet.id);
+                  router.back();
+                }
+              }}
+            >
+              Close Sheet
+            </ProfessionalButton>
             <button
               onClick={() => router.back()}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition"
