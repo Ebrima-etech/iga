@@ -100,9 +100,12 @@ export default function PilgrimDetailPage() {
             onClick={() => setShowPersonalInfo(!showPersonalInfo)}
           >
             <div>
-              <h1 className="text-4xl font-bold text-gray-900">
-                {pilgrim.gender === 'M' ? 'Alagie' : 'Aja'} {pilgrim.full_name}
-              </h1>
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-semibold text-gray-600 italic">
+                  {pilgrim.gender === 'M' ? 'Alagie' : 'Aja'}
+                </span>
+                <h1 className="text-4xl font-bold text-gray-900">{pilgrim.full_name}</h1>
+              </div>
               <div className="flex items-center gap-2 mt-2">
                 <Badge
                   variant={
