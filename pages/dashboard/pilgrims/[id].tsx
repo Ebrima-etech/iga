@@ -8,13 +8,12 @@ import Card from '@/components/Common/Card';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
 import PaymentJourneyMap from '@/components/Dashboard/PaymentJourneyMap';
-import ReceiptModal from '@/components/Dashboard/ReceiptModal';
 import { Pilgrim, Payment } from '@/types';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { BiChevronLeft, BiPhone, BiEnvelope, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp, BiChevronDown, BiReceipt } from 'react-icons/bi';
+import { BiChevronLeft, BiPhone, BiEnvelope, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp, BiChevronDown } from 'react-icons/bi';
 
 export default function PilgrimDetailPage() {
   const router = useRouter();
@@ -24,7 +23,6 @@ export default function PilgrimDetailPage() {
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
-  const [showReceipt, setShowReceipt] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -83,8 +81,8 @@ export default function PilgrimDetailPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-white p-8">
-        {/* Header with Back Button and Actions */}
-        <div className="mb-8 flex items-center justify-between">
+        {/* Header with Back Button */}
+        <div className="mb-8">
           <ProfessionalButton
             variant="ghost"
             size="sm"
@@ -93,16 +91,6 @@ export default function PilgrimDetailPage() {
           >
             Back to Pilgrims
           </ProfessionalButton>
-          <div className="flex items-center gap-3">
-            <ProfessionalButton
-              variant="secondary"
-              size="sm"
-              icon={<BiReceipt size={16} />}
-              onClick={() => setShowReceipt(true)}
-            >
-              Generate Receipt
-            </ProfessionalButton>
-          </div>
         </div>
 
         {/* Pilgrim Info Section */}
@@ -485,14 +473,6 @@ export default function PilgrimDetailPage() {
             </div>
           )}
         </div>
-
-        {/* Receipt Modal */}
-        {showReceipt && pilgrim && (
-          <ReceiptModal
-            pilgrim={pilgrim}
-            onClose={() => setShowReceipt(false)}
-          />
-        )}
       </div>
     </Layout>
   );
