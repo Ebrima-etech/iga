@@ -112,10 +112,10 @@ export default function PaymentJourneyMap({
                 );
               })}
 
-              {/* Pending/Done - Position based on progress */}
+              {/* Pending/Done - Position at the end (100%) as the goal */}
               <div
                 className="absolute flex flex-col items-center"
-                style={{ left: `${progressPercentage}%`, top: '0', width: '60px', transform: 'translateX(-50%)' }}
+                style={{ left: '100%', top: '0', width: '60px', transform: 'translateX(-50%)' }}
               >
                 <div className="mb-2 z-10">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 ${
