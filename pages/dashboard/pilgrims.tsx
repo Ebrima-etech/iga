@@ -497,6 +497,7 @@ export default function PilgrimsPage() {
                         currentSort={tableState.sortConfig}
                         onSort={tableState.handleSort}
                       />
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Title</th>
                       <SortableHeader
                         label="First Name"
                         sortKey="first_name"
@@ -533,7 +534,7 @@ export default function PilgrimsPage() {
                   <tbody className="divide-y divide-gray-200">
                     {tableState.paginatedData.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                        <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                           No pilgrims found matching your criteria
                         </td>
                       </tr>
@@ -544,12 +545,12 @@ export default function PilgrimsPage() {
                             <span className="font-mono text-xs text-gray-500">{pilgrim.registration_id}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-baseline gap-4">
-                              <span className="text-xs font-semibold text-gray-600">
-                                {pilgrim.gender === 'M' ? 'Alagie' : pilgrim.gender === 'F' ? 'Aja' : ''}
-                              </span>
-                              <span className="font-medium text-gray-900">{pilgrim.first_name}</span>
-                            </div>
+                            <span className="text-xs font-semibold text-gray-600">
+                              {pilgrim.gender === 'M' ? 'Alagie' : pilgrim.gender === 'F' ? 'Aja' : '-'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="font-medium text-gray-900">{pilgrim.first_name}</span>
                           </td>
                           <td className="px-6 py-4">
                             <span className="font-medium text-gray-900">{pilgrim.last_name}</span>
