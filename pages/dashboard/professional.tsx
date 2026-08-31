@@ -107,14 +107,19 @@ export default function ProfessionalDashboard() {
     try {
       // Prepare CSV data
       const headers = ['Pilgrim Name', 'Amount', 'Bank', 'Status', 'Date', 'Reference Number'];
-      const rows = payments.map((p: any) => [
-        p.pilgrim_name || 'N/A',
+      const rows = payments.map((p: any) => {
+        const pilgrimName = p.pilgrim_name ||
+          `${p.pilgrim_first_name || ''} ${p.pilgrim_last_name || ''}`.trim() ||
+          'N/A';
+        return [
+        pilgrimName,
         p.amount || 0,
         p.bank_name || 'N/A',
         p.status || 'N/A',
         new Date(p.payment_date).toLocaleDateString(),
         p.reference_number || 'N/A',
-      ]);
+      ];
+      });
 
       // Create CSV content
       const csvContent = [
@@ -465,10 +470,14 @@ export default function ProfessionalDashboard() {
                 <Card padding="lg" shadow="none">
                   <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Payments This Week</h3>
                   <div className="space-y-2">
-                    {payments.slice(0, 10).map((payment: any, idx: number) => (
+                    {payments.slice(0, 10).map((payment: any, idx: number) => {
+                      const pilgrimName = payment.pilgrim_name ||
+                        `${payment.pilgrim_first_name || ''} ${payment.pilgrim_last_name || ''}`.trim() ||
+                        'N/A';
+                      return (
                       <div key={payment.id} className="flex items-center justify-between py-2 px-2 -mx-2 hover:bg-gray-50 rounded-md transition-colors">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{payment.pilgrim_name || 'N/A'}</p>
+                          <p className="text-sm font-medium text-gray-900 truncate">{pilgrimName}</p>
                           <p className="text-xs text-gray-500">{payment.bank_name}</p>
                         </div>
                         <div className="text-right">
@@ -481,7 +490,8 @@ export default function ProfessionalDashboard() {
                           </p>
                         </div>
                       </div>
-                    ))}
+                    );
+                    })}
                     {payments.length === 0 && (
                       <p className="text-sm text-gray-500 text-center py-4">No payments recorded</p>
                     )}
