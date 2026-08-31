@@ -56,7 +56,11 @@ export default function CallSheetsPage() {
   const loadSheets = () => {
     const saved = localStorage.getItem('call_sheets');
     if (saved) {
-      setSheets(JSON.parse(saved));
+      const parsedSheets = JSON.parse(saved);
+      setSheets(parsedSheets);
+      if (parsedSheets.length > 0 && !selectedSheet) {
+        setSelectedSheet(parsedSheets[0]);
+      }
     }
   };
 
@@ -392,87 +396,25 @@ export default function CallSheetsPage() {
     );
   }
 
-  return (
-    <Layout>
-      <div className="min-h-screen bg-gray-100 p-8">
-        <PageHeader
-          title="Call Sheets"
-          description="Spreadsheet-like data viewer"
-          showBreadcrumb={true}
-        />
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
-          {/* Sheets List */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
-              <div className="bg-gray-100 px-4 py-3 border-b border-gray-300 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900 text-sm">Sheets</h3>
-                <ProfessionalButton
-                  variant="primary"
-                  size="sm"
-                  icon={<BiPlus size={14} />}
-                  onClick={() => setShowCreateModal(true)}
-                >
-                  New
-                </ProfessionalButton>
-              </div>
-
-              <div className="divide-y divide-gray-300">
-                {sheets.length === 0 ? (
-                  <p className="text-xs text-gray-500 text-center py-6">No sheets yet</p>
-                ) : (
-                  sheets.map((sheet) => (
-                    <div
-                      key={sheet.id}
-                      className={`px-4 py-3 cursor-pointer transition-colors text-sm ${
-                        selectedSheet?.id === sheet.id
-                          ? 'bg-blue-100 border-l-4 border-l-blue-500'
-                          : 'bg-white hover:bg-gray-50'
-                      }`}
-                      onClick={() => setSelectedSheet(sheet)}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">{sheet.name}</p>
-                          <p className="text-xs text-gray-600 mt-1">
-                            {DATA_SOURCES.find((d) => d.value === sheet.dataSource)?.label}
-                          </p>
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteSheet(sheet.id);
-                          }}
-                          className="text-gray-400 hover:text-red-600 flex-shrink-0"
-                        >
-                          <BiX size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Sheet Content */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg border border-gray-300 flex items-center justify-center h-96">
-              <div className="text-center">
-                <p className="text-gray-600 mb-4 text-sm">Create a new sheet to get started</p>
-                <ProfessionalButton
-                  variant="primary"
-                  icon={<BiPlus size={16} />}
-                  onClick={() => setShowCreateModal(true)}
-                >
-                  Create New Sheet
-                </ProfessionalButton>
-              </div>
-            </div>
+  // Show create modal if no sheets
+  if (sheets.length === 0) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-8">
+          <div className="text-center max-w-md">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Call Sheets</h1>
+            <p className="text-gray-600 mb-8">Create your first sheet to get started</p>
+            <ProfessionalButton
+              variant="primary"
+              size="lg"
+              icon={<BiPlus size={18} />}
+              onClick={() => setShowCreateModal(true)}
+            >
+              Create New Sheet
+            </ProfessionalButton>
           </div>
         </div>
 
-        {/* Create Sheet Modal */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg border border-gray-400 shadow-lg w-full max-w-md">
@@ -538,6 +480,15 @@ export default function CallSheetsPage() {
             </div>
           </div>
         )}
+      </Layout>
+    );
+  }
+
+  // Fallback - should never reach here as selectedSheet is auto-loaded
+  return (
+    <Layout>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <Loading />
       </div>
     </Layout>
   );
