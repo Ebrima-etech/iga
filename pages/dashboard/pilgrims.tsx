@@ -542,7 +542,7 @@ export default function PilgrimsPage() {
                           </td>
                           <td className="px-6 py-4">
                             <span className="font-medium text-gray-900">
-                              {pilgrim.gender === 'M' ? 'Alagie' : 'Aja'} {pilgrim.first_name}
+                              {pilgrim.gender === 'F' ? 'Aja' : 'Alagie'} {pilgrim.first_name}
                             </span>
                           </td>
                           <td className="px-6 py-4">
