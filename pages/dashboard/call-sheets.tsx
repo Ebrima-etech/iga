@@ -67,8 +67,24 @@ export default function CallSheetsPage() {
   const fetchSheetData = async (sheet: Sheet) => {
     try {
       setLoading(true);
-      const response = await api.get(`/${sheet.dataSource}/`);
-      const data = response.data.results || response.data || [];
+      // Fetch with high limit to get all results
+      const response = await api.get(`/${sheet.dataSource}/?limit=10000`);
+      let data = response.data.results || response.data || [];
+
+      // If API returns paginated response, fetch all pages
+      if (response.data.results && response.data.next) {
+        let nextUrl = response.data.next;
+        while (nextUrl) {
+          try {
+            const nextResponse = await api.get(nextUrl);
+            data = [...data, ...nextResponse.data.results];
+            nextUrl = nextResponse.data.next;
+          } catch (err) {
+            console.warn('Failed to fetch next page:', err);
+            break;
+          }
+        }
+      }
 
       if (Array.isArray(data) && data.length > 0) {
         const columns = Object.keys(data[0]);
