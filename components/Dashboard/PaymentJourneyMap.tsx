@@ -73,7 +73,7 @@ export default function PaymentJourneyMap({
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${
                     selectedPoint === 0
                       ? 'bg-blue-50 border-blue-500 text-blue-600'
-                      : 'bg-white border-green-500 text-gray-500'
+                      : 'bg-white border-gray-300 text-gray-500'
                   }`}>
                     1
                   </div>
@@ -95,7 +95,7 @@ export default function PaymentJourneyMap({
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${
                       selectedPoint === idx + 1
                         ? 'bg-blue-50 border-blue-500 text-blue-600'
-                        : 'bg-white border-green-500 text-gray-500'
+                        : 'bg-white border-gray-300 text-gray-500'
                     }`}>
                       {idx + 2}
                     </div>
