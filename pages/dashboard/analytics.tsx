@@ -72,19 +72,45 @@ export default function AnalyticsPage() {
       const payments = paymentsRes.data.results || paymentsRes.data || [];
       const banks = banksRes.data.results || banksRes.data || [];
 
-      // Process pilgrim trend
-      const pilgrimTrendData = pilgrims.slice(0, 15).map((p: any, i: number) => ({
-        name: `Week ${i + 1}`,
-        registrations: Math.floor(Math.random() * 100 + 30),
-        completed: Math.floor(Math.random() * 80 + 20),
-      }));
+      // Process pilgrim trend by registration date
+      const pilgrimsByDate = pilgrims.reduce((acc: Record<string, any>, p: any) => {
+        const date = p.created_at ? new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Unknown';
+        if (!acc[date]) {
+          acc[date] = { registrations: 0, completed: 0 };
+        }
+        acc[date].registrations += 1;
+        if ((p.amount_remaining || 0) === 0) {
+          acc[date].completed += 1;
+        }
+        return acc;
+      }, {});
 
-      // Process payment trend
-      const paymentTrendData = payments.slice(0, 15).map((p: any, i: number) => ({
-        date: `Day ${i + 1}`,
-        amount: Math.floor(Math.random() * 50000 + 10000),
-        transactions: Math.floor(Math.random() * 50 + 10),
-      }));
+      const pilgrimTrendData = Object.entries(pilgrimsByDate)
+        .slice(-15)
+        .map(([name, data]: [string, any]) => ({
+          name,
+          registrations: data.registrations,
+          completed: data.completed,
+        }));
+
+      // Process payment trend by payment date
+      const paymentsByDate = payments.reduce((acc: Record<string, any>, p: any) => {
+        const date = p.payment_date ? new Date(p.payment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Unknown';
+        if (!acc[date]) {
+          acc[date] = { amount: 0, transactions: 0 };
+        }
+        acc[date].amount += (p.amount || 0);
+        acc[date].transactions += 1;
+        return acc;
+      }, {});
+
+      const paymentTrendData = Object.entries(paymentsByDate)
+        .slice(-15)
+        .map(([date, data]: [string, any]) => ({
+          date,
+          amount: Math.floor(data.amount),
+          transactions: data.transactions,
+        }));
 
       // Bank distribution
       const bankDistData = banks.slice(0, 8).map((b: any) => ({
@@ -112,23 +138,55 @@ export default function AnalyticsPage() {
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => (b.value as number) - (a.value as number));
 
-      // Age distribution (simulated)
-      const ageData = [
-        { range: '18-25', count: Math.floor(pilgrims.length * 0.15) },
-        { range: '26-35', count: Math.floor(pilgrims.length * 0.25) },
-        { range: '36-45', count: Math.floor(pilgrims.length * 0.22) },
-        { range: '46-55', count: Math.floor(pilgrims.length * 0.18) },
-        { range: '56-65', count: Math.floor(pilgrims.length * 0.12) },
-        { range: '65+', count: Math.floor(pilgrims.length * 0.08) },
-      ];
+      // Age distribution (real data from database)
+      const ageRanges: Record<string, number> = {
+        '18-25': 0,
+        '26-35': 0,
+        '36-45': 0,
+        '46-55': 0,
+        '56-65': 0,
+        '65+': 0,
+      };
 
-      // Payment method breakdown
-      const methodData = [
-        { name: 'Card Payment', value: Math.floor(payments.length * 0.45), color: '#3b82f6' },
-        { name: 'Bank Transfer', value: Math.floor(payments.length * 0.35), color: '#8b5cf6' },
-        { name: 'Mobile Money', value: Math.floor(payments.length * 0.15), color: '#ec4899' },
-        { name: 'Cash', value: Math.floor(payments.length * 0.05), color: '#f59e0b' },
-      ];
+      pilgrims.forEach((p: any) => {
+        if (p.date_of_birth) {
+          const today = new Date();
+          const birthDate = new Date(p.date_of_birth);
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+
+          if (age >= 18 && age <= 25) ageRanges['18-25']++;
+          else if (age >= 26 && age <= 35) ageRanges['26-35']++;
+          else if (age >= 36 && age <= 45) ageRanges['36-45']++;
+          else if (age >= 46 && age <= 55) ageRanges['46-55']++;
+          else if (age >= 56 && age <= 65) ageRanges['56-65']++;
+          else if (age > 65) ageRanges['65+']++;
+        }
+      });
+
+      const ageData = Object.entries(ageRanges).map(([range, count]) => ({
+        range,
+        count,
+      }));
+
+      // Payment breakdown by bank (real data from database)
+      const paymentsByBank = payments.reduce((acc: Record<string, number>, p: any) => {
+        const bankName = p.bank_name || 'Unknown';
+        acc[bankName] = (acc[bankName] || 0) + 1;
+        return acc;
+      }, {});
+
+      const BANK_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#22c55e', '#06b6d4', '#f97316', '#6366f1'];
+      const methodData = Object.entries(paymentsByBank)
+        .map(([name, value], index) => ({
+          name,
+          value,
+          color: BANK_COLORS[index % BANK_COLORS.length],
+        }))
+        .sort((a, b) => (b.value as number) - (a.value as number));
 
       setData({
         pilgrimTrend: pilgrimTrendData,
@@ -140,10 +198,31 @@ export default function AnalyticsPage() {
         paymentMethodBreakdown: methodData,
       });
 
-      // Calculate metrics
+      // Calculate metrics from real data
       const totalPayments = payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
       const avgPayment = payments.length > 0 ? totalPayments / payments.length : 0;
       const completionRate = pilgrims.length > 0 ? (completedCount / pilgrims.length) * 100 : 0;
+
+      // Conversion rate: percentage of pilgrims with at least one payment
+      const pilgrimsWithPayments = new Set(payments.map((p: any) => p.pilgrim || p.pilgrim_id)).size;
+      const conversionRate = pilgrims.length > 0 ? (pilgrimsWithPayments / pilgrims.length) * 100 : 0;
+
+      // Average registration to payment time (in days)
+      let totalDays = 0;
+      let countWithPayment = 0;
+      pilgrims.forEach((pilgrim: any) => {
+        const pilgrimPayments = payments.filter((p: any) => (p.pilgrim || p.pilgrim_id) === pilgrim.id);
+        if (pilgrimPayments.length > 0 && pilgrim.created_at) {
+          const firstPaymentDate = new Date(pilgrimPayments[0].payment_date || pilgrimPayments[0].created_at);
+          const regDate = new Date(pilgrim.created_at);
+          const days = Math.floor((firstPaymentDate.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24));
+          if (days >= 0) {
+            totalDays += days;
+            countWithPayment++;
+          }
+        }
+      });
+      const avgRegistrationTime = countWithPayment > 0 ? Math.round(totalDays / countWithPayment) : 0;
 
       setMetrics({
         totalPilgrims: pilgrims.length,
@@ -151,8 +230,8 @@ export default function AnalyticsPage() {
         avgPaymentAmount: Math.floor(avgPayment),
         paymentCompletionRate: Math.round(completionRate),
         activeBanks: banks.filter((b: any) => b.is_active).length,
-        conversionRate: Math.round(Math.random() * 40 + 60),
-        avgRegistrationTime: Math.round(Math.random() * 30 + 15),
+        conversionRate: Math.round(conversionRate),
+        avgRegistrationTime: avgRegistrationTime,
         totalRegions: new Set(pilgrims.map((p: any) => p.region)).size,
       });
     } catch (error) {
