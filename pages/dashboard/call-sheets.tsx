@@ -191,6 +191,140 @@ export default function CallSheetsPage() {
 
   const filteredData = getFilteredAndSortedData();
 
+  if (selectedSheet && sheetData) {
+    // Full-screen sheet view
+    return (
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        {/* Top Bar */}
+        <div className="bg-white border-b border-gray-300 px-6 py-3 flex items-center justify-between shadow-sm">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">{selectedSheet.name}</h1>
+            <p className="text-xs text-gray-600">
+              {DATA_SOURCES.find((d) => d.value === selectedSheet.dataSource)?.label}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <ProfessionalButton
+              variant="secondary"
+              size="sm"
+              icon={<BiDownload size={14} />}
+              onClick={handleExport}
+            >
+              Export
+            </ProfessionalButton>
+            <button
+              onClick={() => setSelectedSheet(null)}
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition"
+            >
+              <BiX size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Sheet Content */}
+        <div className="flex-1 overflow-hidden bg-gray-100 p-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loading />
+            </div>
+          ) : sheetData.rows.length > 0 ? (
+            <div className="bg-white rounded-lg border border-gray-300 overflow-hidden flex flex-col h-full shadow-lg">
+              {/* Filter Row */}
+              <div className="bg-gray-50 border-b border-gray-300 overflow-x-auto">
+                <div className="inline-flex min-w-full">
+                  <div className="w-12 bg-gray-100 border-r border-gray-300 flex items-center justify-center text-xs font-semibold text-gray-600" />
+                  {sheetData.columns.map((column) => (
+                    <div
+                      key={`filter-${column}`}
+                      className="flex-1 min-w-48 px-3 py-2 border-r border-gray-300 last:border-r-0"
+                    >
+                      <input
+                        type="text"
+                        placeholder={`Filter...`}
+                        value={filters[column] || ''}
+                        onChange={(e) => handleFilterChange(column, e.target.value)}
+                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Data Grid */}
+              <div className="flex-1 overflow-x-auto overflow-y-auto">
+                <div className="inline-flex min-w-full bg-white">
+                  {/* Row Numbers */}
+                  <div className="w-12 bg-gray-50 border-r border-gray-300 sticky left-0 z-10">
+                    <div className="h-10 bg-gray-100 border-b border-gray-300 flex items-center justify-center text-xs font-semibold text-gray-600" />
+                    {filteredData.map((_, idx) => (
+                      <div
+                        key={`row-${idx}`}
+                        className="h-9 border-b border-gray-300 flex items-center justify-center text-xs text-gray-600 font-medium"
+                      >
+                        {idx + 1}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Columns */}
+                  <div className="flex">
+                    {sheetData.columns.map((column) => (
+                      <div key={`col-${column}`} className="flex flex-col">
+                        {/* Header Cell */}
+                        <div
+                          className="w-48 h-10 bg-gray-100 border-b border-gray-300 border-r border-gray-300 px-3 py-1 cursor-pointer hover:bg-gray-200 transition flex items-center justify-between group"
+                          onClick={() => handleSort(column)}
+                        >
+                          <span className="text-xs font-bold text-gray-700 truncate">
+                            {column}
+                          </span>
+                          {sortConfig?.column === column && (
+                            <span className="ml-2 flex-shrink-0">
+                              {sortConfig.direction === 'asc' ? (
+                                <BiArrowUp size={12} className="text-blue-600" />
+                              ) : (
+                                <BiArrowDown size={12} className="text-blue-600" />
+                              )}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Data Cells */}
+                        {filteredData.map((row, idx) => (
+                          <div
+                            key={`cell-${idx}-${column}`}
+                            className={`w-48 h-9 px-3 py-1 border-b border-gray-300 border-r border-gray-300 text-xs text-gray-800 flex items-center overflow-hidden ${
+                              idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                            }`}
+                          >
+                            <span className="truncate">
+                              {row[column] !== null && row[column] !== undefined
+                                ? String(row[column])
+                                : '-'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="bg-gray-50 px-6 py-3 border-t border-gray-300 text-xs text-gray-600">
+                Showing {filteredData.length} of {sheetData.rows.length} rows
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <p className="text-sm">No data available</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-gray-100 p-8">
@@ -256,138 +390,18 @@ export default function CallSheetsPage() {
 
           {/* Sheet Content */}
           <div className="lg:col-span-3">
-            {selectedSheet ? (
-              <div className="bg-white rounded-lg border border-gray-300 overflow-hidden flex flex-col h-full">
-                {/* Header */}
-                <div className="bg-gray-100 px-6 py-4 border-b border-gray-300 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{selectedSheet.name}</h3>
-                    <p className="text-xs text-gray-600 mt-1">
-                      {DATA_SOURCES.find((d) => d.value === selectedSheet.dataSource)?.label}
-                    </p>
-                  </div>
-                  <ProfessionalButton
-                    variant="secondary"
-                    size="sm"
-                    icon={<BiDownload size={14} />}
-                    onClick={handleExport}
-                  >
-                    Export
-                  </ProfessionalButton>
-                </div>
-
-                {loading ? (
-                  <div className="flex items-center justify-center h-96">
-                    <Loading />
-                  </div>
-                ) : sheetData && sheetData.rows.length > 0 ? (
-                  <div className="flex-1 overflow-hidden flex flex-col">
-                    {/* Filter Row */}
-                    <div className="bg-gray-50 border-b border-gray-300 overflow-x-auto">
-                      <div className="inline-flex min-w-full">
-                        <div className="w-12 bg-gray-100 border-r border-gray-300 flex items-center justify-center text-xs font-semibold text-gray-600" />
-                        {sheetData.columns.map((column, idx) => (
-                          <div
-                            key={`filter-${column}`}
-                            className="flex-1 min-w-48 px-3 py-2 border-r border-gray-300 last:border-r-0"
-                          >
-                            <input
-                              type="text"
-                              placeholder={`Filter...`}
-                              value={filters[column] || ''}
-                              onChange={(e) => handleFilterChange(column, e.target.value)}
-                              className="w-full px-2 py-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Data Grid */}
-                    <div className="flex-1 overflow-x-auto overflow-y-auto">
-                      <div className="inline-flex min-w-full bg-white">
-                        {/* Row Numbers */}
-                        <div className="w-12 bg-gray-50 border-r border-gray-300 sticky left-0 z-10">
-                          <div className="h-10 bg-gray-100 border-b border-gray-300 flex items-center justify-center text-xs font-semibold text-gray-600" />
-                          {filteredData.map((_, idx) => (
-                            <div
-                              key={`row-${idx}`}
-                              className="h-9 border-b border-gray-300 flex items-center justify-center text-xs text-gray-600 font-medium"
-                            >
-                              {idx + 1}
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Columns */}
-                        <div className="flex">
-                          {sheetData.columns.map((column) => (
-                            <div key={`col-${column}`} className="flex flex-col">
-                              {/* Header Cell */}
-                              <div
-                                className="w-48 h-10 bg-gray-100 border-b border-gray-300 border-r border-gray-300 px-3 py-1 cursor-pointer hover:bg-gray-200 transition flex items-center justify-between group"
-                                onClick={() => handleSort(column)}
-                              >
-                                <span className="text-xs font-bold text-gray-700 truncate">
-                                  {column}
-                                </span>
-                                {sortConfig?.column === column && (
-                                  <span className="ml-2 flex-shrink-0">
-                                    {sortConfig.direction === 'asc' ? (
-                                      <BiArrowUp size={12} className="text-blue-600" />
-                                    ) : (
-                                      <BiArrowDown size={12} className="text-blue-600" />
-                                    )}
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Data Cells */}
-                              {filteredData.map((row, idx) => (
-                                <div
-                                  key={`cell-${idx}-${column}`}
-                                  className={`w-48 h-9 px-3 py-1 border-b border-gray-300 border-r border-gray-300 text-xs text-gray-800 flex items-center overflow-hidden ${
-                                    idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                                  }`}
-                                >
-                                  <span className="truncate">
-                                    {row[column] !== null && row[column] !== undefined
-                                      ? String(row[column])
-                                      : '-'}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="bg-gray-50 px-6 py-3 border-t border-gray-300 text-xs text-gray-600">
-                      Showing {filteredData.length} of {sheetData.rows.length} rows
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center text-gray-500">
-                    <p className="text-sm">No data available</p>
-                  </div>
-                )}
+            <div className="bg-white rounded-lg border border-gray-300 flex items-center justify-center h-96">
+              <div className="text-center">
+                <p className="text-gray-600 mb-4 text-sm">Create a new sheet to get started</p>
+                <ProfessionalButton
+                  variant="primary"
+                  icon={<BiPlus size={16} />}
+                  onClick={() => setShowCreateModal(true)}
+                >
+                  Create New Sheet
+                </ProfessionalButton>
               </div>
-            ) : (
-              <div className="bg-white rounded-lg border border-gray-300 flex items-center justify-center h-96">
-                <div className="text-center">
-                  <p className="text-gray-600 mb-4 text-sm">Create a new sheet to get started</p>
-                  <ProfessionalButton
-                    variant="primary"
-                    icon={<BiPlus size={16} />}
-                    onClick={() => setShowCreateModal(true)}
-                  >
-                    Create New Sheet
-                  </ProfessionalButton>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
 
