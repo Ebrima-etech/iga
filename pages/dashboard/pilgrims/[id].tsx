@@ -221,49 +221,84 @@ export default function PilgrimDetailPage() {
           </Card>
         </div>
 
-        {/* Transaction Timeline */}
-        {payments.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Payment Timeline</h2>
-            <div className="bg-white border border-gray-200 rounded-lg p-8">
-              {/* Progress visualization */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-medium text-gray-700">Payment Progress</p>
-                  <p className="text-sm font-medium text-gray-700">
-                    {Math.round((totalPaid / (pilgrim.total_amount_due || 1)) * 100)}%
-                  </p>
+        {/* Payment Journey Map */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">Payment Journey Map</h2>
+          <div className="bg-white border border-gray-200 rounded-lg p-8">
+            {/* Progress visualization */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-gray-700">Payment Progress</p>
+                <p className="text-sm font-medium text-gray-700">
+                  {Math.round((totalPaid / (pilgrim.total_amount_due || 1)) * 100)}%
+                </p>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min((totalPaid / (pilgrim.total_amount_due || 1)) * 100, 100)}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Timeline starting from Registration */}
+            <div className="space-y-6">
+              {/* Registration Point - Starting point */}
+              <div className="flex gap-6">
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                    📋
+                  </div>
+                  <div className="w-1 h-12 bg-blue-200 mt-2"></div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min((totalPaid / (pilgrim.total_amount_due || 1)) * 100, 100)}%` }}
-                  ></div>
+                <div className="flex-1 pb-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="font-semibold text-gray-900">Pilgrim Registration</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {new Date(pilgrim.created_at).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-600">Journey Begins</p>
+                        <p className="text-sm font-mono text-blue-600 mt-1">ID: {pilgrim.registration_id}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Timeline */}
-              <div className="space-y-6">
-                {payments
-                  .filter(p => p.status === 'confirmed')
-                  .map((payment, index) => (
+              {/* Payment Records */}
+              {payments.length > 0 && payments
+                .filter(p => p.status === 'verified' || p.status === 'confirmed')
+                .map((payment, index) => (
                     <div key={payment.id} className="flex gap-6">
                       {/* Timeline dot and line */}
                       <div className="flex flex-col items-center">
-                        <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                          {index + 1}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                          index === 0 ? 'bg-emerald-600' : 'bg-emerald-500'
+                        }`}>
+                          💰
                         </div>
-                        {index < payments.filter(p => p.status === 'confirmed').length - 1 && (
+                        {index < payments.filter(p => p.status === 'verified' || p.status === 'confirmed').length - 1 && (
                           <div className="w-1 h-12 bg-emerald-200 mt-2"></div>
                         )}
                       </div>
 
                       {/* Transaction Details */}
                       <div className="flex-1 pb-4">
-                        <div className="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200 rounded-lg p-4">
+                        <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg p-4">
                           <div className="flex items-start justify-between mb-3">
                             <div>
-                              <p className="font-semibold text-gray-900">Deposit #{index + 1}</p>
+                              <p className="font-semibold text-gray-900">
+                                {index === 0 ? '💳 First Deposit' : `📝 Deposit #${index + 1}`}
+                              </p>
                               <p className="text-sm text-gray-600 mt-1">
                                 {new Date(payment.payment_date).toLocaleDateString('en-US', {
                                   weekday: 'long',
