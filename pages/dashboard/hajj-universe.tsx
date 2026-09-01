@@ -476,7 +476,7 @@ export default function HajjUniverse() {
                         cx="50%"
                         cy="50%"
                         outerRadius={100}
-                        label={({ category, percentage }) => `${category} ${percentage}%`}
+                        label={(entry: any) => `${entry.payload.percentage}%`}
                       >
                         {demographicCategories.map((item, idx) => (
                           <Cell key={idx} fill={item.color} />
