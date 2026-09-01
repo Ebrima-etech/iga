@@ -62,6 +62,13 @@ interface NameFrequencyData {
   count: number;
 }
 
+interface DemographicCategory {
+  category: string;
+  count: number;
+  percentage: number;
+  color: string;
+}
+
 const calculateAge = (dateOfBirth: string): number => {
   const today = new Date();
   const birthDate = new Date(dateOfBirth);
@@ -177,6 +184,50 @@ const calculateNameFrequency = (pilgrims: any[]): NameFrequencyData[] => {
     .slice(0, 5);
 };
 
+const calculateDemographicCategories = (pilgrims: any[]): DemographicCategory[] => {
+  const ages = pilgrims
+    .map((p) => calculateAge(p.date_of_birth))
+    .filter((age) => age >= 0);
+
+  const totalPilgrims = ages.length;
+
+  const youth = ages.filter((age) => age >= 18 && age <= 35).length;
+  const middleAged = ages.filter((age) => age > 35 && age < 60).length;
+  const seniors = ages.filter((age) => age >= 60).length;
+  const other = totalPilgrims - youth - middleAged - seniors;
+
+  return [
+    {
+      category: 'Youth (18-35)',
+      count: youth,
+      percentage: totalPilgrims > 0 ? Math.round((youth / totalPilgrims) * 100) : 0,
+      color: '#3b82f6',
+    },
+    {
+      category: 'Middle-Aged (36-59)',
+      count: middleAged,
+      percentage: totalPilgrims > 0 ? Math.round((middleAged / totalPilgrims) * 100) : 0,
+      color: '#f59e0b',
+    },
+    {
+      category: 'Senior Citizens (60+)',
+      count: seniors,
+      percentage: totalPilgrims > 0 ? Math.round((seniors / totalPilgrims) * 100) : 0,
+      color: '#ef4444',
+    },
+    ...(other > 0
+      ? [
+          {
+            category: 'Other',
+            count: other,
+            percentage: totalPilgrims > 0 ? Math.round((other / totalPilgrims) * 100) : 0,
+            color: '#9ca3af',
+          },
+        ]
+      : []),
+  ];
+};
+
 export default function HajjUniverse() {
   const [yearData, setYearData] = useState<HajjYearData[]>([]);
   const [analytics, setAnalytics] = useState<AnalyticsData>({
@@ -196,6 +247,7 @@ export default function HajjUniverse() {
   const [ageGroupData, setAgeGroupData] = useState<AgeGroupData[]>([]);
   const [regionAgeData, setRegionAgeData] = useState<RegionAgeData[]>([]);
   const [nameFrequencyData, setNameFrequencyData] = useState<NameFrequencyData[]>([]);
+  const [demographicCategories, setDemographicCategories] = useState<DemographicCategory[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -251,6 +303,9 @@ export default function HajjUniverse() {
 
         const nameFreq = calculateNameFrequency(pilgrims);
         setNameFrequencyData(nameFreq);
+
+        const demographics = calculateDemographicCategories(pilgrims);
+        setDemographicCategories(demographics);
 
         // Calculate bank metrics
         const bankMap = new Map<number, BankMetrics>();
@@ -401,6 +456,90 @@ export default function HajjUniverse() {
                 <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">Average Age</p>
                 <p className="text-3xl font-bold text-emerald-900 mt-2">{ageStats.averageAge}</p>
                 <p className="text-xs text-emerald-600 mt-1">mean value</p>
+              </div>
+            </div>
+          )}
+
+          {/* Demographic Categories */}
+          {demographicCategories.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Demographic Categories</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Pie Chart */}
+                <div className="flex justify-center">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={demographicCategories}
+                        dataKey="count"
+                        nameKey="category"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        label={({ category, percentage }) => `${category} ${percentage}%`}
+                      >
+                        {demographicCategories.map((item, idx) => (
+                          <Cell key={idx} fill={item.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => `${value} pilgrims`} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Category Cards */}
+                <div className="space-y-4">
+                  {demographicCategories.map((category, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 rounded-lg border-l-4 bg-gray-50 hover:bg-gray-100 transition"
+                      style={{ borderColor: category.color }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-semibold text-gray-900">{category.category}</p>
+                        <span
+                          className="px-3 py-1 rounded-full text-white text-sm font-bold"
+                          style={{ backgroundColor: category.color }}
+                        >
+                          {category.percentage}%
+                        </span>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-3xl font-bold text-gray-900">{category.count}</p>
+                        <p className="text-sm text-gray-600">pilgrims</p>
+                      </div>
+                      {/* Progress bar */}
+                      <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="h-2 rounded-full transition-all"
+                          style={{
+                            backgroundColor: category.color,
+                            width: `${category.percentage}%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <p className="text-sm font-semibold text-gray-900 mb-4">Summary</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-blue-700 font-medium">Youth Ratio</p>
+                    <p className="text-2xl font-bold text-blue-900 mt-1">
+                      {demographicCategories.find((c) => c.category.includes('Youth'))?.percentage || 0}%
+                    </p>
+                  </div>
+                  <div className="p-4 bg-red-50 rounded-lg">
+                    <p className="text-sm text-red-700 font-medium">Senior Citizens Ratio</p>
+                    <p className="text-2xl font-bold text-red-900 mt-1">
+                      {demographicCategories.find((c) => c.category.includes('Senior'))?.percentage || 0}%
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
