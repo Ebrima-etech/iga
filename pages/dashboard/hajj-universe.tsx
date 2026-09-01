@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import api from '@/lib/api';
-import { BiMedal, BiTrendingUp, BiTrendingDown, BiDownload, BiFilter, BiCalendar, BiMap, BiBarChartAlt2, BiShow, BiHide } from 'react-icons/bi';
+import { BiMedal, BiTrendingUp, BiTrendingDown, BiDownload, BiFilter, BiCalendar, BiMap, BiBarChartAlt2, BiShow, BiHide, BiUsers } from 'react-icons/bi';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
@@ -36,6 +36,148 @@ interface BankMetrics {
   trend: number;
 }
 
+interface AgeStatistics {
+  minAge: number;
+  maxAge: number;
+  medianAge: number;
+  modeAge: number;
+  averageAge: number;
+}
+
+interface AgeGroupData {
+  name: string;
+  range: string;
+  count: number;
+}
+
+interface RegionAgeData {
+  region: string;
+  medianAge: number;
+  averageAge: number;
+  count: number;
+}
+
+interface NameFrequencyData {
+  name: string;
+  count: number;
+}
+
+const calculateAge = (dateOfBirth: string): number => {
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return Math.max(0, age);
+};
+
+const calculateAgeStatistics = (pilgrims: any[]): AgeStatistics => {
+  const ages = pilgrims
+    .map((p) => calculateAge(p.date_of_birth))
+    .filter((age) => age >= 0)
+    .sort((a, b) => a - b);
+
+  if (ages.length === 0) {
+    return { minAge: 0, maxAge: 0, medianAge: 0, modeAge: 0, averageAge: 0 };
+  }
+
+  const minAge = Math.min(...ages);
+  const maxAge = Math.max(...ages);
+  const averageAge = ages.reduce((a, b) => a + b, 0) / ages.length;
+
+  const medianAge = ages.length % 2 === 0
+    ? (ages[ages.length / 2 - 1] + ages[ages.length / 2]) / 2
+    : ages[Math.floor(ages.length / 2)];
+
+  const frequencyMap = new Map<number, number>();
+  ages.forEach((age) => {
+    frequencyMap.set(age, (frequencyMap.get(age) || 0) + 1);
+  });
+
+  const modeAge = Array.from(frequencyMap.entries())
+    .sort((a, b) => b[1] - a[1])[0]?.[0] || 0;
+
+  return {
+    minAge: Math.floor(minAge),
+    maxAge: Math.floor(maxAge),
+    medianAge: Math.round(medianAge),
+    modeAge: Math.floor(modeAge),
+    averageAge: Math.round(averageAge),
+  };
+};
+
+const calculateAgeGroups = (pilgrims: any[]): AgeGroupData[] => {
+  const ageGroups = [
+    { name: '18-25', range: '18-25', min: 18, max: 25 },
+    { name: '26-35', range: '26-35', min: 26, max: 35 },
+    { name: '36-45', range: '36-45', min: 36, max: 45 },
+    { name: '46-55', range: '46-55', min: 46, max: 55 },
+    { name: '56-65', range: '56-65', min: 56, max: 65 },
+    { name: '66+', range: '66+', min: 66, max: 150 },
+  ];
+
+  return ageGroups.map((group) => ({
+    name: group.range,
+    range: group.range,
+    count: pilgrims.filter((p) => {
+      const age = calculateAge(p.date_of_birth);
+      return age >= group.min && age <= group.max;
+    }).length,
+  }));
+};
+
+const calculateRegionAgeData = (pilgrims: any[]): RegionAgeData[] => {
+  const regionMap = new Map<string, any[]>();
+
+  pilgrims.forEach((p) => {
+    const region = p.state || p.city || 'Unknown';
+    if (!regionMap.has(region)) {
+      regionMap.set(region, []);
+    }
+    regionMap.get(region)!.push(p);
+  });
+
+  return Array.from(regionMap.entries())
+    .map(([region, regionPilgrims]) => {
+      const ages = regionPilgrims
+        .map((p) => calculateAge(p.date_of_birth))
+        .filter((age) => age >= 0)
+        .sort((a, b) => a - b);
+
+      const medianAge = ages.length % 2 === 0
+        ? (ages[ages.length / 2 - 1] + ages[ages.length / 2]) / 2
+        : ages[Math.floor(ages.length / 2)];
+
+      const averageAge = ages.reduce((a, b) => a + b, 0) / ages.length;
+
+      return {
+        region,
+        medianAge: Math.round(medianAge),
+        averageAge: Math.round(averageAge),
+        count: regionPilgrims.length,
+      };
+    })
+    .sort((a, b) => b.medianAge - a.medianAge);
+};
+
+const calculateNameFrequency = (pilgrims: any[]): NameFrequencyData[] => {
+  const nameMap = new Map<string, number>();
+
+  pilgrims.forEach((p) => {
+    const firstName = p.first_name || '';
+    if (firstName) {
+      nameMap.set(firstName, (nameMap.get(firstName) || 0) + 1);
+    }
+  });
+
+  return Array.from(nameMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+};
+
 export default function HajjUniverse() {
   const [yearData, setYearData] = useState<HajjYearData[]>([]);
   const [analytics, setAnalytics] = useState<AnalyticsData>({
@@ -51,6 +193,10 @@ export default function HajjUniverse() {
   const [years, setYears] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
+  const [ageStats, setAgeStats] = useState<AgeStatistics | null>(null);
+  const [ageGroupData, setAgeGroupData] = useState<AgeGroupData[]>([]);
+  const [regionAgeData, setRegionAgeData] = useState<RegionAgeData[]>([]);
+  const [nameFrequencyData, setNameFrequencyData] = useState<NameFrequencyData[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -93,6 +239,19 @@ export default function HajjUniverse() {
           verifiedPayments: payments.filter((p: any) => p.status === 'verified').length,
           pendingPayments: payments.filter((p: any) => p.status === 'pending').length,
         });
+
+        // Calculate demographic statistics
+        const stats = calculateAgeStatistics(pilgrims);
+        setAgeStats(stats);
+
+        const ageGroups = calculateAgeGroups(pilgrims);
+        setAgeGroupData(ageGroups);
+
+        const regionData = calculateRegionAgeData(pilgrims);
+        setRegionAgeData(regionData);
+
+        const nameFreq = calculateNameFrequency(pilgrims);
+        setNameFrequencyData(nameFreq);
 
         // Calculate bank metrics
         const bankMap = new Map<number, BankMetrics>();
@@ -209,6 +368,155 @@ export default function HajjUniverse() {
           <h1 className="text-3xl font-semibold text-gray-900">Hajj Universe</h1>
           <p className="text-sm text-gray-600 mt-1">Comprehensive analytics and year-over-year performance metrics across all Hajj seasons</p>
         </div>
+
+        {/* Demographic & Age Analytics Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <BiUsers size={24} className="text-blue-600" /> Demographic & Age Analytics
+          </h2>
+
+          {/* Age Statistics Cards */}
+          {ageStats && (
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
+                <p className="text-xs font-medium text-blue-700 uppercase tracking-wide">Min Age</p>
+                <p className="text-3xl font-bold text-blue-900 mt-2">{ageStats.minAge}</p>
+                <p className="text-xs text-blue-600 mt-1">youngest pilgrim</p>
+              </div>
+              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200 rounded-lg p-4">
+                <p className="text-xs font-medium text-indigo-700 uppercase tracking-wide">Max Age</p>
+                <p className="text-3xl font-bold text-indigo-900 mt-2">{ageStats.maxAge}</p>
+                <p className="text-xs text-indigo-600 mt-1">oldest pilgrim</p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4">
+                <p className="text-xs font-medium text-purple-700 uppercase tracking-wide">Median Age</p>
+                <p className="text-3xl font-bold text-purple-900 mt-2">{ageStats.medianAge}</p>
+                <p className="text-xs text-purple-600 mt-1">middle value</p>
+              </div>
+              <div className="bg-gradient-to-br from-pink-50 to-pink-100 border border-pink-200 rounded-lg p-4">
+                <p className="text-xs font-medium text-pink-700 uppercase tracking-wide">Mode Age</p>
+                <p className="text-3xl font-bold text-pink-900 mt-2">{ageStats.modeAge}</p>
+                <p className="text-xs text-pink-600 mt-1">most common</p>
+              </div>
+              <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg p-4">
+                <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">Average Age</p>
+                <p className="text-3xl font-bold text-emerald-900 mt-2">{ageStats.averageAge}</p>
+                <p className="text-xs text-emerald-600 mt-1">mean value</p>
+              </div>
+            </div>
+          )}
+
+          {/* Age Groups Chart */}
+          {ageGroupData.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Age Distribution by Group</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={ageGroupData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.08)" />
+                  <XAxis dataKey="name" stroke="#666" />
+                  <YAxis stroke="#666" />
+                  <Tooltip contentStyle={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', color: '#000' }} />
+                  <Bar dataKey="count" fill="#3b82f6" name="Number of Pilgrims" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-6 grid grid-cols-2 md:grid-cols-6 gap-4">
+                {ageGroupData.map((group, idx) => (
+                  <div key={idx} className="p-3 bg-gray-50 rounded-lg text-center">
+                    <p className="text-sm font-semibold text-gray-900">{group.range}</p>
+                    <p className="text-2xl font-bold text-blue-600 mt-1">{group.count}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Region Age Analysis */}
+          {regionAgeData.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Age Analysis by Region (Oldest to Youngest)</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={regionAgeData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 200 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.08)" />
+                  <XAxis type="number" stroke="#666" />
+                  <YAxis dataKey="region" type="category" stroke="#666" width={190} />
+                  <Tooltip contentStyle={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', color: '#000' }} />
+                  <Legend />
+                  <Bar dataKey="medianAge" fill="#ec4899" name="Median Age" radius={[0, 8, 8, 0]} />
+                  <Bar dataKey="averageAge" fill="#f59e0b" name="Average Age" radius={[0, 8, 8, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-6 overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 px-4 font-semibold text-gray-900">Region</th>
+                      <th className="text-center py-2 px-4 font-semibold text-gray-900">Median Age</th>
+                      <th className="text-center py-2 px-4 font-semibold text-gray-900">Average Age</th>
+                      <th className="text-center py-2 px-4 font-semibold text-gray-900">Pilgrims</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {regionAgeData.map((region, idx) => (
+                      <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="py-3 px-4 font-medium text-gray-900">{region.region}</td>
+                        <td className="py-3 px-4 text-center text-pink-600 font-semibold">{region.medianAge}</td>
+                        <td className="py-3 px-4 text-center text-amber-600 font-semibold">{region.averageAge}</td>
+                        <td className="py-3 px-4 text-center text-gray-600">{region.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Top 5 Names */}
+          {nameFrequencyData.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Top 5 Most Common First Names</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={nameFrequencyData}
+                        dataKey="count"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        label
+                      >
+                        {nameFrequencyData.map((_, idx) => (
+                          <Cell key={idx} fill={['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6'][idx]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="space-y-3">
+                  {nameFrequencyData.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6'][idx] }}></div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900">{item.name}</p>
+                        <p className="text-xs text-gray-600">{item.count} pilgrims</p>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">{item.count}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <hr className="my-8" />
 
         {/* Deep Analytics Section */}
         <div className="mb-8">

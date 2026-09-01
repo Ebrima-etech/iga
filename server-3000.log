@@ -1,0 +1,28 @@
+
+> iga-hajj-dashboard@1.0.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 13.6s
+ ○ Compiling / ...
+ ✓ Compiled /dashboard/banks in 27.3s (667 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+ GET / 200 in 6359ms
+ GET / 200 in 31963ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /login in 12s (1332 modules)
+ ○ Compiling /dashboard/receipts ...
+ ✓ Compiled /dashboard/receipts in 5.3s (1344 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 867ms (1346 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1051ms
+ ✓ Compiled in 677ms (1052 modules)
+ ✓ Compiled in 844ms (1342 modules)
