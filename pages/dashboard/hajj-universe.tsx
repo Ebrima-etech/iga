@@ -109,23 +109,22 @@ const calculateAgeStatistics = (pilgrims: any[]): AgeStatistics => {
 };
 
 const calculateAgeGroups = (pilgrims: any[]): AgeGroupData[] => {
-  const ageGroups = [
-    { name: '18-25', range: '18-25', min: 18, max: 25 },
-    { name: '26-35', range: '26-35', min: 26, max: 35 },
-    { name: '36-45', range: '36-45', min: 36, max: 45 },
-    { name: '46-55', range: '46-55', min: 46, max: 55 },
-    { name: '56-65', range: '56-65', min: 56, max: 65 },
-    { name: '66+', range: '66+', min: 66, max: 150 },
-  ];
+  const ageMap = new Map<number, number>();
 
-  return ageGroups.map((group) => ({
-    name: group.range,
-    range: group.range,
-    count: pilgrims.filter((p) => {
-      const age = calculateAge(p.date_of_birth);
-      return age >= group.min && age <= group.max;
-    }).length,
-  }));
+  pilgrims.forEach((p) => {
+    const age = calculateAge(p.date_of_birth);
+    if (age >= 0) {
+      ageMap.set(age, (ageMap.get(age) || 0) + 1);
+    }
+  });
+
+  return Array.from(ageMap.entries())
+    .map(([age, count]) => ({
+      name: age.toString(),
+      range: age.toString(),
+      count,
+    }))
+    .sort((a, b) => parseInt(a.name) - parseInt(b.name));
 };
 
 const calculateRegionAgeData = (pilgrims: any[]): RegionAgeData[] => {
@@ -406,26 +405,57 @@ export default function HajjUniverse() {
             </div>
           )}
 
-          {/* Age Groups Chart */}
+          {/* Age Distribution Chart */}
           {ageGroupData.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Age Distribution by Group</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={ageGroupData}>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Age Distribution (Individual Ages)</h3>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={ageGroupData} margin={{ bottom: 40 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.08)" />
-                  <XAxis dataKey="name" stroke="#666" />
+                  <XAxis
+                    dataKey="name"
+                    stroke="#666"
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    interval={Math.max(0, Math.floor(ageGroupData.length / 15))}
+                  />
                   <YAxis stroke="#666" />
                   <Tooltip contentStyle={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', color: '#000' }} />
                   <Bar dataKey="count" fill="#3b82f6" name="Number of Pilgrims" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-              <div className="mt-6 grid grid-cols-2 md:grid-cols-6 gap-4">
-                {ageGroupData.map((group, idx) => (
-                  <div key={idx} className="p-3 bg-gray-50 rounded-lg text-center">
-                    <p className="text-sm font-semibold text-gray-900">{group.range}</p>
-                    <p className="text-2xl font-bold text-blue-600 mt-1">{group.count}</p>
-                  </div>
-                ))}
+              <div className="mt-6">
+                <p className="text-sm font-semibold text-gray-900 mb-4">Age Distribution Summary</p>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-2 px-3 font-semibold text-gray-900">Age</th>
+                        <th className="text-center py-2 px-3 font-semibold text-gray-900">Count</th>
+                        <th className="text-left py-2 px-3 font-semibold text-gray-900">Age</th>
+                        <th className="text-center py-2 px-3 font-semibold text-gray-900">Count</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ageGroupData.reduce((rows: any[][], age, idx) => {
+                        if (idx % 2 === 0) {
+                          rows.push([age]);
+                        } else {
+                          rows[rows.length - 1].push(age);
+                        }
+                        return rows;
+                      }, []).map((row, rowIdx) => (
+                        <tr key={rowIdx} className="border-b border-gray-100 hover:bg-gray-50">
+                          <td className="py-2 px-3 text-gray-900 font-medium">{row[0]?.range} years</td>
+                          <td className="py-2 px-3 text-center text-blue-600 font-semibold">{row[0]?.count}</td>
+                          <td className="py-2 px-3 text-gray-900 font-medium">{row[1]?.range ? `${row[1].range} years` : '-'}</td>
+                          <td className="py-2 px-3 text-center text-blue-600 font-semibold">{row[1]?.count || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
