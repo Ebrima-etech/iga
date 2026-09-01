@@ -209,7 +209,7 @@ export default function HajjUniverse() {
           api.get('/banks/').catch(() => ({ data: { results: [] } })),
         ]);
 
-        const stats = statsRes.data || [];
+        const yearStats = statsRes.data || [];
         const pilgrims = pilgrimsRes.data.results || pilgrimsRes.data || [];
         const payments = paymentsRes.data.results || paymentsRes.data || [];
         const yearsData = yearsRes.data.results || yearsRes.data || [];
@@ -221,7 +221,7 @@ export default function HajjUniverse() {
         }
 
         // Process year data
-        const processedYears: HajjYearData[] = stats.map((year: any) => ({
+        const processedYears: HajjYearData[] = yearStats.map((year: any) => ({
           id: year.id,
           year: year.year,
           name: year.name,
