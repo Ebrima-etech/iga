@@ -97,7 +97,7 @@ export default function ReceiptManagement() {
           </div>
           <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg p-4">
             <p className="text-sm text-emerald-700 font-semibold">Total Amount</p>
-            <p className="text-2xl font-bold text-emerald-900 mt-1">D {parseFloat(summary.total_amount).toLocaleString()}</p>
+            <p className="text-2xl font-bold text-emerald-900 mt-1">D {Number(summary.total_amount).toLocaleString()}</p>
           </div>
         </div>
       )}
