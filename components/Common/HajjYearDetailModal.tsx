@@ -28,8 +28,8 @@ export default function HajjYearDetailModal({ isOpen, year, onClose, onSuccess }
   useEffect(() => {
     if (year) {
       setFormData({
-        first_deposit_amount: year.first_deposit_amount || '',
-        total_package_fee: year.total_package_fee || '',
+        first_deposit_amount: String(year.first_deposit_amount || ''),
+        total_package_fee: String(year.total_package_fee || ''),
         notes: year.notes || '',
       });
     }
