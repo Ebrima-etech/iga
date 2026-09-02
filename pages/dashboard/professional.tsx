@@ -404,10 +404,11 @@ export default function ProfessionalDashboard() {
                               ))}
                             </Pie>
                             <Tooltip
-                              formatter={(value) => {
+                              formatter={(value: any) => {
+                                const numValue = Number(value);
                                 const total = paymentStatusData.reduce((sum, item) => sum + item.value, 0);
-                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                return `${value} pilgrims (${percentage}%)`;
+                                const percentage = total > 0 ? Math.round((numValue / total) * 100) : 0;
+                                return `${numValue} pilgrims (${percentage}%)`;
                               }}
                               contentStyle={{
                                 backgroundColor: 'var(--bg-primary)',
