@@ -500,11 +500,11 @@ export default function ProfessionalDashboard() {
               {/* Right Sidebar */}
               <div className="space-y-6">
                 {/* Top Payments This Week */}
+                <div onClick={navigateToPayments} className="cursor-pointer">
                 <Card
                   padding="lg"
                   shadow="none"
-                  className="cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={navigateToPayments}
+                  className="hover:bg-gray-50 transition-colors"
                 >
                   <h3 className="text-xs font-semibold text-gray-900 mb-2">Top Payments This Week</h3>
                   <div className="space-y-1">
@@ -536,6 +536,7 @@ export default function ProfessionalDashboard() {
                     )}
                   </div>
                 </Card>
+                </div>
 
                 {/* Top Banks */}
                 <Card padding="lg" shadow="none">
