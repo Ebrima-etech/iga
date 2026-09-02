@@ -342,7 +342,7 @@ export default function SignatorySettingsForm({ onSave }: SignatorySettingsFormP
           onClick={handleSave}
           disabled={saving}
           loading={saving}
-          icon={BiSave}
+          icon={<BiSave />}
         >
           {saving ? 'Saving...' : 'Save Settings'}
         </ProfessionalButton>
