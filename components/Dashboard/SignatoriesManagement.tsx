@@ -283,8 +283,8 @@ function SignatoryDetailModal({
       email: '',
       phone: '',
       stamp_color: '#16a34a',
-      digital_signature: null,
-      official_stamp: null,
+      digital_signature: undefined,
+      official_stamp: undefined,
     }
   );
   const [saving, setSaving] = useState(false);
