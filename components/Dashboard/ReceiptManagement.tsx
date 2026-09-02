@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { BiX, BiDownload, BiSearch, BiCalendarAlt } from 'react-icons/bi';
+import React, { useState, useEffect } from 'react';
+import { BiX, BiDownload, BiSearch, BiCalendarAlt, BiChevronDown, BiChevronUp } from 'react-icons/bi';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 
@@ -175,13 +175,15 @@ export default function ReceiptManagement() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredReceipts.map((receipt) => (
-                  <tbody key={receipt.id}>
-                    <tr className="hover:bg-gray-50 cursor-pointer" onClick={() => setExpandedId(expandedId === receipt.id ? null : receipt.id)}>
-                      <td className="px-6 py-4 text-sm font-mono text-gray-900">{receipt.receipt_number}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                  <React.Fragment key={receipt.id}>
+                    <tr className="hover:bg-gray-50 transition-colors cursor-pointer">
+                      <td className="px-6 py-4 text-sm font-mono text-emerald-600 font-semibold">{receipt.receipt_number}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 font-medium">
                         {receipt.pilgrim_first_name} {receipt.pilgrim_last_name}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">D {parseFloat(receipt.amount).toLocaleString()}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <span className="font-semibold text-gray-900">D {parseFloat(receipt.amount).toLocaleString()}</span>
+                      </td>
                       <td className="px-6 py-4 text-sm text-gray-600">{receipt.signatory_name}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{receipt.generated_by_name}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">
@@ -189,41 +191,100 @@ export default function ReceiptManagement() {
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedId(expandedId === receipt.id ? null : receipt.id);
-                          }}
-                          className="text-emerald-600 hover:text-emerald-700 font-medium"
+                          onClick={() => setExpandedId(expandedId === receipt.id ? null : receipt.id)}
+                          className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
                         >
-                          {expandedId === receipt.id ? 'Hide' : 'Details'}
+                          {expandedId === receipt.id ? (
+                            <>
+                              <BiChevronUp size={16} /> Hide
+                            </>
+                          ) : (
+                            <>
+                              <BiChevronDown size={16} /> Details
+                            </>
+                          )}
                         </button>
                       </td>
                     </tr>
                     {expandedId === receipt.id && (
-                      <tr className="bg-gray-50">
-                        <td colSpan={7} className="px-6 py-4">
-                          <div className="grid grid-cols-2 gap-4 text-sm">
+                      <tr className="bg-gradient-to-r from-gray-50 to-white">
+                        <td colSpan={7} className="px-6 py-6">
+                          <div className="space-y-6">
+                            {/* Receipt Information */}
                             <div>
-                              <p className="text-gray-600">Email</p>
-                              <p className="text-gray-900 font-medium">{receipt.pilgrim_email || 'N/A'}</p>
+                              <h4 className="text-sm font-semibold text-gray-900 mb-4">Receipt Information</h4>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Receipt #</p>
+                                  <p className="text-lg font-bold text-emerald-600 mt-2">{receipt.receipt_number}</p>
+                                </div>
+                                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Amount</p>
+                                  <p className="text-lg font-bold text-gray-900 mt-2">D {parseFloat(receipt.amount).toLocaleString()}</p>
+                                </div>
+                                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Payment Date</p>
+                                  <p className="text-sm font-medium text-gray-900 mt-2">{new Date(receipt.payment_date).toLocaleDateString()}</p>
+                                </div>
+                                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Generated At</p>
+                                  <p className="text-sm font-medium text-gray-900 mt-2">{new Date(receipt.generated_at).toLocaleString()}</p>
+                                </div>
+                              </div>
                             </div>
+
+                            {/* Signatory & Generator Info */}
                             <div>
-                              <p className="text-gray-600">Phone</p>
-                              <p className="text-gray-900 font-medium">{receipt.pilgrim_phone || 'N/A'}</p>
+                              <h4 className="text-sm font-semibold text-gray-900 mb-4">Authority & Generator</h4>
+                              <div className="grid grid-cols-2 md:grid-cols-2 gap-6">
+                                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Signatory</p>
+                                  <p className="text-sm font-medium text-gray-900 mt-2">{receipt.signatory_name}</p>
+                                </div>
+                                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Generated By</p>
+                                  <p className="text-sm font-medium text-gray-900 mt-2">{receipt.generated_by_name}</p>
+                                </div>
+                              </div>
                             </div>
+
+                            {/* Pilgrim Info */}
                             <div>
-                              <p className="text-gray-600">Passport</p>
-                              <p className="text-gray-900 font-medium">{receipt.pilgrim_passport || 'N/A'}</p>
-                            </div>
-                            <div>
-                              <p className="text-gray-600">Payment Date</p>
-                              <p className="text-gray-900 font-medium">{new Date(receipt.payment_date).toLocaleDateString()}</p>
+                              <h4 className="text-sm font-semibold text-gray-900 mb-4">Pilgrim Information</h4>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">First Name</p>
+                                  <p className="text-sm font-medium text-gray-900 mt-2">{receipt.pilgrim_first_name}</p>
+                                </div>
+                                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Last Name</p>
+                                  <p className="text-sm font-medium text-gray-900 mt-2">{receipt.pilgrim_last_name}</p>
+                                </div>
+                                {receipt.pilgrim_email && (
+                                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Email</p>
+                                    <p className="text-sm font-medium text-gray-900 mt-2 break-all">{receipt.pilgrim_email}</p>
+                                  </div>
+                                )}
+                                {receipt.pilgrim_phone && (
+                                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Phone</p>
+                                    <p className="text-sm font-medium text-gray-900 mt-2">{receipt.pilgrim_phone}</p>
+                                  </div>
+                                )}
+                                {receipt.pilgrim_passport && (
+                                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Passport</p>
+                                    <p className="text-sm font-medium text-gray-900 mt-2">{receipt.pilgrim_passport}</p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </td>
                       </tr>
                     )}
-                  </tbody>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
