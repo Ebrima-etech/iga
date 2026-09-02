@@ -309,7 +309,7 @@ export default function PilgrimDetailPage() {
 
               {/* Payment Records */}
               {payments.length > 0 && payments
-                .filter(p => p.status === 'verified' || p.status === 'confirmed')
+                .filter(p => p.status === 'confirmed')
                 .map((payment, index) => (
                     <div key={payment.id} className="flex gap-6">
                       {/* Timeline dot and line */}
@@ -319,7 +319,7 @@ export default function PilgrimDetailPage() {
                         }`}>
                           💰
                         </div>
-                        {index < payments.filter(p => p.status === 'verified' || p.status === 'confirmed').length - 1 && (
+                        {index < payments.filter(p => p.status === 'confirmed').length - 1 && (
                           <div className="w-1 h-12 bg-emerald-200 mt-2"></div>
                         )}
                       </div>
