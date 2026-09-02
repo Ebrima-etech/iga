@@ -317,7 +317,7 @@ function SignatoryDetailModal({
         const value = data[key as keyof Signatory];
         if (value) {
           if ((value as any) instanceof File) {
-            formData.append(key, value as File);
+            formData.append(key, value as unknown as File);
           } else {
             formData.append(key, String(value));
           }
