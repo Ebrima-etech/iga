@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import { BiPlus, BiEdit, BiTrash, BiPlane, BiPhone } from 'react-icons/bi';
+import { BiPlus, BiEdit, BiTrash, BiPhone } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { KabaaTableSkeleton } from '@/components/Common/Skeleton';
@@ -254,8 +254,8 @@ export default function FlightsPage() {
                 <tbody className="divide-y divide-gray-100">
                   {flights.map((flight) => (
                     <tr key={flight.id} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900 flex items-center gap-2">
-                        <BiPlane size={16} className="text-gray-400" /> {flight.airline} {flight.flight_number}
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {flight.airline} {flight.flight_number}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">{flight.departure_city} → {flight.arrival_city}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{new Date(flight.departure_date).toLocaleDateString()}</td>
