@@ -172,3 +172,23 @@ export interface ReceiptSummary {
   total_receipts: number;
   total_amount: string | number;
 }
+
+export interface EmailNotification {
+  id: number;
+  email: string;
+  description: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface EmailNotificationSettings {
+  id: number;
+  enable_notifications: boolean;
+  notify_on_payment: boolean;
+  notify_on_receipt: boolean;
+  notification_delay: number;
+  email_from: string;
+  email_subject: string;
+  created_at: string;
+  updated_at: string;
+}

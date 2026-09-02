@@ -8,7 +8,7 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Badge from '@/components/Common/Badge';
 import FormField from '@/components/Common/FormField';
 import Input from '@/components/Common/Input';
-import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh, BiCalendar, BiPlus } from 'react-icons/bi';
+import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh, BiCalendar, BiPlus, BiMail } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import { User, CurrencyCode, HajjYear } from '@/types';
 import api from '@/lib/api';
@@ -19,8 +19,9 @@ import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
 import HajjYearDetailModal from '@/components/Common/HajjYearDetailModal';
 import SignatoriesManagement from '@/components/Dashboard/SignatoriesManagement';
 import ReceiptManagement from '@/components/Dashboard/ReceiptManagement';
+import EmailNotificationSettings from '@/components/Dashboard/EmailNotificationSettings';
 
-type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years' | 'signatory' | 'receipts';
+type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years' | 'signatory' | 'receipts' | 'email-notifications';
 
 interface CurrencyData {
   code: CurrencyCode;
@@ -345,6 +346,19 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-2">
                       <BiCog size={18} />
                       Receipts
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('email-notifications')}
+                    className={`pb-4 px-2 font-medium text-sm transition-all ${
+                      activeTab === 'email-notifications'
+                        ? 'border-b-2 border-indigo-600 text-indigo-600'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <BiMail size={18} />
+                      Email Notifications
                     </div>
                   </button>
                 </>
@@ -869,6 +883,28 @@ export default function SettingsPage() {
               <div className="text-center py-8">
                 <BiX size={32} className="text-red-400 mx-auto mb-3" />
                 <p className="text-gray-600">Only administrators can view receipt records</p>
+              </div>
+            </Card>
+          )}
+
+          {/* Email Notifications Tab */}
+          {activeTab === 'email-notifications' && user?.is_staff && (
+            <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Email Notification Settings</h2>
+                <p className="text-gray-600 mt-2">
+                  Configure email notifications for payments and receipts using Google Email
+                </p>
+              </div>
+              <EmailNotificationSettings />
+            </div>
+          )}
+
+          {activeTab === 'email-notifications' && !user?.is_staff && (
+            <Card padding="lg" shadow="none">
+              <div className="text-center py-8">
+                <BiX size={32} className="text-red-400 mx-auto mb-3" />
+                <p className="text-gray-600">Only administrators can manage email notifications</p>
               </div>
             </Card>
           )}
