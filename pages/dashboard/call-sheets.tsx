@@ -7,7 +7,7 @@ import PageHeader from '@/components/Dashboard/PageHeader';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Card from '@/components/Common/Card';
 import Loading from '@/components/Common/Loading';
-import { BiPlus, BiX, BiDownload, BiArrowUp, BiArrowDown } from 'react-icons/bi';
+import { BiPlus, BiX, BiDownload } from 'react-icons/bi';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 
@@ -416,12 +416,8 @@ export default function CallSheetsPage() {
                             {column}
                           </span>
                           {sortConfig?.column === column && (
-                            <span className="ml-2 flex-shrink-0">
-                              {sortConfig.direction === 'asc' ? (
-                                <BiArrowUp size={12} className="text-blue-600" />
-                              ) : (
-                                <BiArrowDown size={12} className="text-blue-600" />
-                              )}
+                            <span className="ml-2 flex-shrink-0 text-blue-600 text-xs">
+                              {sortConfig.direction === 'asc' ? '↑' : '↓'}
                             </span>
                           )}
                         </div>
