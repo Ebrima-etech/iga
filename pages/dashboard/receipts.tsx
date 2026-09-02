@@ -64,7 +64,7 @@ export default function ReceiptsPage() {
       <div className="min-h-screen bg-white p-8">
         <PageHeader
           title="Receipts"
-          subtitle="View and manage all generated payment receipts"
+          description="View and manage all generated payment receipts"
         />
         <div className="mt-8">
           <Card padding="lg" shadow="none">
