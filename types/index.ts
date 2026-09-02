@@ -158,3 +158,17 @@ export interface SystemSettings {
   theme_color?: string;
   updated_at: string;
 }
+
+export interface Receipt {
+  id: number;
+  receipt_number: string;
+  payment: number;
+  signatory: number;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface ReceiptSummary {
+  total_receipts: number;
+  total_amount: string | number;
+}

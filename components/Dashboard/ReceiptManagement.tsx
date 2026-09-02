@@ -2,19 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BiX, BiDownload, BiSearch, BiCalendarAlt, BiChevronDown, BiChevronUp } from 'react-icons/bi';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
-
-interface Receipt {
-  id: number;
-  receipt_number: string;
-  payment: number;
-  signatory: number;
-  created_at: string;
-}
-
-interface ReceiptSummary {
-  total_receipts: number;
-  total_amount: string;
-}
+import { Receipt, ReceiptSummary } from '@/types';
 
 export default function ReceiptManagement() {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
