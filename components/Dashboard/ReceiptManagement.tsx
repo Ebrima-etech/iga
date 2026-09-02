@@ -8,6 +8,9 @@ interface Receipt {
   receipt_number: string;
   pilgrim_first_name: string;
   pilgrim_last_name: string;
+  pilgrim_email?: string;
+  pilgrim_phone?: string;
+  pilgrim_passport?: string;
   amount: string;
   payment_date: string;
   signatory_name: string;
