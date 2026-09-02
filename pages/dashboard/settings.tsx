@@ -645,12 +645,12 @@ export default function SettingsPage() {
                   </div>
                   {editingPrice && (
                     <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
                       <Input
                         type="number"
                         value={hajjPackagePrice.toString()}
                         onChange={(e) => setHajjPackagePrice(parseFloat(e.target.value) || 0)}
                         placeholder="Enter package price"
-                        label="Price"
                       />
                     </div>
                   )}
