@@ -314,11 +314,12 @@ function SignatoryDetailModal({
       setSaving(true);
       const formData = new FormData();
       Object.keys(data).forEach(key => {
-        if (data[key as keyof Signatory]) {
-          if (data[key as keyof Signatory] instanceof File) {
-            formData.append(key, data[key as keyof Signatory] as File);
+        const value = data[key as keyof Signatory];
+        if (value) {
+          if ((value as any) instanceof File) {
+            formData.append(key, value as File);
           } else {
-            formData.append(key, String(data[key as keyof Signatory]));
+            formData.append(key, String(value));
           }
         }
       });
