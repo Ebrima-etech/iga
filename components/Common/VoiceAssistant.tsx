@@ -42,9 +42,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
   const stopRecordingRef = useRef<(() => void) | null>(null);
 
   // Only show in GIA dashboard (not in bank portal)
-  if (router.pathname.startsWith('/bank') || router.pathname.startsWith('/bank-portal')) {
-    return null;
-  }
+  const isInBankPortal = router.pathname.startsWith('/bank') || router.pathname.startsWith('/bank-portal');
 
   // Auto-start listening for wake word on mount (only if enabled)
   React.useEffect(() => {
@@ -603,6 +601,11 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
     }
   };
 
+  // Only show in GIA dashboard (not in bank portal)
+  if (isInBankPortal) {
+    return null;
+  }
+
   return (
     <>
       <style>{`
@@ -647,7 +650,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
 
             {transcript && (
               <p className="text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-md">
-                "{transcript}"
+                &quot;{transcript}&quot;
               </p>
             )}
 

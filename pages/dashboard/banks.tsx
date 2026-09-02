@@ -476,7 +476,7 @@ export default function BanksManagementPage() {
             ) : (
               <div className="px-6 py-12 text-center">
                 <p className="text-gray-500 text-sm mb-4">
-                  No banks found • Click 'Add Bank' to create one
+                  No banks found • Click &apos;Add Bank&apos; to create one
                 </p>
                 <ProfessionalButton
                   variant="primary"
