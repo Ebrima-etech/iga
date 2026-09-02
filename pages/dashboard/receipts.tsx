@@ -46,7 +46,7 @@ export default function ReceiptsPage() {
         <div className="min-h-screen bg-white p-8">
           <PageHeader
             title="Receipts"
-            subtitle="View and manage payment receipts"
+            description="View and manage payment receipts"
           />
           <Card padding="lg" shadow="none" className="mt-8">
             <div className="text-center py-12">
