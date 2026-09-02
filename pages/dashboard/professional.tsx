@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
 import MetricsPanel from '@/components/Dashboard/MetricsPanel';
@@ -31,6 +32,7 @@ import {
 } from 'recharts';
 
 export default function ProfessionalDashboard() {
+  const router = useRouter();
   const { selectedHajjYear } = useHajjYear();
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState('');
