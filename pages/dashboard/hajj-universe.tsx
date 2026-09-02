@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import api from '@/lib/api';
-import { BiMedal, BiTrendingUp, BiTrendingDown, BiDownload, BiFilter, BiCalendar, BiMap, BiBarChartAlt2, BiShow, BiHide, BiUsers } from 'react-icons/bi';
+import { BiMedal, BiTrendingUp, BiTrendingDown, BiDownload, BiFilter, BiCalendar, BiMap, BiBarChartAlt2, BiShow, BiHide, BiUser } from 'react-icons/bi';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
@@ -426,7 +426,7 @@ export default function HajjUniverse() {
         {/* Demographic & Age Analytics Section */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <BiUsers size={24} className="text-blue-600" /> Demographic & Age Analytics
+            <BiUser size={24} className="text-blue-600" /> Demographic & Age Analytics
           </h2>
 
           {/* Age Statistics Cards */}
