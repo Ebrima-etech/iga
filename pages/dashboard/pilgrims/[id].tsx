@@ -213,7 +213,7 @@ export default function PilgrimDetailPage() {
           <Card padding="lg" shadow="none" className="border border-gray-200">
             <p className="text-xs text-gray-600 font-medium uppercase">Verified Payments</p>
             <p className="text-2xl font-bold text-gray-900 mt-3 font-mono">
-              {payments.filter(p => p.status === 'verified' || p.status === 'confirmed').length}
+              {payments.filter(p => p.status === 'confirmed').length}
             </p>
             <p className="text-xs text-gray-500 mt-2">
               {payments.length > 0 ? `From ${payments.length} total` : 'No payments yet'}
