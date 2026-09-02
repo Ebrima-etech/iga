@@ -51,7 +51,7 @@ export const getUserRole = async (userId: number): Promise<string | null> => {
 
 export const isGIAUser = async (userId: number): Promise<boolean> => {
   const role = await getUserRole(userId);
-  return role && (role === 'hajj_admin' || role === 'hajj_staff');
+  return !!(role && (role === 'hajj_admin' || role === 'hajj_staff'));
 };
 
 export const isLoggedIn = (): boolean => {
