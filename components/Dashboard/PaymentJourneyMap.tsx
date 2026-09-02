@@ -25,7 +25,7 @@ export default function PaymentJourneyMap({
 }: PaymentJourneyMapProps) {
   const [selectedPoint, setSelectedPoint] = useState<number | null>(null);
 
-  const verifiedPayments = payments.filter(p => p.status === 'verified' || p.status === 'confirmed');
+  const verifiedPayments = payments.filter(p => p.status === 'confirmed');
 
   let cumulativeAmount = 0;
   const paymentPoints = verifiedPayments.map((payment, idx) => {
