@@ -143,7 +143,7 @@ export default function ReceiptManagement() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Receipt #</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Payment ID</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Payment Reference</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Signatory ID</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Created At</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Action</th>
@@ -154,7 +154,7 @@ export default function ReceiptManagement() {
                   <React.Fragment key={receipt.id}>
                     <tr className="hover:bg-gray-50 transition-colors cursor-pointer">
                       <td className="px-6 py-4 text-sm font-mono text-emerald-600 font-semibold">{receipt.receipt_number}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 font-medium">#{receipt.payment}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 font-medium">{receipt.payment_reference}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">#{receipt.signatory}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{new Date(receipt.created_at).toLocaleString()}</td>
                       <td className="px-6 py-4 text-sm">
@@ -185,8 +185,8 @@ export default function ReceiptManagement() {
                                 <p className="text-lg font-bold text-emerald-600 mt-2">{receipt.receipt_number}</p>
                               </div>
                               <div className="bg-white rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Payment ID</p>
-                                <p className="text-lg font-bold text-blue-600 mt-2">#{receipt.payment}</p>
+                                <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Payment Reference</p>
+                                <p className="text-sm font-medium text-blue-600 mt-2 font-mono">{receipt.payment_reference}</p>
                               </div>
                               <div className="bg-white rounded-lg p-4 border border-gray-200">
                                 <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Signatory ID</p>

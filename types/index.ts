@@ -162,10 +162,10 @@ export interface SystemSettings {
 export interface Receipt {
   id: number;
   receipt_number: string;
-  payment: number;
+  payment_reference: string;
   signatory: number;
   created_at: string;
-  updated_at?: string;
+  updated_at: string;
 }
 
 export interface ReceiptSummary {
