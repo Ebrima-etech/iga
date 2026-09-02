@@ -18,10 +18,9 @@ import { setCurrencyMode, startRealtimeUpdates, stopRealtimeUpdates, getCurrency
 import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
 import HajjYearDetailModal from '@/components/Common/HajjYearDetailModal';
 import SignatoriesManagement from '@/components/Dashboard/SignatoriesManagement';
-import ReceiptManagement from '@/components/Dashboard/ReceiptManagement';
 import EmailNotificationSettings from '@/components/Dashboard/EmailNotificationSettings';
 
-type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years' | 'signatory' | 'receipts' | 'email-notifications';
+type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years' | 'signatory' | 'email-notifications';
 
 interface CurrencyData {
   code: CurrencyCode;
@@ -333,19 +332,6 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-2">
                       <BiCog size={18} />
                       Signatory
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('receipts')}
-                    className={`pb-4 px-2 font-medium text-sm transition-all ${
-                      activeTab === 'receipts'
-                        ? 'border-b-2 border-indigo-600 text-indigo-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <BiCog size={18} />
-                      Receipts
                     </div>
                   </button>
                   <button
@@ -868,21 +854,6 @@ export default function SettingsPage() {
               <div className="text-center py-8">
                 <BiX size={32} className="text-red-400 mx-auto mb-3" />
                 <p className="text-gray-600">Only administrators can manage signatory settings</p>
-              </div>
-            </Card>
-          )}
-
-          {activeTab === 'receipts' && user?.is_staff && (
-            <Card padding="lg" shadow="none">
-              <ReceiptManagement />
-            </Card>
-          )}
-
-          {activeTab === 'receipts' && !user?.is_staff && (
-            <Card padding="lg" shadow="none">
-              <div className="text-center py-8">
-                <BiX size={32} className="text-red-400 mx-auto mb-3" />
-                <p className="text-gray-600">Only administrators can view receipt records</p>
               </div>
             </Card>
           )}
