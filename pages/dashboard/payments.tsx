@@ -23,6 +23,8 @@ type PaymentRecord = Payment & {
   payer_name?: string;
   payer_contact?: string;
   payer_relationship?: string;
+  gender?: string;
+  pilgrim_name?: string;
 }
 
 export default function PaymentsPage() {
