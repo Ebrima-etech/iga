@@ -314,7 +314,7 @@ export default function BanksManagementPage() {
                   <input
                     type="text"
                     value={bankFormData.name}
-                    onChange={(e) => setBankFormData({ name: e.target.value })}
+                    onChange={(e) => setBankFormData({ ...bankFormData, name: e.target.value })}
                     placeholder="e.g., First Bank, Standard Chartered"
                     required
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition bg-white text-sm"
@@ -330,7 +330,7 @@ export default function BanksManagementPage() {
                     size="md"
                     onClick={() => {
                       setShowBankForm(false);
-                      setBankFormData({ name: '' });
+                      setBankFormData({ name: '', logo: '' });
                     }}
                   >
                     Cancel
