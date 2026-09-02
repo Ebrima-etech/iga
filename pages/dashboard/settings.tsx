@@ -8,7 +8,7 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Badge from '@/components/Common/Badge';
 import FormField from '@/components/Common/FormField';
 import Input from '@/components/Common/Input';
-import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh, BiCalendar, BiPlus, BiMail } from 'react-icons/bi';
+import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh, BiCalendar, BiPlus, BiEnvelope } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import { User, CurrencyCode, HajjYear } from '@/types';
 import api from '@/lib/api';
@@ -343,7 +343,7 @@ export default function SettingsPage() {
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <BiMail size={18} />
+                      <BiEnvelope size={18} />
                       Email Notifications
                     </div>
                   </button>

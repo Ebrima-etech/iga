@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BiPlus, BiX, BiSave, BiRefresh, BiMail, BiCheckCircle } from 'react-icons/bi';
+import { BiPlus, BiX, BiSave, BiRefresh, BiEnvelope, BiCheckCircle } from 'react-icons/bi';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
@@ -317,7 +317,7 @@ export default function EmailNotificationSettings() {
         {/* Email List */}
         {emails.length === 0 ? (
           <div className="text-center py-8">
-            <BiMail size={48} className="mx-auto text-gray-300 mb-3" />
+            <BiEnvelope size={48} className="mx-auto text-gray-300 mb-3" />
             <p className="text-gray-600">No email recipients added yet</p>
             <p className="text-sm text-gray-500">Add email addresses above to enable notifications</p>
           </div>
@@ -334,7 +334,7 @@ export default function EmailNotificationSettings() {
                       email.is_active ? 'bg-emerald-100' : 'bg-gray-100'
                     }`}
                   >
-                    <BiMail
+                    <BiEnvelope
                       size={18}
                       className={email.is_active ? 'text-emerald-600' : 'text-gray-400'}
                     />
