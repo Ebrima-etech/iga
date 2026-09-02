@@ -56,11 +56,14 @@ export default function EmailNotificationSettings() {
         api.get('/settings/email-notifications/config/'),
       ]);
 
-      setEmails(emailsRes.data);
+      // Handle paginated results from DRF
+      const emailList = emailsRes.data.results || emailsRes.data || [];
+      setEmails(Array.isArray(emailList) ? emailList : []);
       setSettings(settingsRes.data);
     } catch (error) {
       console.error('Failed to load email notification settings:', error);
       toast.error('Failed to load settings');
+      setEmails([]);
     } finally {
       setLoading(false);
     }
