@@ -101,7 +101,7 @@ export default function NotificationsPage() {
         )}
 
         {/* Notifications List */}
-        <Card padding="none" shadow="none">
+        <Card shadow="none">
           {notifications.length === 0 ? (
             <div className="p-12 text-center">
               <p className="text-gray-500 text-lg">No notifications yet</p>
