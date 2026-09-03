@@ -50,7 +50,7 @@ export default function ChatPage() {
 
   const fetchConversations = async () => {
     try {
-      const response = await api.get('/dashboard/chat-messages/conversations/');
+      const response = await api.get('/chat-messages/conversations/');
       setConversations(response.data);
     } catch (error) {
       console.error('Failed to fetch conversations:', error);
@@ -59,7 +59,7 @@ export default function ChatPage() {
 
   const fetchStaffList = async () => {
     try {
-      const response = await api.get('/dashboard/users/staff_list/');
+      const response = await api.get('/users/staff_list/');
       setStaffList(response.data);
     } catch (error) {
       console.error('Failed to fetch staff:', error);
@@ -68,7 +68,7 @@ export default function ChatPage() {
 
   const fetchMessages = async (userId: number) => {
     try {
-      const response = await api.get(`/dashboard/chat-messages/with_user/?user_id=${userId}`);
+      const response = await api.get(`/chat-messages/with_user/?user_id=${userId}`);
       setMessages(response.data);
     } catch (error) {
       console.error('Failed to fetch messages:', error);
@@ -79,7 +79,7 @@ export default function ChatPage() {
     if (!newMessage.trim() || !selectedUser) return;
 
     try {
-      await api.post('/dashboard/chat-messages/', {
+      await api.post('/chat-messages/', {
         recipient: selectedUser.id,
         message: newMessage,
       });
