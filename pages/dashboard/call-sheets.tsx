@@ -301,6 +301,32 @@ export default function CallSheetsPage() {
 
   const filteredData = getFilteredAndSortedData();
 
+  // Calculate optimal column widths based on content
+  const getColumnWidths = () => {
+    if (!sheetData) return {};
+    const widths: Record<string, number> = {};
+    const minWidth = 100;
+    const maxWidth = 500;
+    const padding = 24;
+
+    sheetData.columns.forEach(column => {
+      let headerLength = column.length * 8;
+      let maxDataLength = 0;
+      sheetData.rows.slice(0, 100).forEach(row => {
+        const cellValue = String(row[column] || '');
+        const cellLength = cellValue.length * 7;
+        if (cellLength > maxDataLength) {
+          maxDataLength = cellLength;
+        }
+      });
+      const width = Math.max(minWidth, Math.min(maxWidth, Math.max(headerLength, maxDataLength) + padding));
+      widths[column] = width;
+    });
+    return widths;
+  };
+
+  const columnWidths = getColumnWidths();
+
   // Show initial shimmer on first load
   if (loading && !sheetData) {
     return <ShimmerLoader />;
@@ -373,7 +399,8 @@ export default function CallSheetsPage() {
                   {sheetData.columns.map((column) => (
                     <div
                       key={`filter-${column}`}
-                      className="flex-1 min-w-48 px-3 py-2 border-r border-gray-300 last:border-r-0"
+                      style={{ width: `${columnWidths[column] || 192}px` }}
+                      className="px-3 py-2 border-r border-gray-300 last:border-r-0 flex-shrink-0"
                     >
                       <input
                         type="text"
@@ -406,10 +433,10 @@ export default function CallSheetsPage() {
                   {/* Columns */}
                   <div className="flex">
                     {sheetData.columns.map((column) => (
-                      <div key={`col-${column}`} className="flex flex-col">
+                      <div key={`col-${column}`} className="flex flex-col flex-shrink-0" style={{ width: `${columnWidths[column] || 192}px` }}>
                         {/* Header Cell */}
                         <div
-                          className="w-48 h-10 bg-gray-100 border-b border-gray-300 border-r border-gray-300 px-3 py-1 cursor-pointer hover:bg-gray-200 transition flex items-center justify-between group"
+                          className="h-10 bg-gray-100 border-b border-gray-300 border-r border-gray-300 px-3 py-1 cursor-pointer hover:bg-gray-200 transition flex items-center justify-between group"
                           onClick={() => handleSort(column)}
                         >
                           <span className="text-xs font-bold text-gray-700 truncate">
@@ -426,7 +453,7 @@ export default function CallSheetsPage() {
                         {filteredData.map((row, idx) => (
                           <div
                             key={`cell-${idx}-${column}`}
-                            className={`w-48 h-9 px-3 py-1 border-b border-gray-300 border-r border-gray-300 text-xs text-gray-800 flex items-center overflow-hidden ${
+                            className={`h-9 px-3 py-1 border-b border-gray-300 border-r border-gray-300 text-xs text-gray-800 flex items-center overflow-hidden ${
                               idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                             }`}
                           >
