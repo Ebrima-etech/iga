@@ -161,7 +161,10 @@ export default function CallSheetsPage() {
       console.log(`Finished fetching: ${allData.length} total items`);
 
       if (Array.isArray(allData) && allData.length > 0) {
-        const columns = Object.keys(allData[0]);
+        // Columns to hide for payment records
+        const hiddenColumns = ['bank', 'payment', 'status', 'submission_method', 'error_message', 'verified_at', 'created_pigrim_id'];
+        const allColumns = Object.keys(allData[0]);
+        const columns = allColumns.filter(col => !hiddenColumns.includes(col));
         setSheetData({
           columns,
           rows: allData,
