@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
@@ -99,6 +99,11 @@ const ShimmerLoader = () => (
   </div>
 );
 
+interface CellCoord {
+  row: number;
+  col: number;
+}
+
 export default function CallSheetsPage() {
   const router = useRouter();
   const [sheets, setSheets] = useState<Sheet[]>([]);
@@ -110,6 +115,13 @@ export default function CallSheetsPage() {
   const [selectedDataSource, setSelectedDataSource] = useState('');
   const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' } | null>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const [selectedCell, setSelectedCell] = useState<CellCoord | null>(null);
+  const [selectionStart, setSelectionStart] = useState<CellCoord | null>(null);
+  const [editCell, setEditCell] = useState<CellCoord | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const [copiedRange, setCopiedRange] = useState<{ start: CellCoord; end: CellCoord } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadSheets();
@@ -118,6 +130,9 @@ export default function CallSheetsPage() {
   useEffect(() => {
     if (selectedSheet) {
       fetchSheetData(selectedSheet);
+      setSelectedCell(null);
+      setSelectionStart(null);
+      setEditCell(null);
     }
   }, [selectedSheet]);
 
@@ -302,8 +317,6 @@ export default function CallSheetsPage() {
     localStorage.setItem('call_sheets', JSON.stringify(updated));
   };
 
-  const filteredData = getFilteredAndSortedData();
-
   // Calculate optimal column widths based on content
   const getColumnWidths = () => {
     if (!sheetData) return {};
@@ -329,6 +342,234 @@ export default function CallSheetsPage() {
   };
 
   const columnWidths = getColumnWidths();
+  const filteredData = getFilteredAndSortedData();
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCell, selectionStart, editCell, sheetData, filteredData]);
+
+  const getColumnLetter = (colIndex: number): string => {
+    let letter = '';
+    while (colIndex >= 0) {
+      letter = String.fromCharCode(65 + (colIndex % 26)) + letter;
+      colIndex = Math.floor(colIndex / 26) - 1;
+    }
+    return letter;
+  };
+
+  const getCellRef = (row: number, col: number): string => {
+    return `${getColumnLetter(col)}${row + 1}`;
+  };
+
+  const handleCellClick = (row: number, col: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (e.ctrlKey || e.metaKey) {
+      return;
+    }
+    if (e.shiftKey && selectedCell) {
+      setSelectionStart(selectedCell);
+      setSelectedCell({ row, col });
+    } else {
+      setSelectedCell({ row, col });
+      setSelectionStart(null);
+      setCopiedRange(null);
+      setContextMenu(null);
+    }
+    setEditCell(null);
+  };
+
+  const handleCellDoubleClick = (row: number, col: number) => {
+    setEditCell({ row, col });
+    setEditValue(String(filteredData[row][sheetData?.columns[col] || ''] || ''));
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (!selectedCell || editCell) return;
+
+    const columns = sheetData?.columns || [];
+    const rows = filteredData.length;
+
+    switch (e.key) {
+      case 'ArrowUp':
+        e.preventDefault();
+        if (selectedCell.row > 0) {
+          if (e.shiftKey) {
+            setSelectionStart(selectedCell);
+          }
+          setSelectedCell({ ...selectedCell, row: selectedCell.row - 1 });
+        }
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        if (selectedCell.row < rows - 1) {
+          if (e.shiftKey) {
+            setSelectionStart(selectedCell);
+          }
+          setSelectedCell({ ...selectedCell, row: selectedCell.row + 1 });
+        }
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (selectedCell.col > 0) {
+          if (e.shiftKey) {
+            setSelectionStart(selectedCell);
+          }
+          setSelectedCell({ ...selectedCell, col: selectedCell.col - 1 });
+        }
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        if (selectedCell.col < columns.length - 1) {
+          if (e.shiftKey) {
+            setSelectionStart(selectedCell);
+          }
+          setSelectedCell({ ...selectedCell, col: selectedCell.col + 1 });
+        }
+        break;
+      case 'Enter':
+        e.preventDefault();
+        setSelectedCell({ ...selectedCell, row: Math.min(selectedCell.row + 1, rows - 1) });
+        break;
+      case 'Tab':
+        e.preventDefault();
+        if (e.shiftKey) {
+          setSelectedCell({ ...selectedCell, col: Math.max(selectedCell.col - 1, 0) });
+        } else {
+          setSelectedCell({ ...selectedCell, col: Math.min(selectedCell.col + 1, columns.length - 1) });
+        }
+        break;
+      case 'F2':
+      case 'Enter':
+        if (e.key === 'F2') {
+          e.preventDefault();
+          handleCellDoubleClick(selectedCell.row, selectedCell.col);
+        }
+        break;
+      case 'c':
+      case 'C':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          handleCopy();
+        }
+        break;
+      case 'v':
+      case 'V':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          handlePaste();
+        }
+        break;
+      case 'Delete':
+      case 'Backspace':
+        e.preventDefault();
+        handleDelete();
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setSelectedCell(null);
+        setSelectionStart(null);
+        setCopiedRange(null);
+        setEditCell(null);
+        break;
+    }
+  };
+
+  const handleCopy = () => {
+    if (!selectedCell || !sheetData) return;
+
+    const startRow = Math.min(selectedCell.row, selectionStart?.row || selectedCell.row);
+    const endRow = Math.max(selectedCell.row, selectionStart?.row || selectedCell.row);
+    const startCol = Math.min(selectedCell.col, selectionStart?.col || selectedCell.col);
+    const endCol = Math.max(selectedCell.col, selectionStart?.col || selectedCell.col);
+
+    const copyData: string[] = [];
+    for (let r = startRow; r <= endRow; r++) {
+      for (let c = startCol; c <= endCol; c++) {
+        const colName = sheetData.columns[c];
+        const value = filteredData[r][colName];
+        copyData.push(String(value || ''));
+      }
+    }
+
+    navigator.clipboard.writeText(copyData.join('\t'));
+    setCopiedRange({ start: { row: startRow, col: startCol }, end: { row: endRow, col: endCol } });
+    toast.success('Copied to clipboard');
+  };
+
+  const handlePaste = () => {
+    toast.info('Paste in read-only mode');
+  };
+
+  const handleDelete = () => {
+    toast.info('Delete protected - data is read-only');
+  };
+
+  const handleSaveEdit = () => {
+    if (editCell) {
+      const column = sheetData?.columns[editCell.col];
+      if (column) {
+        filteredData[editCell.row][column] = editValue;
+        toast.info('Edit logged (read-only mode)');
+      }
+    }
+    setEditCell(null);
+  };
+
+  const isCellSelected = (row: number, col: number): boolean => {
+    if (!selectedCell) return false;
+    if (selectionStart) {
+      const minRow = Math.min(selectedCell.row, selectionStart.row);
+      const maxRow = Math.max(selectedCell.row, selectionStart.row);
+      const minCol = Math.min(selectedCell.col, selectionStart.col);
+      const maxCol = Math.max(selectedCell.col, selectionStart.col);
+      return row >= minRow && row <= maxRow && col >= minCol && col <= maxCol;
+    }
+    return row === selectedCell.row && col === selectedCell.col;
+  };
+
+  const isCellActive = (row: number, col: number): boolean => {
+    return selectedCell?.row === row && selectedCell?.col === col;
+  };
+
+  const isCellCopied = (row: number, col: number): boolean => {
+    if (!copiedRange) return false;
+    return row >= copiedRange.start.row && row <= copiedRange.end.row &&
+           col >= copiedRange.start.col && col <= copiedRange.end.col;
+  };
+
+  const getStatusBarInfo = () => {
+    if (!selectedCell || !sheetData) return { count: 0, sum: 0, avg: 0 };
+
+    const startRow = Math.min(selectedCell.row, selectionStart?.row || selectedCell.row);
+    const endRow = Math.max(selectedCell.row, selectionStart?.row || selectedCell.row);
+    const startCol = Math.min(selectedCell.col, selectionStart?.col || selectedCell.col);
+    const endCol = Math.max(selectedCell.col, selectionStart?.col || selectedCell.col);
+
+    let count = 0;
+    let sum = 0;
+    let numberCount = 0;
+
+    for (let r = startRow; r <= endRow; r++) {
+      for (let c = startCol; c <= endCol; c++) {
+        const colName = sheetData.columns[c];
+        const value = filteredData[r][colName];
+        count++;
+        const numValue = parseFloat(value);
+        if (!isNaN(numValue)) {
+          sum += numValue;
+          numberCount++;
+        }
+      }
+    }
+
+    return {
+      count,
+      sum: numberCount > 0 ? sum : 0,
+      avg: numberCount > 0 ? sum / numberCount : 0,
+      numberCount
+    };
+  };
 
   // Show initial shimmer on first load
   if (loading && !sheetData) {
@@ -388,6 +629,25 @@ export default function CallSheetsPage() {
             >
               <BiX size={20} />
             </button>
+          </div>
+        </div>
+
+        {/* Sheet Toolbar - Name Box & Formula Bar */}
+        <div className="bg-white border-b border-gray-300 px-6 py-3 flex items-center gap-4 shadow-sm">
+          {/* Name Box */}
+          <div className="flex-shrink-0 w-32 px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm font-mono text-gray-700">
+            {selectedCell ? getCellRef(selectedCell.row, selectedCell.col) : 'A1'}
+          </div>
+
+          {/* Formula Bar */}
+          <div className="flex-1 px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm font-mono text-gray-700 flex items-center">
+            {selectedCell && sheetData ? (
+              <span className="text-gray-600">
+                {String(filteredData[selectedCell.row][sheetData.columns[selectedCell.col]] || '')}
+              </span>
+            ) : (
+              <span className="text-gray-400">Select a cell to view its value</span>
+            )}
           </div>
         </div>
 
@@ -453,29 +713,83 @@ export default function CallSheetsPage() {
                         </div>
 
                         {/* Data Cells */}
-                        {filteredData.map((row, idx) => (
-                          <div
-                            key={`cell-${idx}-${column}`}
-                            className={`h-9 px-3 py-1 border-b border-gray-300 border-r border-gray-300 text-xs text-gray-800 flex items-center overflow-hidden ${
-                              idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                            }`}
-                          >
-                            <span className="truncate">
-                              {row[column] !== null && row[column] !== undefined
-                                ? String(row[column])
-                                : '-'}
-                            </span>
-                          </div>
-                        ))}
+                        {filteredData.map((row, idx) => {
+                          const isSelected = isCellSelected(idx, sheetData.columns.indexOf(column));
+                          const isActive = isCellActive(idx, sheetData.columns.indexOf(column));
+                          const isCopied = isCellCopied(idx, sheetData.columns.indexOf(column));
+                          const isEditing = editCell?.row === idx && editCell?.col === sheetData.columns.indexOf(column);
+
+                          return (
+                            <div
+                              key={`cell-${idx}-${column}`}
+                              onClick={(e) => handleCellClick(idx, sheetData.columns.indexOf(column), e)}
+                              onDoubleClick={() => handleCellDoubleClick(idx, sheetData.columns.indexOf(column))}
+                              onContextMenu={(e) => {
+                                e.preventDefault();
+                                setContextMenu({ x: e.clientX, y: e.clientY });
+                                setSelectedCell({ row: idx, col: sheetData.columns.indexOf(column) });
+                              }}
+                              className={`h-9 px-3 py-1 border-b border-gray-300 border-r border-gray-300 text-xs text-gray-800 flex items-center overflow-hidden cursor-cell transition-colors ${
+                                isActive
+                                  ? 'bg-blue-100 border border-blue-500 border-b-2 border-r-2'
+                                  : isSelected
+                                  ? 'bg-blue-50 border border-blue-300'
+                                  : idx % 2 === 0
+                                  ? 'bg-white'
+                                  : 'bg-gray-50'
+                              } ${
+                                isCopied ? 'ring-2 ring-yellow-400 ring-inset' : ''
+                              }`}
+                            >
+                              {isEditing ? (
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={editValue}
+                                  onChange={(e) => setEditValue(e.target.value)}
+                                  onBlur={handleSaveEdit}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      handleSaveEdit();
+                                      setSelectedCell({ row: idx + 1, col: sheetData.columns.indexOf(column) });
+                                    } else if (e.key === 'Escape') {
+                                      setEditCell(null);
+                                    }
+                                  }}
+                                  className="w-full px-0 py-0 border-0 focus:outline-none focus:ring-0 bg-white text-xs"
+                                />
+                              ) : (
+                                <span className="truncate">
+                                  {row[column] !== null && row[column] !== undefined
+                                    ? String(row[column])
+                                    : '-'}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="bg-gray-50 px-6 py-2 border-t border-gray-300 text-xs text-gray-600">
-                Showing {filteredData.length} of {sheetData.rows.length} rows
+              {/* Footer - Status Bar */}
+              <div className="bg-gray-50 px-6 py-2 border-t border-gray-300 text-xs text-gray-600 flex items-center justify-between">
+                <div>
+                  Showing {filteredData.length} of {sheetData.rows.length} rows
+                </div>
+                {selectedCell && (
+                  <div className="flex gap-4 text-xs text-gray-700">
+                    <span>Count: {getStatusBarInfo().count}</span>
+                    {getStatusBarInfo().numberCount > 0 && (
+                      <>
+                        <span>Sum: {getStatusBarInfo().sum.toFixed(2)}</span>
+                        <span>Average: {getStatusBarInfo().avg.toFixed(2)}</span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -535,6 +849,40 @@ export default function CallSheetsPage() {
           {/* Spacer */}
           <div className="flex-1" />
         </div>
+
+        {/* Context Menu */}
+        {contextMenu && (
+          <div
+            className="fixed bg-white border border-gray-300 rounded shadow-lg z-50 text-xs"
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+            onMouseLeave={() => setContextMenu(null)}
+          >
+            <button
+              onClick={() => {
+                handleCopy();
+                setContextMenu(null);
+              }}
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100 border-b border-gray-200"
+            >
+              Copy (Ctrl+C)
+            </button>
+            <button
+              onClick={() => {
+                handleDelete();
+                setContextMenu(null);
+              }}
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100 border-b border-gray-200"
+            >
+              Clear (Del)
+            </button>
+            <button
+              onClick={() => setContextMenu(null)}
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            >
+              Close
+            </button>
+          </div>
+        )}
 
         {/* Create Sheet Modal */}
         {showCreateModal && (
