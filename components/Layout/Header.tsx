@@ -5,6 +5,7 @@ import { User } from '@/types';
 import { BiSearch, BiHelpCircle } from 'react-icons/bi';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import SearchModal from '@/components/Dashboard/SearchModal';
+import NotificationCenter from '@/components/Common/NotificationCenter';
 
 const pageTitles: Record<string, string> = {
   '/dashboard': 'Overview',
@@ -119,6 +120,7 @@ export default function Header({
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             All Systems OK
           </span>
+          <NotificationCenter />
           {!router.pathname.startsWith('/bank') && (
             <button
               onClick={() => onVoiceAssistantEnabledChange?.(!voiceAssistantEnabled)}

@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import ThemeProvider from '@/components/Providers/ThemeProvider';
 import CurrencyProvider from '@/components/Providers/CurrencyProvider';
 import HajjYearProvider from '@/components/Providers/HajjYearProvider';
+import { NotificationProvider } from '@/lib/notificationContext';
 import { isLoggedIn } from '@/lib/auth';
 import '@/styles/globals.css';
 
@@ -31,13 +32,15 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.pathname]);
 
   return (
-    <ThemeProvider>
-      <CurrencyProvider>
-        <HajjYearProvider>
-          <Toaster position="top-right" />
-          <Component {...pageProps} />
-        </HajjYearProvider>
-      </CurrencyProvider>
-    </ThemeProvider>
+    <NotificationProvider>
+      <ThemeProvider>
+        <CurrencyProvider>
+          <HajjYearProvider>
+            <Toaster position="top-right" />
+            <Component {...pageProps} />
+          </HajjYearProvider>
+        </CurrencyProvider>
+      </ThemeProvider>
+    </NotificationProvider>
   );
 }
