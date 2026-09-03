@@ -510,7 +510,7 @@ export default function CallSheetsPage() {
       const column = sheetData?.columns[editCell.col];
       if (column) {
         filteredData[editCell.row][column] = editValue;
-        toast.info('Edit logged (read-only mode)');
+        toast.success('Edit logged (read-only mode)');
       }
     }
     setEditCell(null);
