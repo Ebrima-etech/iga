@@ -4,7 +4,7 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   hoverable?: boolean;
-  padding?: 'sm' | 'md' | 'lg';
+  padding?: 'sm' | 'md' | 'lg' | 'none';
   shadow?: 'none' | 'sm' | 'md' | 'lg';
   border?: boolean;
 }
@@ -13,6 +13,7 @@ const paddingStyles = {
   sm: 'p-4',
   md: 'p-6',
   lg: 'p-8',
+  none: '',
 };
 
 const shadowStyles = {
