@@ -539,7 +539,7 @@ export default function CallSheetsPage() {
   };
 
   const getStatusBarInfo = () => {
-    if (!selectedCell || !sheetData) return { count: 0, sum: 0, avg: 0 };
+    if (!selectedCell || !sheetData) return { count: 0, sum: 0, avg: 0, numberCount: 0 };
 
     const startRow = Math.min(selectedCell.row, selectionStart?.row || selectedCell.row);
     const endRow = Math.max(selectedCell.row, selectionStart?.row || selectedCell.row);
