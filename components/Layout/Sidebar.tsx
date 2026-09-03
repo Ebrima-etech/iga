@@ -19,7 +19,6 @@ import {
   BiGlobe,
   BiTable,
   BiReceipt,
-  BiMessageSquare,
 } from 'react-icons/bi';
 
 interface NavItem {
@@ -55,12 +54,6 @@ const navSections: NavSection[] = [
       { label: 'Room Assignments', href: '/dashboard/accommodations/room-assignments', icon: <BiBuilding size={18} /> },
       { label: 'Flights', href: '/dashboard/accommodations/flights', icon: <BiLineChart size={18} /> },
       { label: 'Flight Assignments', href: '/dashboard/accommodations/flight-assignments', icon: <BiWallet size={18} /> },
-    ],
-  },
-  {
-    label: 'Communication',
-    items: [
-      { label: 'Chat', href: '/dashboard/chat', icon: <BiMessageSquare size={18} /> },
     ],
   },
   {
