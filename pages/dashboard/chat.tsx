@@ -118,7 +118,7 @@ export default function ChatPage() {
                     : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <BiUser className="inline mr-2" size={18} />
+                <BiGroup className="inline mr-2" size={18} />
                 Groups
               </button>
             </div>
