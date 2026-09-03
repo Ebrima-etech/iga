@@ -39,7 +39,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const fetchNotifications = async () => {
     try {
-      const response = await api.get('/dashboard/notifications/');
+      const response = await api.get('/notifications/');
       const data = response.data.results || response.data;
       const transformed = Array.isArray(data) ? data.map(n => ({
         ...n,
@@ -64,19 +64,19 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const removeNotification = useCallback((id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
-    api.delete(`/dashboard/notifications/${id}/`).catch(console.error);
+    api.delete(`/notifications/${id}/`).catch(console.error);
   }, []);
 
   const markAsRead = useCallback((id: string) => {
     setNotifications(prev =>
       prev.map(n => (n.id === id ? { ...n, read: true } : n))
     );
-    api.patch(`/dashboard/notifications/${id}/`, { read: true }).catch(console.error);
+    api.patch(`/notifications/${id}/`, { read: true }).catch(console.error);
   }, []);
 
   const markAllAsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    api.patch('/dashboard/notifications/mark_all_as_read/').catch(console.error);
+    api.patch('/notifications/mark_all_as_read/').catch(console.error);
   }, []);
 
   const clearAllNotifications = useCallback(() => {
