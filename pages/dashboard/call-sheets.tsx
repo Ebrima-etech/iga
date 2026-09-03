@@ -498,11 +498,11 @@ export default function CallSheetsPage() {
   };
 
   const handlePaste = () => {
-    toast.info('Paste in read-only mode');
+    toast.success('Sheet is read-only');
   };
 
   const handleDelete = () => {
-    toast.info('Delete protected - data is read-only');
+    toast.success('Delete protected - data is read-only');
   };
 
   const handleSaveEdit = () => {
