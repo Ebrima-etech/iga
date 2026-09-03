@@ -97,7 +97,7 @@ export default function NotificationCenter() {
           <div className="overflow-y-auto flex-1">
             {notifications.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
-                <Bibell size={40} className="mx-auto mb-2 opacity-50" />
+                <BiBell size={40} className="mx-auto mb-2 opacity-50" />
                 <p>No notifications yet</p>
               </div>
             ) : (
