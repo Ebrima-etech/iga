@@ -43,7 +43,7 @@ export const SWR_CONFIG_STATIC: SWRConfiguration = {
  */
 export const SWR_CONFIG_REALTIME: SWRConfiguration = {
   ...SWR_CONFIG,
-  revalidateInterval: 10 * 1000,      // Revalidate every 10 seconds
+  refreshInterval: 10 * 1000,         // Revalidate every 10 seconds
   focusThrottleInterval: 0,           // Always revalidate on focus
 };
 
