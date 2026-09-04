@@ -282,9 +282,8 @@ export function useRenderMetrics(componentName: string) {
 export function reportWebVitals() {
   if (typeof window === 'undefined') return;
 
-  import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+  import('web-vitals').then(({ onCLS, onFCP, onLCP, onTTFB }) => {
     onCLS(metric => console.log(`CLS: ${metric.value.toFixed(3)}`));
-    onFID(metric => console.log(`FID: ${metric.value.toFixed(3)}ms`));
     onFCP(metric => console.log(`FCP: ${metric.value.toFixed(3)}ms`));
     onLCP(metric => console.log(`LCP: ${metric.value.toFixed(3)}ms`));
     onTTFB(metric => console.log(`TTFB: ${metric.value.toFixed(3)}ms`));
