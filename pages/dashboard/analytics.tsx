@@ -222,9 +222,9 @@ export default function AnalyticsPage() {
             <Card className="p-6 border-l-4 border-l-blue-500">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Total Pilgrims</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalPilgrims.toLocaleString()}</p>
-                  <p className="text-xs text-emerald-600 mt-2">↑ 12.5% from last period</p>
+                  <p className="text-xs text-gray-600 font-medium">Total Pilgrims</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-2">{metrics.totalPilgrims.toLocaleString()}</p>
+                  <p className="text-xs text-emerald-600 mt-1">↑ 12.5% from last period</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <BiUser size={24} className="text-blue-600" />
@@ -235,18 +235,18 @@ export default function AnalyticsPage() {
             <Card className="p-6 border-l-4 border-l-emerald-500">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Total Revenue</p>
+                  <p className="text-xs text-gray-600 font-medium">Total Revenue</p>
                   <div className="flex items-center justify-between mt-2">
-                    <p className="text-3xl font-bold text-gray-900">{isFieldHidden('total-payments') ? '••••••' : formatMoney(metrics.totalPayments, 'millions')}</p>
+                    <p className="text-2xl font-bold text-gray-900">{isFieldHidden('total-payments') ? '••••••' : formatMoney(metrics.totalPayments, 'millions')}</p>
                     <button
                       onClick={() => toggleFieldVisibility('total-payments')}
                       className="p-1 hover:bg-gray-200 rounded transition-colors"
                       title={isFieldHidden('total-payments') ? 'Show' : 'Hide'}
                     >
-                      {isFieldHidden('total-payments') ? <BiHide size={20} className="text-gray-600" /> : <BiShow size={20} className="text-gray-600" />}
+                      {isFieldHidden('total-payments') ? <BiHide size={16} className="text-gray-600" /> : <BiShow size={16} className="text-gray-600" />}
                     </button>
                   </div>
-                  <p className="text-xs text-emerald-600 mt-2">↑ 8.3% from last period</p>
+                  <p className="text-xs text-emerald-600 mt-1">↑ 8.3% from last period</p>
                 </div>
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
                   <BiWallet size={24} className="text-emerald-600" />
@@ -257,9 +257,9 @@ export default function AnalyticsPage() {
             <Card className="p-6 border-l-4 border-l-amber-500">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Completion Rate</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{metrics.paymentCompletionRate}%</p>
-                  <p className="text-xs text-emerald-600 mt-2">↑ 3.2% from last period</p>
+                  <p className="text-xs text-gray-600 font-medium">Completion Rate</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-2">{metrics.paymentCompletionRate}%</p>
+                  <p className="text-xs text-emerald-600 mt-1">↑ 3.2% from last period</p>
                 </div>
                 <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
                   <BiCheckCircle size={24} className="text-amber-600" />
@@ -270,18 +270,18 @@ export default function AnalyticsPage() {
             <Card className="p-6 border-l-4 border-l-purple-500">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Avg Payment</p>
+                  <p className="text-xs text-gray-600 font-medium">Avg Payment</p>
                   <div className="flex items-center justify-between mt-2">
-                    <p className="text-3xl font-bold text-gray-900">{isFieldHidden('avg-payment') ? '••••••' : formatMoney(metrics.avgPaymentAmount)}</p>
+                    <p className="text-2xl font-bold text-gray-900">{isFieldHidden('avg-payment') ? '••••••' : formatMoney(metrics.avgPaymentAmount)}</p>
                     <button
                       onClick={() => toggleFieldVisibility('avg-payment')}
                       className="p-1 hover:bg-gray-200 rounded transition-colors"
                       title={isFieldHidden('avg-payment') ? 'Show' : 'Hide'}
                     >
-                      {isFieldHidden('avg-payment') ? <BiHide size={20} className="text-gray-600" /> : <BiShow size={20} className="text-gray-600" />}
+                      {isFieldHidden('avg-payment') ? <BiHide size={16} className="text-gray-600" /> : <BiShow size={16} className="text-gray-600" />}
                     </button>
                   </div>
-                  <p className="text-xs text-emerald-600 mt-2">↑ 5.1% from last period</p>
+                  <p className="text-xs text-emerald-600 mt-1">↑ 5.1% from last period</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                   <BiTrendingUp size={24} className="text-purple-600" />
