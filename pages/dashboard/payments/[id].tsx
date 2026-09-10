@@ -5,10 +5,13 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import Loading from '@/components/Common/Loading';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import api from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { formatCurrencyWithCode } from '@/lib/currency';
 import toast from 'react-hot-toast';
 import { BiChevronLeft } from 'react-icons/bi';
+import { CurrencyCode } from '@/types';
 
 interface BankPaymentSubmission {
   id: string | number;
@@ -38,8 +41,13 @@ export default function PaymentDetailPage() {
   const [loading, setLoading] = useState(true);
   const [payment, setPayment] = useState<BankPaymentSubmission | null>(null);
   const [error, setError] = useState('');
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>(() =>
+    useCurrencyStore.getState().defaultCurrency || 'GMD'
+  );
 
   useEffect(() => {
+    // Initialize page currency from global default on mount
+    setPageCurrency(useCurrencyStore.getState().defaultCurrency);
     if (id) {
       fetchPayment();
     }
@@ -77,18 +85,30 @@ export default function PaymentDetailPage() {
     <Layout>
       <div className="max-w-4xl mx-auto space-y-6 p-8">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700"
-          >
-            <BiChevronLeft size={20} />
-            Back
-          </button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Payment Details</h1>
-            <p className="text-gray-600 mt-1">{payment.reference_number}</p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700"
+            >
+              <BiChevronLeft size={20} />
+              Back
+            </button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Payment Details</h1>
+              <p className="text-gray-600 mt-1">{payment.reference_number}</p>
+            </div>
           </div>
+          <select
+            value={pageCurrency}
+            onChange={(e) => setPageCurrency(e.target.value as CurrencyCode)}
+            className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+          >
+            <option value="GMD">GMD</option>
+            <option value="USD">USD</option>
+            <option value="GBP">GBP</option>
+            <option value="EUR">EUR</option>
+          </select>
         </div>
 
         {error && (
@@ -156,7 +176,7 @@ export default function PaymentDetailPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
               <p className="text-gray-600">Amount</p>
-              <p className="font-bold text-lg text-emerald-700">{formatCurrency(payment.amount)}</p>
+              <p className="font-bold text-lg text-emerald-700">{formatCurrencyWithCode(payment.amount, pageCurrency)}</p>
             </div>
             <div>
               <p className="text-gray-600">Reference</p>
