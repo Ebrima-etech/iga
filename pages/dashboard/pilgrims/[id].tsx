@@ -451,7 +451,7 @@ export default function PilgrimDetailPage() {
                     {payments.map((payment) => (
                       <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-3.5 font-mono text-xs text-gray-500">{payment.reference_number}</td>
-                        <td className="px-6 py-3.5 font-mono font-medium text-gray-900">{formatCurrency(payment.amount)}</td>
+                        <td className="px-6 py-3.5 font-mono font-medium text-gray-900">{formatCurrencyWithCode(payment.amount, pageCurrency)}</td>
                         <td className="px-6 py-3.5 text-sm text-gray-600">{payment.bank_name}</td>
                         <td className="px-6 py-3.5 text-sm">
                           <div>
