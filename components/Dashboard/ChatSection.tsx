@@ -18,6 +18,7 @@ export default function ChatSection() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -29,8 +30,10 @@ export default function ChatSection() {
       setRefreshing(true);
       const response = await api.get('/chat-broadcasts/recent/?limit=50');
       setMessages(response.data.reverse());
-    } catch (error) {
-      console.error('Failed to fetch chat messages:', error);
+      setError(null);
+    } catch (err: any) {
+      console.error('Failed to fetch chat messages:', err);
+      setError(err?.message || 'Failed to load messages');
     } finally {
       setRefreshing(false);
     }
@@ -86,7 +89,20 @@ export default function ChatSection() {
 
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.length === 0 ? (
+        {error ? (
+          <div className="flex items-center justify-center h-full text-center">
+            <div>
+              <p className="text-red-600 font-semibold mb-2">Unable to load chat</p>
+              <p className="text-sm text-gray-500 mb-3">{error}</p>
+              <button
+                onClick={fetchMessages}
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-500">
             <p>No messages yet. Start the conversation!</p>
           </div>
