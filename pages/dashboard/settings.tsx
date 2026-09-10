@@ -19,8 +19,9 @@ import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
 import HajjYearDetailModal from '@/components/Common/HajjYearDetailModal';
 import SignatoriesManagement from '@/components/Dashboard/SignatoriesManagement';
 import EmailNotificationSettings from '@/components/Dashboard/EmailNotificationSettings';
+import UserManagement from '@/components/Dashboard/UserManagement';
 
-type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years' | 'signatory' | 'email-notifications';
+type SettingsTab = 'profile' | 'currency' | 'system' | 'hajj-years' | 'signatory' | 'email-notifications' | 'users';
 
 interface CurrencyData {
   code: CurrencyCode;
@@ -345,6 +346,19 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-2">
                       <BiEnvelope size={18} />
                       Email Notifications
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('users')}
+                    className={`pb-4 px-2 font-medium text-sm transition-all ${
+                      activeTab === 'users'
+                        ? 'border-b-2 border-indigo-600 text-indigo-600'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <BiUser size={18} />
+                      Users & Staff
                     </div>
                   </button>
                 </>
@@ -878,6 +892,19 @@ export default function SettingsPage() {
               <div className="text-center py-8">
                 <BiX size={32} className="text-red-400 mx-auto mb-3" />
                 <p className="text-gray-600">Only administrators can manage email notifications</p>
+              </div>
+            </Card>
+          )}
+
+          {activeTab === 'users' && user?.is_staff && (
+            <UserManagement />
+          )}
+
+          {activeTab === 'users' && !user?.is_staff && (
+            <Card padding="lg" shadow="none">
+              <div className="text-center py-8">
+                <BiX size={32} className="text-red-400 mx-auto mb-3" />
+                <p className="text-gray-600">Only administrators can manage users and staff</p>
               </div>
             </Card>
           )}
