@@ -86,6 +86,43 @@ export default function LoginPage() {
         style={{ background: 'radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.35) 100%)' }}
       />
 
+      {/* Airplane, now flying across the entire page */}
+      <div className="absolute top-[9%] left-0 w-full pointer-events-none hajj-plane-track" style={{ willChange: 'transform' }}>
+        <svg width="128" height="74" viewBox="0 0 110 64" fill="none" className="text-amber-200/95" style={{ backfaceVisibility: 'hidden' }}>
+          <defs>
+            <clipPath id="tailFlagClip">
+              <path d="M10 34 L26 8 L33 8 L26 34 Z" />
+            </clipPath>
+          </defs>
+          <path d="M10 34 L26 50 L33 50 Z" fill="currentColor" opacity="0.85" />
+          <g clipPath="url(#tailFlagClip)">
+            <rect x="5" y="8" width="35" height="8" fill="#CE1126" />
+            <rect x="5" y="16" width="35" height="1" fill="#ffffff" />
+            <rect x="5" y="17" width="35" height="8" fill="#0C1C8C" />
+            <rect x="5" y="25" width="35" height="1" fill="#ffffff" />
+            <rect x="5" y="26" width="35" height="8" fill="#3A7728" />
+          </g>
+          <path d="M41 34 L64 4 L71 4 L55 34 Z" fill="currentColor" />
+          <path d="M41 34 L64 60 L71 60 L55 34 Z" fill="currentColor" opacity="0.85" />
+          <rect x="17" y="27" width="82" height="14" rx="7" fill="currentColor" />
+          <path d="M99 27 L110 34 L99 41 Z" fill="currentColor" />
+          <text
+            x="58"
+            y="36"
+            fontSize="14"
+            fontWeight="800"
+            fill="#052e21"
+            textAnchor="middle"
+            fontFamily="Arial, sans-serif"
+            letterSpacing="1"
+          >
+            GIA
+          </text>
+        </svg>
+        <svg width="175" height="6" viewBox="0 0 150 5" className="text-amber-100/25 -mt-1 -ml-28">
+          <line x1="0" y1="2.5" x2="145" y2="2.5" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 4" />
+        </svg>
+      </div>
 
       <HajjVisualPanel />
 
@@ -212,6 +249,22 @@ export default function LoginPage() {
       )}
 
       <style jsx>{`
+        .hajj-plane-track {
+          animation: hajjFlyPage 26s ease-in-out 1;
+          animation-fill-mode: forwards;
+        }
+        @keyframes hajjFlyPage {
+          0% { transform: translate3d(-10%, 100%, 0) rotateZ(0deg) rotateY(-8deg) rotateX(5deg); opacity: 0; }
+          5% { opacity: 0.3; }
+          12% { opacity: 1; transform: translate3d(20%, 60%, 0) rotateZ(-2deg) rotateY(-9deg) rotateX(6deg); }
+          25% { transform: translate3d(85%, 10%, 0) rotateZ(-10deg) rotateY(-11deg) rotateX(8deg); }
+          40% { transform: translate3d(150%, -120px, 0) rotateZ(-16deg) rotateY(-13deg) rotateX(10deg); }
+          60% { transform: translate3d(220%, -240px, 0) rotateZ(-22deg) rotateY(-15deg) rotateX(12deg); }
+          80% { transform: translate3d(290%, -340px, 0) rotateZ(-28deg) rotateY(-17deg) rotateX(14deg); }
+          90% { opacity: 1; }
+          100% { transform: translate3d(340%, -400px, 0) rotateZ(-30deg) rotateY(-18deg) rotateX(15deg); opacity: 0; }
+        }
+
         .door-stage {
           perspective: 900px;
           perspective-origin: 50% 50%;
