@@ -9,7 +9,7 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
-import { getCurrencySymbol, convertCurrency } from '@/lib/currency';
+import { getCurrencySymbol, convertCurrency, formatCurrencyWithCode } from '@/lib/currency';
 import {
   LineChart,
   Line,
@@ -124,6 +124,14 @@ export default function AnalyticsPage() {
     const convertedValue = convertCurrency(value, 'GMD', currency);
     if (format === 'millions') return `${symbol}${(convertedValue / 1000000).toFixed(2)}M`;
     return `${symbol}${convertedValue.toLocaleString()}`;
+  };
+
+  const formatMoneyWithCode = (value: number, format: 'millions' | 'regular' = 'regular') => {
+    const currency = useCurrencyStore.getState().defaultCurrency;
+    // Convert from GMD (database default) to selected currency
+    const convertedValue = convertCurrency(value, 'GMD', currency);
+    if (format === 'millions') return `${currency} ${(convertedValue / 1000000).toFixed(2)}M`;
+    return `${currency} ${convertedValue.toLocaleString()}`;
   };
 
   if (loading) {
@@ -243,7 +251,7 @@ export default function AnalyticsPage() {
                 <div>
                   <p className="text-xs text-gray-600 font-medium">Total Revenue</p>
                   <div className="flex items-center justify-between mt-2">
-                    <p className="text-2xl font-bold text-gray-900">{isFieldHidden('total-payments') ? '••••••' : formatMoney(metrics.totalPayments, 'millions')}</p>
+                    <p className="text-2xl font-bold text-gray-900">{isFieldHidden('total-payments') ? '••••••' : formatMoneyWithCode(metrics.totalPayments, 'millions')}</p>
                     <button
                       onClick={() => toggleFieldVisibility('total-payments')}
                       className="p-1 hover:bg-gray-200 rounded transition-colors"
@@ -278,7 +286,7 @@ export default function AnalyticsPage() {
                 <div>
                   <p className="text-xs text-gray-600 font-medium">Avg Payment</p>
                   <div className="flex items-center justify-between mt-2">
-                    <p className="text-2xl font-bold text-gray-900">{isFieldHidden('avg-payment') ? '••••••' : formatMoney(metrics.avgPaymentAmount)}</p>
+                    <p className="text-2xl font-bold text-gray-900">{isFieldHidden('avg-payment') ? '••••••' : formatMoneyWithCode(metrics.avgPaymentAmount)}</p>
                     <button
                       onClick={() => toggleFieldVisibility('avg-payment')}
                       className="p-1 hover:bg-gray-200 rounded transition-colors"

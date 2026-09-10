@@ -11,6 +11,8 @@ import { Payment } from '@/types';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
+import { formatCurrencyWithCode } from '@/lib/currency';
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import toast from 'react-hot-toast';
 import { BiPlus, BiShow, BiHide } from 'react-icons/bi';
 import { useTableState } from '@/lib/useTableState';
@@ -158,7 +160,7 @@ export default function PaymentsPage() {
               </button>
             </div>
             <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">
-              {isFieldHidden('payments-total-amount') ? '••••••' : formatCurrency(totalAmount)}
+              {isFieldHidden('payments-total-amount') ? '••••••' : formatCurrencyWithCode(totalAmount, useCurrencyStore.getState().defaultCurrency)}
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
@@ -173,7 +175,7 @@ export default function PaymentsPage() {
               </button>
             </div>
             <p className="text-2xl font-bold text-emerald-600 mt-2 font-mono">
-              {isFieldHidden('payments-confirmed-amount') ? '••••••' : formatCurrency(confirmedAmount)}
+              {isFieldHidden('payments-confirmed-amount') ? '••••••' : formatCurrencyWithCode(confirmedAmount, useCurrencyStore.getState().defaultCurrency)}
             </p>
           </div>
         </div>

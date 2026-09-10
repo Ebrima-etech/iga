@@ -83,6 +83,27 @@ export function formatCurrency(
 }
 
 /**
+ * Format currency value with code (e.g., USD 1,234.56)
+ * @param amount - Amount in GMD (from database)
+ * @param currency - Target currency code
+ * @param decimals - Number of decimal places
+ * @returns Formatted currency string with code instead of symbol
+ */
+export function formatCurrencyWithCode(
+  amount: number,
+  currency: CurrencyCode = 'USD',
+  decimals: number = 2
+): string {
+  // Convert from GMD (database default) to target currency
+  const convertedAmount = convertCurrency(amount, 'GMD', currency);
+  const formatted = convertedAmount.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return `${currency} ${formatted}`;
+}
+
+/**
  * Format currency without symbol
  */
 export function formatCurrencyValue(amount: number, decimals: number = 2): string {

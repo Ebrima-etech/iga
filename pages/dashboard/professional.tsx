@@ -16,7 +16,7 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
-import { getCurrencySymbol, convertCurrency } from '@/lib/currency';
+import { getCurrencySymbol, convertCurrency, formatCurrencyWithCode } from '@/lib/currency';
 import {
   LineChart,
   Line,
@@ -193,7 +193,13 @@ export default function ProfessionalDashboard() {
     },
     {
       label: 'Total Payment',
-      value: stats.totalPayments > 0 ? `D${(stats.totalPayments / 1000000).toFixed(2)}M` : 'D0.00M',
+      value: stats.totalPayments > 0
+        ? (() => {
+            const currency = useCurrencyStore.getState().defaultCurrency;
+            const converted = convertCurrency(stats.totalPayments, 'GMD', currency);
+            return `${currency} ${(converted / 1000000).toFixed(2)}M`;
+          })()
+        : `${useCurrencyStore.getState().defaultCurrency} 0.00M`,
       caption: `${payments.length} transactions`,
       icon: <BiWallet size={15} />,
       isFinancial: true,
