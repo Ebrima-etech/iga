@@ -9,7 +9,6 @@ import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import ProfessionalTable from '@/components/Common/ProfessionalTable';
-import ChatSection from '@/components/Dashboard/ChatSection';
 {/* GIA Logo Engravings - Inline */}
 import { StatCardSkeleton, ChartSkeleton, TableSkeleton } from '@/components/Common/Skeleton';
 import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh, BiShow, BiHide } from 'react-icons/bi';
@@ -621,10 +620,6 @@ export default function ProfessionalDashboard() {
                   </div>
                 </Card>
 
-                {/* Chat Section */}
-                <div style={{ height: '400px' }}>
-                  <ChatSection />
-                </div>
               </div>
             </div>
             </div>
