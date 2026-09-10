@@ -191,18 +191,31 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Search and Create Button */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex-1 flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+      {/* Page Title Section */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">User & Staff Management</h1>
+        <p className="text-gray-600 mt-1">Manage GIA team members and view bank users</p>
+      </div>
+
+      {/* Action Bar - Search and Buttons */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 transition">
           <BiSearch size={18} className="text-gray-400" />
           <input
             type="text"
-            placeholder="Search users..."
+            placeholder="Search by name, username, or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 bg-transparent outline-none text-gray-700"
+            className="flex-1 bg-transparent outline-none text-gray-700 text-sm"
           />
         </div>
+        <button
+          onClick={fetchUsers}
+          className="p-2.5 hover:bg-gray-100 rounded-lg transition text-gray-600"
+          title="Refresh users"
+        >
+          <BiRefresh size={18} />
+        </button>
         <ProfessionalButton
           variant="primary"
           size="md"
@@ -215,155 +228,172 @@ export default function UserManagement() {
         >
           Add User
         </ProfessionalButton>
-        <button
-          onClick={fetchUsers}
-          className="p-2 hover:bg-gray-100 rounded-lg transition"
-          title="Refresh users"
-        >
-          <BiRefresh size={18} />
-        </button>
       </div>
 
       {/* Create/Edit Modal */}
       {(showCreateModal || editingUser) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card padding="lg" className="w-full max-w-md">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">
-                {editingUser ? 'Edit User' : 'Create New User'}
-              </h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card padding="lg" className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {editingUser ? 'Edit User' : 'Create New User'}
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {editingUser ? 'Update user role and status' : 'Add a new GIA team member'}
+                </p>
+              </div>
               <button
                 onClick={() => {
                   setShowCreateModal(false);
                   setEditingUser(null);
                   resetForm();
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 transition"
               >
                 <BiX size={24} />
               </button>
             </div>
 
-            <div className="space-y-4 mb-6">
+            {/* Form Section */}
+            <div className="space-y-6 mb-6">
+              {/* Account Information */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  disabled={!!editingUser}
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100"
-                  placeholder="Enter username"
-                />
-              </div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-4">Account Information</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Username
+                    </label>
+                    <input
+                      type="text"
+                      disabled={!!editingUser}
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100 text-sm"
+                      placeholder="Enter username"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  disabled={!!editingUser}
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100"
-                  placeholder="Enter email"
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      disabled={!!editingUser}
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100 text-sm"
+                      placeholder="Enter email"
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    disabled={!!editingUser}
-                    value={formData.first_name}
-                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100"
-                    placeholder="First name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    disabled={!!editingUser}
-                    value={formData.last_name}
-                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100"
-                    placeholder="Last name"
-                  />
+                  {!editingUser && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Password
+                      </label>
+                      <input
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        placeholder="Enter password"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {!editingUser && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    placeholder="Enter password"
-                  />
-                </div>
-              )}
-
+              {/* Personal Information */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
-                </label>
-                <select
-                  value={formData.role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value as any })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                >
-                  {ROLE_OPTIONS.map((role) => (
-                    <option key={role.value} value={role.value}>
-                      {role.label}
-                    </option>
-                  ))}
-                </select>
+                <h3 className="text-sm font-semibold text-gray-900 mb-4">Personal Information</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      disabled={!!editingUser}
+                      value={formData.first_name}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100 text-sm"
+                      placeholder="First name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      disabled={!!editingUser}
+                      value={formData.last_name}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100 text-sm"
+                      placeholder="Last name"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="is_active"
-                  checked={formData.is_active}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-4 h-4"
-                />
-                <label htmlFor="is_active" className="text-sm text-gray-700">
-                  Active
-                </label>
+              {/* Role & Status */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-4">Role & Status</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Role
+                    </label>
+                    <select
+                      value={formData.role}
+                      onChange={(e) =>
+                        setFormData({ ...formData, role: e.target.value as any })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    >
+                      {ROLE_OPTIONS.map((role) => (
+                        <option key={role.value} value={role.value}>
+                          {role.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <input
+                      type="checkbox"
+                      id="is_active"
+                      checked={formData.is_active}
+                      onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                      className="w-4 h-4"
+                    />
+                    <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+                      Active Status
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-2">
+            {/* Modal Footer */}
+            <div className="flex gap-3 pt-4 border-t border-gray-200">
               <button
                 onClick={() => {
                   setShowCreateModal(false);
                   setEditingUser(null);
                   resetForm();
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-sm text-gray-700"
               >
                 Cancel
               </button>
               <button
                 onClick={editingUser ? handleUpdateUser : handleCreateUser}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm"
               >
                 {editingUser ? 'Update User' : 'Create User'}
               </button>
@@ -372,17 +402,25 @@ export default function UserManagement() {
         </div>
       )}
 
-      {/* Users Table */}
-      <Card padding="lg" shadow="none">
-        <div className="flex items-start justify-between mb-4">
+      {/* Info Box */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex gap-3">
+          <div className="text-blue-600 mt-0.5">ℹ️</div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              Users & Staff ({filteredUsers.length})
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              💡 Bank users are displayed as view-only for reference only (cannot edit or delete)
+            <p className="text-sm font-medium text-blue-900">Bank Users are View-Only</p>
+            <p className="text-sm text-blue-700 mt-1">
+              Bank users (Bank Admin, Bank Staff) are displayed for reference only and cannot be edited or deleted by GIA admins.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <Card padding="lg" shadow="none">
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Team Members ({filteredUsers.length})
+          </h2>
         </div>
 
         {loading ? (
