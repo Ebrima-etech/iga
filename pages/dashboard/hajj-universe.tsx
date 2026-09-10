@@ -253,18 +253,35 @@ export default function HajjUniverse() {
     const loadData = async () => {
       try {
         const [statsRes, pilgrimsRes, paymentsRes, yearsRes, banksRes] = await Promise.all([
-          api.get('/dashboard/hajj-years/statistics/').catch(() => ({ data: [] })),
-          api.get('/pilgrims/').catch(() => ({ data: { results: [] } })),
-          api.get('/bank-payment-submissions/').catch(() => ({ data: { results: [] } })),
-          api.get('/dashboard/hajj-years/').catch(() => ({ data: { results: [] } })),
-          api.get('/banks/').catch(() => ({ data: { results: [] } })),
+          api.get('/dashboard/hajj-years/statistics/').catch((e) => {
+            console.error('Failed to fetch year statistics:', e);
+            return { data: [] };
+          }),
+          api.get('/pilgrims/').catch((e) => {
+            console.error('Failed to fetch pilgrims:', e);
+            return { data: { results: [] } };
+          }),
+          api.get('/bank-payment-submissions/').catch((e) => {
+            console.error('Failed to fetch payments:', e);
+            return { data: { results: [] } };
+          }),
+          api.get('/dashboard/hajj-years/').catch((e) => {
+            console.error('Failed to fetch hajj years:', e);
+            return { data: { results: [] } };
+          }),
+          api.get('/banks/').catch((e) => {
+            console.error('Failed to fetch banks:', e);
+            return { data: { results: [] } };
+          }),
         ]);
 
         const yearStats = statsRes.data || [];
-        const pilgrims = pilgrimsRes.data.results || pilgrimsRes.data || [];
+        const pilgrims = (pilgrimsRes.data.results || pilgrimsRes.data || []).filter((p: any) => p && p.date_of_birth);
         const payments = paymentsRes.data.results || paymentsRes.data || [];
         const yearsData = yearsRes.data.results || yearsRes.data || [];
         const banksData = banksRes.data.results || banksRes.data || [];
+
+        console.log('Loaded data - Pilgrims:', pilgrims.length, 'Payments:', payments.length, 'Years:', yearsData.length);
 
         setYears(yearsData.sort((a: any, b: any) => b.year - a.year));
         if (yearsData.length > 0) {
