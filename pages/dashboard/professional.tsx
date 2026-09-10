@@ -259,7 +259,10 @@ export default function ProfessionalDashboard() {
       key: 'amount',
       label: 'Amount',
       width: '15%',
-      render: (value: number) => <span className="font-mono font-medium text-gray-900">D{value.toLocaleString()}</span>,
+      render: (value: number) => {
+        const symbol = getCurrencySymbol(useCurrencyStore.getState().defaultCurrency);
+        return <span className="font-mono font-medium text-gray-900">{symbol}{value.toLocaleString()}</span>;
+      },
     },
     {
       key: 'bank_name',
@@ -523,7 +526,7 @@ export default function ProfessionalDashboard() {
                           <p className="text-xs text-gray-500 leading-tight">{payment.bank_name}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs font-semibold text-gray-900">D{parseFloat(payment.amount || 0).toLocaleString()}</p>
+                          <p className="text-xs font-semibold text-gray-900">{getCurrencySymbol(useCurrencyStore.getState().defaultCurrency)}{parseFloat(payment.amount || 0).toLocaleString()}</p>
                           <p className={`text-xs font-medium leading-tight ${
                             payment.status === 'verified' || payment.status === 'confirmed' ? 'text-emerald-600' :
                             payment.status === 'pending' ? 'text-amber-600' : 'text-red-600'
