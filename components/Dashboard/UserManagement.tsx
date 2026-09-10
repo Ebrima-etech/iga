@@ -43,6 +43,7 @@ export default function UserManagement() {
   const [filteredUsers, setFilteredUsers] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [userType, setUserType] = useState<'gia' | 'bank'>('gia');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRole | null>(null);
 
@@ -62,13 +63,23 @@ export default function UserManagement() {
   }, []);
 
   useEffect(() => {
-    const filtered = users.filter((user) =>
-      user.user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      `${user.user.first_name} ${user.user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    let filtered = users.filter((user) => {
+      // Filter by user type
+      const isGiaUser = user.role === 'hajj_admin' || user.role === 'hajj_staff';
+      const isBankUser = user.role === 'bank_admin' || user.role === 'bank_staff';
+
+      if (userType === 'gia' && !isGiaUser) return false;
+      if (userType === 'bank' && !isBankUser) return false;
+
+      // Filter by search query
+      return (
+        user.user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        `${user.user.first_name} ${user.user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
     setFilteredUsers(filtered);
-  }, [searchQuery, users]);
+  }, [searchQuery, users, userType]);
 
   const fetchUsers = async () => {
     try {
@@ -402,32 +413,75 @@ export default function UserManagement() {
         </div>
       )}
 
-      {/* Info Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex gap-3">
-          <div className="text-blue-600 mt-0.5">ℹ️</div>
-          <div>
-            <p className="text-sm font-medium text-blue-900">Bank Users are View-Only</p>
-            <p className="text-sm text-blue-700 mt-1">
-              Bank users (Bank Admin, Bank Staff) are displayed for reference only and cannot be edited or deleted by GIA admins.
-            </p>
-          </div>
-        </div>
+      {/* User Type Tabs */}
+      <div className="flex gap-4 border-b border-gray-200">
+        <button
+          onClick={() => setUserType('gia')}
+          className={`pb-4 px-1 font-medium text-sm transition-all ${
+            userType === 'gia'
+              ? 'border-b-2 border-blue-600 text-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          GIA Staff
+          <span className="ml-2 text-xs font-normal text-gray-500">
+            ({users.filter((u) => !isBankUser(u.role)).length})
+          </span>
+        </button>
+        <button
+          onClick={() => setUserType('bank')}
+          className={`pb-4 px-1 font-medium text-sm transition-all ${
+            userType === 'bank'
+              ? 'border-b-2 border-blue-600 text-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Bank Users
+          <span className="ml-2 text-xs font-normal text-gray-500">
+            ({users.filter((u) => isBankUser(u.role)).length})
+          </span>
+        </button>
       </div>
 
+      {/* Info Box - Show only for Bank Users */}
+      {userType === 'bank' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+          <div className="flex gap-3">
+            <div className="text-blue-600 mt-0.5">ℹ️</div>
+            <div>
+              <p className="text-sm font-medium text-blue-900">View-Only Access</p>
+              <p className="text-sm text-blue-700 mt-1">
+                Bank users are displayed for reference only and cannot be edited or deleted by GIA admins.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Users Table */}
-      <Card padding="lg" shadow="none">
+      <Card padding="lg" shadow="none" className="mt-4">
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-gray-900">
-            Team Members ({filteredUsers.length})
+            {userType === 'gia' ? 'GIA Team Members' : 'Bank Users'} ({filteredUsers.length})
           </h2>
+          <p className="text-sm text-gray-600 mt-2">
+            {userType === 'gia'
+              ? 'Manage Hajj company staff members'
+              : 'View bank user accounts (read-only)'}
+          </p>
         </div>
 
         {loading ? (
-          <div className="text-center py-8 text-gray-500">Loading users...</div>
+          <div className="text-center py-12 text-gray-500">
+            <p className="text-sm">Loading users...</p>
+          </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            {searchQuery ? 'No users found matching your search' : 'No users yet'}
+          <div className="text-center py-12 text-gray-500">
+            <p className="text-sm">
+              {searchQuery
+                ? `No ${userType === 'gia' ? 'GIA staff' : 'bank users'} found matching your search`
+                : `No ${userType === 'gia' ? 'GIA staff' : 'bank users'} yet`}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
