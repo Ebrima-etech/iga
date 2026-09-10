@@ -8,6 +8,8 @@ import { BiDownload, BiRefresh, BiUser, BiWallet, BiCheckCircle, BiTrendingUp, B
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
+import { getCurrencySymbol } from '@/lib/currency';
 import {
   LineChart,
   Line,
@@ -116,8 +118,9 @@ export default function AnalyticsPage() {
   const isFieldHidden = (fieldId: string) => hiddenFields.has(fieldId);
 
   const formatMoney = (value: number, format: 'millions' | 'regular' = 'regular') => {
-    if (format === 'millions') return `D${(value / 1000000).toFixed(2)}M`;
-    return `D${value.toLocaleString()}`;
+    const symbol = getCurrencySymbol(useCurrencyStore.getState().defaultCurrency);
+    if (format === 'millions') return `${symbol}${(value / 1000000).toFixed(2)}M`;
+    return `${symbol}${value.toLocaleString()}`;
   };
 
   if (loading) {
@@ -347,7 +350,10 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis />
-                  <Tooltip formatter={(value) => isFieldHidden('payment-trend') ? '••••••' : `D${value.toLocaleString()}`} />
+                  <Tooltip formatter={(value) => {
+                    const symbol = getCurrencySymbol(useCurrencyStore.getState().defaultCurrency);
+                    return isFieldHidden('payment-trend') ? '••••••' : `${symbol}${value.toLocaleString()}`;
+                  }} />
                   <Legend />
                   <Line type="monotone" dataKey="amount" stroke="#22c55e" strokeWidth={2} dot={{ fill: '#22c55e' }} name="Daily Amount" />
                   <Line type="monotone" dataKey="transactions" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6' }} name="Transactions" />

@@ -15,6 +15,8 @@ import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh, 
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
+import { getCurrencySymbol } from '@/lib/currency';
 import {
   LineChart,
   Line,
@@ -148,13 +150,14 @@ export default function ProfessionalDashboard() {
       });
 
       // Create CSV content
+      const symbol = getCurrencySymbol(useCurrencyStore.getState().defaultCurrency);
       const csvContent = [
         ['DASHBOARD EXPORT', new Date().toLocaleString()].join(','),
         '',
         ['STATISTICS'].join(','),
         ['Metric', 'Value'].join(','),
         ['Total Pilgrims', stats.totalPilgrims].join(','),
-        ['Total Payments', `D${stats.totalPayments.toLocaleString()}`].join(','),
+        ['Total Payments', `${symbol}${stats.totalPayments.toLocaleString()}`].join(','),
         ['Completion Rate', `${stats.paymentRate}%`].join(','),
         ['Banks Connected', stats.activeBanks].join(','),
         '',
