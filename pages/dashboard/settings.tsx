@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
 import Card from '@/components/Common/Card';
@@ -243,17 +243,37 @@ export default function SettingsPage() {
     }
   };
 
-  const settingsTabs = [
-    { id: 'profile', label: 'Profile', icon: <BiUser size={18} /> },
-    { id: 'currency', label: 'Currency', icon: <BiGlobe size={18} /> },
-    { id: 'system', label: 'System', icon: <BiCog size={18} /> },
-    { id: 'hajj-years', label: 'Hajj Years', icon: <BiCalendar size={18} /> },
-    ...(user?.is_staff ? [
-      { id: 'signatory', label: 'Signatory', icon: <BiCog size={18} /> },
-      { id: 'email-notifications', label: 'Email', icon: <BiEnvelope size={18} /> },
-      { id: 'users', label: 'Users & Staff', icon: <BiUser size={18} /> },
-    ] : []),
-  ];
+  const getSettingsTabs = () => {
+    const tabs = [
+      { id: 'profile', label: 'Profile', iconType: 'user' },
+      { id: 'currency', label: 'Currency', iconType: 'globe' },
+      { id: 'system', label: 'System', iconType: 'cog' },
+      { id: 'hajj-years', label: 'Hajj Years', iconType: 'calendar' },
+    ];
+
+    if (user?.is_staff) {
+      tabs.push(
+        { id: 'signatory', label: 'Signatory', iconType: 'cog' },
+        { id: 'email-notifications', label: 'Email', iconType: 'envelope' },
+        { id: 'users', label: 'Users & Staff', iconType: 'user' }
+      );
+    }
+
+    return tabs;
+  };
+
+  const settingsTabs = getSettingsTabs();
+
+  const getTabIcon = (iconType: string) => {
+    switch (iconType) {
+      case 'user': return <BiUser size={18} />;
+      case 'globe': return <BiGlobe size={18} />;
+      case 'cog': return <BiCog size={18} />;
+      case 'calendar': return <BiCalendar size={18} />;
+      case 'envelope': return <BiEnvelope size={18} />;
+      default: return null;
+    }
+  };
 
   if (loading) {
     return (
@@ -291,7 +311,7 @@ export default function SettingsPage() {
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                {tab.icon}
+                {getTabIcon((tab as any).iconType)}
                 <span>{tab.label}</span>
               </button>
             ))}
