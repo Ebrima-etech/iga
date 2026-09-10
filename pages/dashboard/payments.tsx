@@ -10,7 +10,7 @@ import { TableSkeleton } from '@/components/Common/Skeleton';
 import { Payment, CurrencyCode } from '@/types';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
-import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
+import { formatDate, getStatusColor } from '@/lib/utils';
 import { formatCurrencyWithCode } from '@/lib/currency';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import toast from 'react-hot-toast';
@@ -297,7 +297,7 @@ export default function PaymentsPage() {
                             </td>
                             <td className="px-4 py-3.5 text-sm text-gray-600">{payment.bank_name}</td>
                             <td className="px-4 py-3.5 text-sm font-mono font-medium text-gray-900">
-                              {formatCurrency(payment.amount)}
+                              {formatCurrencyWithCode(parseFloat(String(payment.amount)), pageCurrency)}
                             </td>
                             <td className="px-4 py-3.5 text-sm">
                               <Badge
@@ -352,7 +352,7 @@ export default function PaymentsPage() {
                 <div key={status} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                   <p className="text-sm font-medium text-gray-600 capitalize">{status}</p>
                   <p className="text-2xl font-bold text-gray-900 mt-1 font-mono">{statusPayments.length}</p>
-                  <p className="text-xs text-gray-500 mt-1 font-mono">{formatCurrency(amount)}</p>
+                  <p className="text-xs text-gray-500 mt-1 font-mono">{formatCurrencyWithCode(amount, pageCurrency)}</p>
                 </div>
               );
             })}
