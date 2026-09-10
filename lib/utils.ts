@@ -1,24 +1,5 @@
-export const formatCurrency = (amount: number | string, currency?: string): string => {
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-
-  // If currency is explicitly provided, use it
-  if (currency) {
-    try {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency,
-      }).format(num);
-    } catch (e) {
-      // Fallback if currency code is invalid
-    }
-  }
-
-  // Default to GMD (Gambian Dalasi)
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'GMD',
-  }).format(num);
-};
+// Re-export formatCurrency from lib/currency to ensure proper conversion
+export { formatCurrency } from './currency';
 
 export const formatDate = (date: string | Date): string => {
   const d = new Date(date);
