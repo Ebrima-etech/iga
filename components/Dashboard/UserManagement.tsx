@@ -223,8 +223,8 @@ export default function UserManagement() {
     }
 
     try {
-      // Update user password
-      await api.put(`/users/${resetUser.user.id}/`, {
+      // Reset user password using dedicated endpoint
+      await api.post(`/users/${resetUser.user.id}/reset_password/`, {
         password: newPassword,
       });
 
@@ -236,7 +236,7 @@ export default function UserManagement() {
       fetchUsers();
     } catch (error: any) {
       console.error('Failed to reset password:', error);
-      toast.error('Failed to reset password');
+      toast.error(error?.response?.data?.error || error?.response?.data?.detail || 'Failed to reset password');
     }
   };
 
