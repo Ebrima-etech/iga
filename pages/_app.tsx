@@ -32,15 +32,22 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.pathname]);
 
   return (
-    <NotificationProvider>
-      <ThemeProvider>
-        <CurrencyProvider>
-          <HajjYearProvider>
-            <Toaster position="top-right" />
-            <Component {...pageProps} />
-          </HajjYearProvider>
-        </CurrencyProvider>
-      </ThemeProvider>
-    </NotificationProvider>
+    <ThemeProvider>
+      {isPublicPage ? (
+        <>
+          <Toaster position="top-right" />
+          <Component {...pageProps} />
+        </>
+      ) : (
+        <NotificationProvider>
+          <CurrencyProvider>
+            <HajjYearProvider>
+              <Toaster position="top-right" />
+              <Component {...pageProps} />
+            </HajjYearProvider>
+          </CurrencyProvider>
+        </NotificationProvider>
+      )}
+    </ThemeProvider>
   );
 }
