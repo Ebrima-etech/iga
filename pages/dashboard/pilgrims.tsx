@@ -19,6 +19,8 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import { Pilgrim } from '@/types';
 import api from '@/lib/api';
+import { formatCurrency } from '@/lib/currency';
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
 
 const pilgrimFormSteps = [
   {
@@ -574,7 +576,7 @@ export default function PilgrimsPage() {
                           </td>
                           <td className="px-6 py-4">
                             <span className="text-gray-900 font-mono font-medium">
-                              ${(pilgrim.amount_remaining || 0).toLocaleString()}
+                              {formatCurrency(pilgrim.amount_remaining || 0, useCurrencyStore.getState().defaultCurrency)}
                             </span>
                           </td>
                           <td className="px-6 py-4">
