@@ -21,8 +21,7 @@ interface UserRole {
   id: number;
   user: UserData;
   user_id: number;
-  role: 'hajj_admin' | 'hajj_staff' | 'bank_admin' | 'bank_staff';
-  bank_id?: number | null;
+  role: 'hajj_admin' | 'hajj_staff';
   is_active: boolean;
   created_at: string;
 }
@@ -30,8 +29,6 @@ interface UserRole {
 const ROLE_OPTIONS = [
   { value: 'hajj_admin', label: 'Hajj Company Admin', color: 'bg-purple-100 text-purple-800' },
   { value: 'hajj_staff', label: 'Hajj Company Staff', color: 'bg-blue-100 text-blue-800' },
-  { value: 'bank_admin', label: 'Bank Admin', color: 'bg-green-100 text-green-800' },
-  { value: 'bank_staff', label: 'Bank Staff', color: 'bg-yellow-100 text-yellow-800' },
 ];
 
 export default function UserManagement() {
@@ -49,7 +46,7 @@ export default function UserManagement() {
     first_name: '',
     last_name: '',
     password: '',
-    role: 'hajj_staff' as 'hajj_admin' | 'hajj_staff' | 'bank_admin' | 'bank_staff',
+    role: 'hajj_staff' as 'hajj_admin' | 'hajj_staff',
     is_active: true,
   });
 
