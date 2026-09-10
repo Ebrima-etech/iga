@@ -258,114 +258,32 @@ export default function SettingsPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-white p-8">
-        {/* Page Header */}
-        <div className="mb-8 pb-6 border-b border-gray-200">
-          <h1 className="text-3xl font-semibold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-1">Manage profile, currency, and system preferences</p>
+      <div className="min-h-screen bg-white flex">
+        {/* Settings Sidebar */}
+        <div className="w-64 bg-gray-50 border-r border-gray-200 p-6 overflow-y-auto">
+          <h2 className="text-lg font-bold text-gray-900 mb-6">Settings</h2>
+          <nav className="space-y-2">
+            <button onClick={() => setActiveTab('profile')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'profile' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiUser className="inline mr-2" />Profile</button>
+            <button onClick={() => setActiveTab('currency')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'currency' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiGlobe className="inline mr-2" />Currency</button>
+            <button onClick={() => setActiveTab('system')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'system' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiCog className="inline mr-2" />System</button>
+            <button onClick={() => setActiveTab('hajj-years')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'hajj-years' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiCalendar className="inline mr-2" />Hajj Years</button>
+            {user?.is_staff && (
+              <>
+                <button onClick={() => setActiveTab('signatory')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'signatory' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiCog className="inline mr-2" />Signatory</button>
+                <button onClick={() => setActiveTab('email-notifications')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'email-notifications' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiEnvelope className="inline mr-2" />Email</button>
+                <button onClick={() => setActiveTab('users')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'users' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiUser className="inline mr-2" />Users & Staff</button>
+              </>
+            )}
+          </nav>
         </div>
 
-        {/* Tabs Navigation */}
-        <div className="mb-8 border-b border-gray-200">
-            <div className="flex gap-8">
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`pb-4 px-2 font-medium text-sm transition-all ${
-                  activeTab === 'profile'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <BiUser size={18} />
-                  Profile
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('currency')}
-                className={`pb-4 px-2 font-medium text-sm transition-all ${
-                  activeTab === 'currency'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <BiGlobe size={18} />
-                  Currency
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('system')}
-                className={`pb-4 px-2 font-medium text-sm transition-all ${
-                  activeTab === 'system'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <BiCog size={18} />
-                  System
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('hajj-years')}
-                className={`pb-4 px-2 font-medium text-sm transition-all ${
-                  activeTab === 'hajj-years'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <BiCalendar size={18} />
-                  Hajj Years
-                </div>
-              </button>
-              {user?.is_staff && (
-                <>
-                  <button
-                    onClick={() => setActiveTab('signatory')}
-                    className={`pb-4 px-2 font-medium text-sm transition-all ${
-                      activeTab === 'signatory'
-                        ? 'border-b-2 border-indigo-600 text-indigo-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <BiCog size={18} />
-                      Signatory
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('email-notifications')}
-                    className={`pb-4 px-2 font-medium text-sm transition-all ${
-                      activeTab === 'email-notifications'
-                        ? 'border-b-2 border-indigo-600 text-indigo-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <BiEnvelope size={18} />
-                      Email Notifications
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('users')}
-                    className={`pb-4 px-2 font-medium text-sm transition-all ${
-                      activeTab === 'users'
-                        ? 'border-b-2 border-indigo-600 text-indigo-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <BiUser size={18} />
-                      Users & Staff
-                    </div>
-                  </button>
-                </>
-              )}
-            </div>
+        {/* Main Content Area */}
+        <div className="flex-1 p-8 overflow-y-auto">
+          {/* Page Header */}
+          <div className="mb-8 pb-6 border-b border-gray-200">
+            <h1 className="text-3xl font-semibold text-gray-900">Settings</h1>
+            <p className="text-gray-600 mt-1">Manage profile, currency, and system preferences</p>
           </div>
-
           {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -930,6 +848,7 @@ export default function SettingsPage() {
             fetchHajjYears();
           }}
         />
+        </div>
       </div>
     </Layout>
   );
