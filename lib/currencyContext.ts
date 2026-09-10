@@ -17,12 +17,12 @@ export function useCurrency() {
   if (!context) {
     // Provide default implementation if context not available
     return {
-      defaultCurrency: 'USD' as CurrencyCode,
+      defaultCurrency: 'GMD' as CurrencyCode,
       setDefaultCurrency: () => {},
-      convert: (amount: number, from: CurrencyCode = 'GMD', to: CurrencyCode = 'USD') =>
+      convert: (amount: number, from: CurrencyCode = 'GMD', to: CurrencyCode = 'GMD') =>
         convertCurrency(amount, from, to),
-      format: (amount: number, currency: CurrencyCode = 'USD') => formatCurrency(amount, currency),
-      symbol: '$',
+      format: (amount: number, currency: CurrencyCode = 'GMD') => formatCurrency(amount, currency),
+      symbol: 'D',
     };
   }
   return context;
