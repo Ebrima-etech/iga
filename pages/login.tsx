@@ -37,15 +37,14 @@ export default function LoginPage() {
       }
 
       setDoorsOpen(true);
-      // double rAF so the browser paints the closed doors before the
-      // transition class is applied — otherwise it can jump straight
-      // to the open state instead of animating
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setDoorsSwing(true));
-      });
+      setDoorsSwing(true);
+      // Navigate after door animation completes
       setTimeout(() => {
-        router.push('/dashboard');
-      }, 1500);
+        router.push('/dashboard').catch(() => {
+          // If push fails, at least we're authenticated
+          window.location.href = '/dashboard';
+        });
+      }, 1600);
     } catch (err) {
       const errorMessage =
         (err as any)?.response?.data?.detail || 'Login failed. Please check your credentials.';
