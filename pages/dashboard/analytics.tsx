@@ -36,7 +36,9 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('30days');
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
-  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>('GMD');
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>(() =>
+    useCurrencyStore.getState().defaultCurrency || 'GMD'
+  );
   const [data, setData] = useState<any>({
     pilgrimTrend: [],
     paymentTrend: [],
@@ -55,6 +57,15 @@ export default function AnalyticsPage() {
     activeBanks: 0,
     totalRegions: 0,
   });
+
+  useEffect(() => {
+    // Update page currency when global default currency changes
+    const unsubscribe = useCurrencyStore.subscribe(
+      (state) => state.defaultCurrency,
+      (defaultCurrency) => setPageCurrency(defaultCurrency)
+    );
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     loadAnalyticsData();

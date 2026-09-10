@@ -181,13 +181,24 @@ export default function PilgrimsPage() {
   const [editingPilgrim, setEditingPilgrim] = useState<Pilgrim | null>(null);
   const [pageSize, setPageSize] = useState(10);
   const [hajjPackagePrice, setHajjPackagePrice] = useState(0);
-  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>('GMD');
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>(() =>
+    useCurrencyStore.getState().defaultCurrency || 'GMD'
+  );
 
   // Use the new table state hook
   const tableState = useTableState<Pilgrim>(pilgrims, {
     initialPageSize: pageSize,
     searchableFields: ['first_name', 'last_name', 'email', 'registration_id', 'phone'],
   });
+
+  useEffect(() => {
+    // Update page currency when global default currency changes
+    const unsubscribe = useCurrencyStore.subscribe(
+      (state) => state.defaultCurrency,
+      (defaultCurrency) => setPageCurrency(defaultCurrency)
+    );
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     fetchPilgrims();

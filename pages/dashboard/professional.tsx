@@ -40,7 +40,9 @@ export default function ProfessionalDashboard() {
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState('');
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
-  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>('GMD');
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>(() =>
+    useCurrencyStore.getState().defaultCurrency || 'GMD'
+  );
   const [stats, setStats] = useState({
     totalPilgrims: 0,
     totalPayments: 0,
@@ -50,6 +52,15 @@ export default function ProfessionalDashboard() {
   const [payments, setPayments] = useState<any[]>([]);
   const [pilgrims, setPilgrims] = useState<any[]>([]);
   const [banks, setBanks] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Update page currency when global default currency changes
+    const unsubscribe = useCurrencyStore.subscribe(
+      (state) => state.defaultCurrency,
+      (defaultCurrency) => setPageCurrency(defaultCurrency)
+    );
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     loadDashboardData();

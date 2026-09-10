@@ -37,13 +37,24 @@ export default function PaymentsPage() {
   const [banks, setBanks] = useState<any[]>([]);
   const [pageSize, setPageSize] = useState(10);
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
-  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>('GMD');
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>(() =>
+    useCurrencyStore.getState().defaultCurrency || 'GMD'
+  );
 
   // Use the new table state hook
   const tableState = useTableState<PaymentRecord>(payments, {
     initialPageSize: pageSize,
     searchableFields: ['reference_number', 'pilgrim_name', 'bank_name', 'payer_name'],
   });
+
+  useEffect(() => {
+    // Update page currency when global default currency changes
+    const unsubscribe = useCurrencyStore.subscribe(
+      (state) => state.defaultCurrency,
+      (defaultCurrency) => setPageCurrency(defaultCurrency)
+    );
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     console.log('Payments page mounted, fetching data...');
