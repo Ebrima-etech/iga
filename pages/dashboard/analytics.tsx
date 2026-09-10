@@ -9,7 +9,7 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
-import { getCurrencySymbol } from '@/lib/currency';
+import { getCurrencySymbol, convertCurrency } from '@/lib/currency';
 import {
   LineChart,
   Line,
@@ -118,9 +118,12 @@ export default function AnalyticsPage() {
   const isFieldHidden = (fieldId: string) => hiddenFields.has(fieldId);
 
   const formatMoney = (value: number, format: 'millions' | 'regular' = 'regular') => {
-    const symbol = getCurrencySymbol(useCurrencyStore.getState().defaultCurrency);
-    if (format === 'millions') return `${symbol}${(value / 1000000).toFixed(2)}M`;
-    return `${symbol}${value.toLocaleString()}`;
+    const currency = useCurrencyStore.getState().defaultCurrency;
+    const symbol = getCurrencySymbol(currency);
+    // Convert from GMD (database default) to selected currency
+    const convertedValue = convertCurrency(value, 'GMD', currency);
+    if (format === 'millions') return `${symbol}${(convertedValue / 1000000).toFixed(2)}M`;
+    return `${symbol}${convertedValue.toLocaleString()}`;
   };
 
   if (loading) {

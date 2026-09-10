@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import api from '@/lib/api';
 import { BiMedal, BiTrendingUp, BiTrendingDown, BiDownload, BiFilter, BiCalendar, BiMap, BiBarChartAlt2, BiShow, BiHide, BiUser } from 'react-icons/bi';
+import { getCurrencySymbol, convertCurrency } from '@/lib/currency';
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
@@ -411,8 +413,12 @@ export default function HajjUniverse() {
   const isFieldHidden = (fieldId: string) => hiddenFields.has(fieldId);
 
   const formatMoney = (value: number, format: 'millions' | 'regular' = 'regular') => {
-    if (format === 'millions') return `D${(value / 1000000).toFixed(2)}M`;
-    return `D${value.toFixed(0)}`;
+    const currency = useCurrencyStore.getState().defaultCurrency;
+    const symbol = getCurrencySymbol(currency);
+    // Convert from GMD (database default) to selected currency
+    const convertedValue = convertCurrency(value, 'GMD', currency);
+    if (format === 'millions') return `${symbol}${(convertedValue / 1000000).toFixed(2)}M`;
+    return `${symbol}${convertedValue.toFixed(0)}`;
   };
 
   return (
