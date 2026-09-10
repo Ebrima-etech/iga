@@ -49,7 +49,7 @@ export default function UserManagement() {
     first_name: '',
     last_name: '',
     password: '',
-    role: 'hajj_staff' as const,
+    role: 'hajj_staff' as 'hajj_admin' | 'hajj_staff' | 'bank_admin' | 'bank_staff',
     is_active: true,
   });
 
