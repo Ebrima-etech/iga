@@ -62,18 +62,20 @@ export function convertCurrency(
 
 /**
  * Format currency value with symbol
- * @param amount - Amount to format
- * @param currency - Currency code
+ * @param amount - Amount in GMD (from database)
+ * @param currency - Target currency code
  * @param decimals - Number of decimal places
- * @returns Formatted currency string
+ * @returns Formatted currency string with converted amount
  */
 export function formatCurrency(
   amount: number,
   currency: CurrencyCode = 'USD',
   decimals: number = 2
 ): string {
+  // Convert from GMD (database default) to target currency
+  const convertedAmount = convertCurrency(amount, 'GMD', currency);
   const currencyConfig = getCurrency(currency);
-  const formatted = amount.toLocaleString('en-US', {
+  const formatted = convertedAmount.toLocaleString('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
