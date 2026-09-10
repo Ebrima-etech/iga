@@ -324,10 +324,10 @@ export default function ProfessionalDashboard() {
                 onChange={(e) => setPageCurrency(e.target.value as CurrencyCode)}
                 className="px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
               >
-                <option value="GMD">GMD (Dalasi)</option>
-                <option value="USD">USD (Dollar)</option>
-                <option value="GBP">GBP (Pound)</option>
-                <option value="EUR">EUR (Euro)</option>
+                <option value="GMD">GMD</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+                <option value="EUR">EUR</option>
               </select>
               <ProfessionalButton
                 variant="secondary"
