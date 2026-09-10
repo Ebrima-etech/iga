@@ -33,7 +33,7 @@ const paymentFormSteps = [
     fields: [
       {
         name: 'amount',
-        label: 'Amount (GMD)',
+        label: 'Amount',
         type: 'number' as const,
         required: true,
         placeholder: '0.00',
@@ -210,7 +210,7 @@ export default function RecordPaymentPage() {
       };
 
       await api.post('/payments/', paymentData);
-      toast.success(`Payment of ${formData.amount} GMD recorded for ${selectedPilgrim?.full_name}!`);
+      toast.success(`Payment of ${formData.amount} recorded for ${selectedPilgrim?.full_name}!`);
       router.push('/dashboard/payments');
     } catch (error: any) {
       const errorMsg = error.response?.data?.detail || 'Failed to record payment';

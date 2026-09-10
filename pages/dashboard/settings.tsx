@@ -610,11 +610,13 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 bg-white rounded-lg border border-gray-200">
                     <p className="text-sm font-medium text-gray-500">Base Currency</p>
-                    <p className="text-2xl font-semibold text-gray-900 mt-1.5 font-mono">GMD</p>
+                    <p className="text-2xl font-semibold text-gray-900 mt-1.5 font-mono">D</p>
                   </div>
                   <div className="p-4 bg-white rounded-lg border border-gray-200">
                     <p className="text-sm font-medium text-gray-500">Default Currency</p>
-                    <p className="text-2xl font-semibold text-gray-900 mt-1.5 font-mono">{defaultCurrency}</p>
+                    <p className="text-2xl font-semibold text-gray-900 mt-1.5 font-mono">
+                      {currencies.find(c => c.code === defaultCurrency)?.symbol || defaultCurrency}
+                    </p>
                   </div>
                 </div>
               </Card>
