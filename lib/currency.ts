@@ -1,4 +1,5 @@
 import { CurrencyCode } from '@/types';
+import { useCurrencyStore } from './stores/currencyStore';
 
 interface CurrencyConfig {
   code: CurrencyCode;
@@ -15,9 +16,23 @@ const DEFAULT_CURRENCIES: Record<CurrencyCode, CurrencyConfig> = {
 };
 
 /**
- * Get currency configuration
+ * Get currency configuration - uses rates from store if available
  */
 export function getCurrency(code: CurrencyCode): CurrencyConfig {
+  try {
+    const store = useCurrencyStore.getState();
+    const storedCurrency = store.currencies[code];
+    if (storedCurrency) {
+      return {
+        code: storedCurrency.code,
+        name: storedCurrency.name,
+        symbol: storedCurrency.symbol,
+        rate: storedCurrency.rate,
+      };
+    }
+  } catch (e) {
+    // Store not available, use defaults
+  }
   return DEFAULT_CURRENCIES[code] || DEFAULT_CURRENCIES.USD;
 }
 
