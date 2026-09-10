@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
-import { BiPlus, BiPencil, BiTrash, BiSearch, BiRefresh, BiCheckCircle, BiX } from 'react-icons/bi';
+import { BiPlus, BiPencil, BiTrash, BiSearch, BiRefresh, BiCheckCircle, BiX, BiKey } from 'react-icons/bi';
 import Card from '@/components/Common/Card';
 import Badge from '@/components/Common/Badge';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
@@ -46,6 +46,10 @@ export default function UserManagement() {
   const [userType, setUserType] = useState<'gia' | 'bank'>('gia');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRole | null>(null);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [resetUser, setResetUser] = useState<UserRole | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Create/Edit form states
   const [formData, setFormData] = useState({
@@ -200,6 +204,42 @@ export default function UserManagement() {
     return role === 'bank_admin' || role === 'bank_staff';
   };
 
+  const handlePasswordReset = async () => {
+    if (!resetUser) return;
+
+    if (!newPassword || !confirmPassword) {
+      toast.error('Both password fields are required');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    try {
+      // Update user password
+      await api.put(`/users/${resetUser.user.id}/`, {
+        password: newPassword,
+      });
+
+      toast.success(`Password reset successfully for ${resetUser.user.username}`);
+      setShowPasswordReset(false);
+      setResetUser(null);
+      setNewPassword('');
+      setConfirmPassword('');
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Failed to reset password:', error);
+      toast.error('Failed to reset password');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Title Section */}
@@ -240,6 +280,90 @@ export default function UserManagement() {
           Add User
         </ProfessionalButton>
       </div>
+
+      {/* Password Reset Modal */}
+      {showPasswordReset && resetUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card padding="lg" className="w-full max-w-md">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Reset Password</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Set new password for {resetUser.user.username}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowPasswordReset(false);
+                  setResetUser(null);
+                  setNewPassword('');
+                  setConfirmPassword('');
+                }}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <BiX size={24} />
+              </button>
+            </div>
+
+            {/* Password Fields */}
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter new password (min 6 characters)"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Confirm password"
+                />
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-xs text-amber-900">
+                  ⚠️ The user will need to log in again with their new password.
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex gap-3 pt-4 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setShowPasswordReset(false);
+                  setResetUser(null);
+                  setNewPassword('');
+                  setConfirmPassword('');
+                }}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-sm text-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePasswordReset}
+                className="flex-1 px-4 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium text-sm"
+              >
+                Reset Password
+              </button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Create/Edit Modal */}
       {(showCreateModal || editingUser) && (
@@ -549,7 +673,17 @@ export default function UserManagement() {
                       {isBankUser(userRole.role) ? (
                         <span className="text-xs text-gray-500">View Only</span>
                       ) : (
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => {
+                              setResetUser(userRole);
+                              setShowPasswordReset(true);
+                            }}
+                            className="p-2 hover:bg-orange-100 rounded text-orange-600 transition"
+                            title="Reset password"
+                          >
+                            <BiKey size={16} />
+                          </button>
                           <button
                             onClick={() => handleEditClick(userRole)}
                             className="p-2 hover:bg-blue-100 rounded text-blue-600 transition"
