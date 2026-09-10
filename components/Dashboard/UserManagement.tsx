@@ -434,7 +434,7 @@ export default function UserManagement() {
                       <p className="text-sm text-gray-600">{userRole.user.email}</p>
                     </td>
                     <td className="py-3 px-4">
-                      <Badge variant="secondary" size="sm">
+                      <Badge variant="info" size="sm">
                         {getRoleLabel(userRole.role)}
                       </Badge>
                     </td>
