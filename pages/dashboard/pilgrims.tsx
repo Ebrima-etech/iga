@@ -17,7 +17,7 @@ import { saveDraft, getDraft, deleteDraft } from '@/lib/draftManager';
 import { TableSkeleton } from '@/components/Common/Skeleton';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
-import { Pilgrim } from '@/types';
+import { Pilgrim, CurrencyCode } from '@/types';
 import api from '@/lib/api';
 import { formatCurrency } from '@/lib/currency';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
@@ -181,6 +181,7 @@ export default function PilgrimsPage() {
   const [editingPilgrim, setEditingPilgrim] = useState<Pilgrim | null>(null);
   const [pageSize, setPageSize] = useState(10);
   const [hajjPackagePrice, setHajjPackagePrice] = useState(0);
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>('GMD');
 
   // Use the new table state hook
   const tableState = useTableState<Pilgrim>(pilgrims, {
@@ -340,7 +341,17 @@ export default function PilgrimsPage() {
             <h1 className="text-3xl font-semibold text-gray-900">Pilgrims</h1>
             <p className="text-gray-600 mt-1">Manage and register pilgrims for Hajj operations</p>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap items-center">
+            <select
+              value={pageCurrency}
+              onChange={(e) => setPageCurrency(e.target.value as CurrencyCode)}
+              className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+            >
+              <option value="GMD">GMD (Dalasi)</option>
+              <option value="USD">USD (Dollar)</option>
+              <option value="GBP">GBP (Pound)</option>
+              <option value="EUR">EUR (Euro)</option>
+            </select>
             {draftsList.length > 0 && (
               <ProfessionalButton
                 variant="secondary"
@@ -576,7 +587,7 @@ export default function PilgrimsPage() {
                           </td>
                           <td className="px-6 py-4">
                             <span className="text-gray-900 font-mono font-medium">
-                              {formatCurrency(pilgrim.amount_remaining || 0, useCurrencyStore.getState().defaultCurrency)}
+                              {formatCurrency(pilgrim.amount_remaining || 0, pageCurrency)}
                             </span>
                           </td>
                           <td className="px-6 py-4">

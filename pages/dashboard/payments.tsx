@@ -7,7 +7,7 @@ import PageHeader from '@/components/Dashboard/PageHeader';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
 import { TableSkeleton } from '@/components/Common/Skeleton';
-import { Payment } from '@/types';
+import { Payment, CurrencyCode } from '@/types';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import api from '@/lib/api';
 import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
@@ -37,6 +37,7 @@ export default function PaymentsPage() {
   const [banks, setBanks] = useState<any[]>([]);
   const [pageSize, setPageSize] = useState(10);
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>('GMD');
 
   // Use the new table state hook
   const tableState = useTableState<PaymentRecord>(payments, {
@@ -130,15 +131,27 @@ export default function PaymentsPage() {
             <h1 className="text-3xl font-semibold text-gray-900">Payments</h1>
             <p className="text-gray-600 mt-1">Track all payments from banks</p>
           </div>
-          <ProfessionalButton
-            variant="primary"
-            size="md"
-            icon={<BiPlus size={18} />}
-            onClick={() => router.push('/dashboard/record-payment')}
-            className="hidden"
-          >
-            Record Payment
-          </ProfessionalButton>
+          <div className="flex items-center gap-4">
+            <select
+              value={pageCurrency}
+              onChange={(e) => setPageCurrency(e.target.value as CurrencyCode)}
+              className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+            >
+              <option value="GMD">GMD (Dalasi)</option>
+              <option value="USD">USD (Dollar)</option>
+              <option value="GBP">GBP (Pound)</option>
+              <option value="EUR">EUR (Euro)</option>
+            </select>
+            <ProfessionalButton
+              variant="primary"
+              size="md"
+              icon={<BiPlus size={18} />}
+              onClick={() => router.push('/dashboard/record-payment')}
+              className="hidden"
+            >
+              Record Payment
+            </ProfessionalButton>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -160,7 +173,7 @@ export default function PaymentsPage() {
               </button>
             </div>
             <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">
-              {isFieldHidden('payments-total-amount') ? '••••••' : formatCurrencyWithCode(totalAmount, useCurrencyStore.getState().defaultCurrency)}
+              {isFieldHidden('payments-total-amount') ? '••••••' : formatCurrencyWithCode(totalAmount, pageCurrency)}
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
@@ -175,7 +188,7 @@ export default function PaymentsPage() {
               </button>
             </div>
             <p className="text-2xl font-bold text-emerald-600 mt-2 font-mono">
-              {isFieldHidden('payments-confirmed-amount') ? '••••••' : formatCurrencyWithCode(confirmedAmount, useCurrencyStore.getState().defaultCurrency)}
+              {isFieldHidden('payments-confirmed-amount') ? '••••••' : formatCurrencyWithCode(confirmedAmount, pageCurrency)}
             </p>
           </div>
         </div>

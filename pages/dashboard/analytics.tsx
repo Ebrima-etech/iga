@@ -6,6 +6,7 @@ import Card from '@/components/Common/Card';
 import { StatCardSkeleton, ChartSkeleton, Skeleton } from '@/components/Common/Skeleton';
 import { BiDownload, BiRefresh, BiUser, BiWallet, BiCheckCircle, BiTrendingUp, BiBarChartAlt2, BiBuilding, BiTime, BiGlobe, BiShow, BiHide } from 'react-icons/bi';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
+import { CurrencyCode } from '@/types';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
@@ -35,6 +36,7 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('30days');
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>('GMD');
   const [data, setData] = useState<any>({
     pilgrimTrend: [],
     paymentTrend: [],
@@ -127,11 +129,10 @@ export default function AnalyticsPage() {
   };
 
   const formatMoneyWithCode = (value: number, format: 'millions' | 'regular' = 'regular') => {
-    const currency = useCurrencyStore.getState().defaultCurrency;
     // Convert from GMD (database default) to selected currency
-    const convertedValue = convertCurrency(value, 'GMD', currency);
-    if (format === 'millions') return `${currency} ${(convertedValue / 1000000).toFixed(2)}M`;
-    return `${currency} ${convertedValue.toLocaleString()}`;
+    const convertedValue = convertCurrency(value, 'GMD', pageCurrency);
+    if (format === 'millions') return `${pageCurrency} ${(convertedValue / 1000000).toFixed(2)}M`;
+    return `${pageCurrency} ${convertedValue.toLocaleString()}`;
   };
 
   if (loading) {
@@ -206,6 +207,16 @@ export default function AnalyticsPage() {
               <p className="text-gray-600 mt-2">Comprehensive data analysis and insights</p>
             </div>
             <div className="flex gap-3">
+              <select
+                value={pageCurrency}
+                onChange={(e) => setPageCurrency(e.target.value as CurrencyCode)}
+                className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm bg-white"
+              >
+                <option value="GMD">GMD (Dalasi)</option>
+                <option value="USD">USD (Dollar)</option>
+                <option value="GBP">GBP (Pound)</option>
+                <option value="EUR">EUR (Euro)</option>
+              </select>
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}

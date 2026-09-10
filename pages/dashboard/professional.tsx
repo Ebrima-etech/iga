@@ -13,6 +13,7 @@ import ProfessionalTable from '@/components/Common/ProfessionalTable';
 import { StatCardSkeleton, ChartSkeleton, TableSkeleton } from '@/components/Common/Skeleton';
 import { BiBarChartAlt2, BiTrendingUp, BiUser, BiWallet, BiDownload, BiRefresh, BiShow, BiHide } from 'react-icons/bi';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
+import { CurrencyCode } from '@/types';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
@@ -39,6 +40,7 @@ export default function ProfessionalDashboard() {
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState('');
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>('GMD');
   const [stats, setStats] = useState({
     totalPilgrims: 0,
     totalPayments: 0,
@@ -195,11 +197,10 @@ export default function ProfessionalDashboard() {
       label: 'Total Payment',
       value: stats.totalPayments > 0
         ? (() => {
-            const currency = useCurrencyStore.getState().defaultCurrency;
-            const converted = convertCurrency(stats.totalPayments, 'GMD', currency);
-            return `${currency} ${(converted / 1000000).toFixed(2)}M`;
+            const converted = convertCurrency(stats.totalPayments, 'GMD', pageCurrency);
+            return `${pageCurrency} ${(converted / 1000000).toFixed(2)}M`;
           })()
-        : `${useCurrencyStore.getState().defaultCurrency} 0.00M`,
+        : `${pageCurrency} 0.00M`,
       caption: `${payments.length} transactions`,
       icon: <BiWallet size={15} />,
       isFinancial: true,
@@ -318,6 +319,16 @@ export default function ProfessionalDashboard() {
               <p className="text-sm text-gray-600 mt-2 font-medium">Real-time overview of Hajj operations</p>
             </div>
             <div className="flex gap-3">
+              <select
+                value={pageCurrency}
+                onChange={(e) => setPageCurrency(e.target.value as CurrencyCode)}
+                className="px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+              >
+                <option value="GMD">GMD (Dalasi)</option>
+                <option value="USD">USD (Dollar)</option>
+                <option value="GBP">GBP (Pound)</option>
+                <option value="EUR">EUR (Euro)</option>
+              </select>
               <ProfessionalButton
                 variant="secondary"
                 size="md"
