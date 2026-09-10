@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Layout from '@/components/Layout';
 import PageHeader from '@/components/Dashboard/PageHeader';
 import Card from '@/components/Common/Card';
@@ -8,7 +9,7 @@ import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Badge from '@/components/Common/Badge';
 import FormField from '@/components/Common/FormField';
 import Input from '@/components/Common/Input';
-import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh, BiCalendar, BiPlus, BiEnvelope } from 'react-icons/bi';
+import { BiUser, BiGlobe, BiCog, BiCheckCircle, BiX, BiPencil, BiSave, BiRefresh, BiCalendar, BiPlus, BiEnvelope, BiChevronDown } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import { User, CurrencyCode, HajjYear } from '@/types';
 import api from '@/lib/api';
@@ -261,6 +262,12 @@ export default function SettingsPage() {
       <div className="min-h-screen bg-white flex">
         {/* Settings Sidebar */}
         <div className="w-64 bg-gray-50 border-r border-gray-200 p-6 h-screen sticky top-0 overflow-y-auto">
+          <Link href="/dashboard">
+            <span className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-semibold text-sm mb-6 cursor-pointer">
+              <BiChevronDown size={18} className="rotate-90" />
+              Back to Dashboard
+            </span>
+          </Link>
           <h2 className="text-lg font-bold text-gray-900 mb-6">Settings</h2>
           <nav className="space-y-2">
             <button onClick={() => setActiveTab('profile')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'profile' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiUser className="inline mr-2" />Profile</button>
