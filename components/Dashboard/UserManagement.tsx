@@ -21,7 +21,7 @@ interface UserRole {
   id: number;
   user: UserData;
   user_id: number;
-  role: 'hajj_admin' | 'hajj_staff';
+  role: 'hajj_admin' | 'hajj_staff' | 'bank_admin' | 'bank_staff';
   is_active: boolean;
   created_at: string;
 }
@@ -30,6 +30,13 @@ const ROLE_OPTIONS = [
   { value: 'hajj_admin', label: 'Hajj Company Admin', color: 'bg-purple-100 text-purple-800' },
   { value: 'hajj_staff', label: 'Hajj Company Staff', color: 'bg-blue-100 text-blue-800' },
 ];
+
+const ALL_ROLE_LABELS: Record<string, { label: string; color: string; type: 'hajj' | 'bank' }> = {
+  'hajj_admin': { label: 'Hajj Company Admin', color: 'bg-purple-100 text-purple-800', type: 'hajj' },
+  'hajj_staff': { label: 'Hajj Company Staff', color: 'bg-blue-100 text-blue-800', type: 'hajj' },
+  'bank_admin': { label: 'Bank Admin', color: 'bg-green-100 text-green-800', type: 'bank' },
+  'bank_staff': { label: 'Bank Staff', color: 'bg-yellow-100 text-yellow-800', type: 'bank' },
+};
 
 export default function UserManagement() {
   const [users, setUsers] = useState<UserRole[]>([]);
@@ -141,6 +148,11 @@ export default function UserManagement() {
   };
 
   const handleEditClick = (userRole: UserRole) => {
+    // Don't allow editing bank users
+    if (userRole.role === 'bank_admin' || userRole.role === 'bank_staff') {
+      toast.error('Bank users cannot be edited from GIA admin panel');
+      return;
+    }
     setEditingUser(userRole);
     setFormData({
       username: userRole.user.username,
@@ -148,7 +160,7 @@ export default function UserManagement() {
       first_name: userRole.user.first_name,
       last_name: userRole.user.last_name,
       password: '',
-      role: userRole.role,
+      role: (userRole.role as 'hajj_admin' | 'hajj_staff'),
       is_active: userRole.is_active,
     });
   };
@@ -166,13 +178,15 @@ export default function UserManagement() {
   };
 
   const getRoleColor = (role: string) => {
-    const roleOption = ROLE_OPTIONS.find((r) => r.value === role);
-    return roleOption?.color || 'bg-gray-100 text-gray-800';
+    return ALL_ROLE_LABELS[role]?.color || 'bg-gray-100 text-gray-800';
   };
 
   const getRoleLabel = (role: string) => {
-    const roleOption = ROLE_OPTIONS.find((r) => r.value === role);
-    return roleOption?.label || role;
+    return ALL_ROLE_LABELS[role]?.label || role;
+  };
+
+  const isBankUser = (role: string) => {
+    return role === 'bank_admin' || role === 'bank_staff';
   };
 
   return (
@@ -360,9 +374,16 @@ export default function UserManagement() {
 
       {/* Users Table */}
       <Card padding="lg" shadow="none">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Users & Staff ({filteredUsers.length})
-        </h2>
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Users & Staff ({filteredUsers.length})
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              💡 Bank users are displayed for reference but cannot be edited here
+            </p>
+          </div>
+        </div>
 
         {loading ? (
           <div className="text-center py-8 text-gray-500">Loading users...</div>
@@ -436,8 +457,13 @@ export default function UserManagement() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEditClick(userRole)}
-                          className="p-2 hover:bg-blue-100 rounded text-blue-600 transition"
-                          title="Edit user"
+                          disabled={isBankUser(userRole.role)}
+                          className={`p-2 rounded transition ${
+                            isBankUser(userRole.role)
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'hover:bg-blue-100 rounded text-blue-600'
+                          }`}
+                          title={isBankUser(userRole.role) ? 'Bank users cannot be edited' : 'Edit user'}
                         >
                           <BiPencil size={16} />
                         </button>
