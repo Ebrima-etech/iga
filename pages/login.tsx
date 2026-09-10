@@ -88,8 +88,8 @@ export default function LoginPage() {
       />
 
       {/* Airplane, now flying across the entire page */}
-      <div className="absolute top-[9%] left-0 w-full pointer-events-none hajj-plane-track">
-        <svg width="128" height="74" viewBox="0 0 110 64" fill="none" className="text-amber-200/95">
+      <div className="absolute top-[9%] left-0 w-full pointer-events-none hajj-plane-track" style={{ willChange: 'transform' }}>
+        <svg width="128" height="74" viewBox="0 0 110 64" fill="none" className="text-amber-200/95" style={{ backfaceVisibility: 'hidden' }}>
           <defs>
             <clipPath id="tailFlagClip">
               <path d="M10 34 L26 8 L33 8 L26 34 Z" />
@@ -251,18 +251,19 @@ export default function LoginPage() {
 
       <style jsx>{`
         .hajj-plane-track {
-          animation: hajjFlyPage 26s ease-in-out infinite;
+          animation: hajjFlyPage 26s ease-in-out 1;
+          animation-fill-mode: forwards;
         }
         @keyframes hajjFlyPage {
-          0% { transform: translate(-10%, 100%) rotateZ(0deg) rotateY(-8deg) rotateX(5deg); opacity: 0; }
+          0% { transform: translate3d(-10%, 100%, 0) rotateZ(0deg) rotateY(-8deg) rotateX(5deg); opacity: 0; }
           5% { opacity: 0.3; }
-          12% { opacity: 1; transform: translate(20%, 60%) rotateZ(-2deg) rotateY(-9deg) rotateX(6deg); }
-          25% { transform: translate(85%, 10%) rotateZ(-10deg) rotateY(-11deg) rotateX(8deg); }
-          40% { transform: translate(150%, -120px) rotateZ(-16deg) rotateY(-13deg) rotateX(10deg); }
-          60% { transform: translate(220%, -240px) rotateZ(-22deg) rotateY(-15deg) rotateX(12deg); }
-          80% { transform: translate(290%, -340px) rotateZ(-28deg) rotateY(-17deg) rotateX(14deg); }
+          12% { opacity: 1; transform: translate3d(20%, 60%, 0) rotateZ(-2deg) rotateY(-9deg) rotateX(6deg); }
+          25% { transform: translate3d(85%, 10%, 0) rotateZ(-10deg) rotateY(-11deg) rotateX(8deg); }
+          40% { transform: translate3d(150%, -120px, 0) rotateZ(-16deg) rotateY(-13deg) rotateX(10deg); }
+          60% { transform: translate3d(220%, -240px, 0) rotateZ(-22deg) rotateY(-15deg) rotateX(12deg); }
+          80% { transform: translate3d(290%, -340px, 0) rotateZ(-28deg) rotateY(-17deg) rotateX(14deg); }
           90% { opacity: 1; }
-          100% { transform: translate(340%, -400px) rotateZ(-30deg) rotateY(-18deg) rotateX(15deg); opacity: 0; }
+          100% { transform: translate3d(340%, -400px, 0) rotateZ(-30deg) rotateY(-18deg) rotateX(15deg); opacity: 0; }
         }
 
         .door-stage {
@@ -277,6 +278,7 @@ export default function LoginPage() {
           transition: transform 1.35s cubic-bezier(0.65, 0, 0.35, 1);
           transform-style: preserve-3d;
           will-change: transform;
+          backface-visibility: hidden;
         }
         .door-left {
           transform-origin: 0% 50%;
