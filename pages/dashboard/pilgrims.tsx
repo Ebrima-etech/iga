@@ -194,8 +194,7 @@ export default function PilgrimsPage() {
   useEffect(() => {
     // Update page currency when global default currency changes
     const unsubscribe = useCurrencyStore.subscribe(
-      (state) => state.defaultCurrency,
-      (defaultCurrency) => setPageCurrency(defaultCurrency)
+      (state) => setPageCurrency(state.defaultCurrency)
     );
     return unsubscribe;
   }, []);
