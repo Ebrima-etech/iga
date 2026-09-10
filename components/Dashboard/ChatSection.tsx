@@ -13,37 +13,66 @@ interface ChatMessage {
   created_at: string;
 }
 
+interface Staff {
+  id: number;
+  username: string;
+  email: string;
+}
+
 export default function ChatSection() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [staffList, setStaffList] = useState<Staff[]>([]);
+  const [selectedStaff, setSelectedStaff] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    fetchStaffList();
+  }, []);
+
+  const fetchStaffList = async () => {
+    try {
+      const response = await api.get('/users/?is_staff=true');
+      setStaffList(response.data.results || response.data || []);
+      if (response.data.results?.length > 0 || response.data?.length > 0) {
+        const staff = response.data.results?.[0] || response.data?.[0];
+        setSelectedStaff(staff?.id);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch staff list:', err);
+    }
+  };
+
   const fetchMessages = async () => {
+    if (!selectedStaff) return;
     try {
       setRefreshing(true);
-      const response = await api.get('/chat-broadcasts/recent/?limit=50');
-      setMessages(response.data.reverse());
+      const response = await api.get(`/chat-messages/?staff_id=${selectedStaff}&limit=50`);
+      const data = Array.isArray(response.data) ? response.data : response.data.results || [];
+      setMessages(data.reverse());
       setError(null);
     } catch (err: any) {
-      console.error('Failed to fetch chat messages:', err);
-      setError(err?.message || 'Failed to load messages');
+      console.warn('Failed to fetch chat messages:', err);
+      setError('Unable to load chat history');
     } finally {
       setRefreshing(false);
     }
   };
 
   useEffect(() => {
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    if (selectedStaff) {
+      fetchMessages();
+      const interval = setInterval(() => fetchMessages(), 5000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedStaff]);
 
   useEffect(() => {
     scrollToBottom();
@@ -51,17 +80,19 @@ export default function ChatSection() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !selectedStaff) return;
 
     try {
       setLoading(true);
-      await api.post('/chat-broadcasts/', { message: newMessage });
+      await api.post('/chat-messages/', {
+        staff_id: selectedStaff,
+        message: newMessage
+      });
       setNewMessage('');
       await fetchMessages();
-      toast.success('Message sent!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to send message:', error);
-      toast.error('Failed to send message');
+      toast.error(error?.response?.data?.detail || 'Failed to send message');
     } finally {
       setLoading(false);
     }
@@ -75,31 +106,44 @@ export default function ChatSection() {
   return (
     <div className="flex flex-col h-full bg-white rounded-lg border border-gray-200">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Chat</h2>
-        <button
-          onClick={fetchMessages}
-          disabled={refreshing}
-          className="p-2 hover:bg-gray-100 rounded-lg transition disabled:opacity-50"
-          title="Refresh messages"
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-gray-900">Chat with Staff</h2>
+          <button
+            onClick={fetchMessages}
+            disabled={refreshing || !selectedStaff}
+            className="p-2 hover:bg-gray-100 rounded-lg transition disabled:opacity-50"
+            title="Refresh messages"
+          >
+            <BiRefresh size={18} className={refreshing ? 'animate-spin' : ''} />
+          </button>
+        </div>
+        {/* Staff Selector */}
+        <select
+          value={selectedStaff || ''}
+          onChange={(e) => setSelectedStaff(Number(e.target.value) || null)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <BiRefresh size={18} className={refreshing ? 'animate-spin' : ''} />
-        </button>
+          <option value="">Select staff member...</option>
+          {staffList.map((staff) => (
+            <option key={staff.id} value={staff.id}>
+              {staff.username}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {error ? (
+        {!selectedStaff ? (
+          <div className="flex items-center justify-center h-full text-gray-500 text-center">
+            <p>Select a staff member to start chatting</p>
+          </div>
+        ) : error ? (
           <div className="flex items-center justify-center h-full text-center">
             <div>
-              <p className="text-red-600 font-semibold mb-2">Unable to load chat</p>
-              <p className="text-sm text-gray-500 mb-3">{error}</p>
-              <button
-                onClick={fetchMessages}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Try Again
-              </button>
+              <p className="text-gray-600 font-semibold mb-2">No chat history yet</p>
+              <p className="text-sm text-gray-500">{error}</p>
             </div>
           </div>
         ) : messages.length === 0 ? (
@@ -127,13 +171,13 @@ export default function ChatSection() {
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            disabled={loading}
+            placeholder={selectedStaff ? "Type a message..." : "Select staff member first..."}
+            disabled={loading || !selectedStaff}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           />
           <button
             type="submit"
-            disabled={loading || !newMessage.trim()}
+            disabled={loading || !newMessage.trim() || !selectedStaff}
             className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             title="Send message"
           >
