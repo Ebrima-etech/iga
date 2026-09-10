@@ -278,17 +278,12 @@ export function useRenderMetrics(componentName: string) {
 
 /**
  * Report Web Vitals
+ * Note: Requires web-vitals package to be installed
  */
 export function reportWebVitals() {
   if (typeof window === 'undefined') return;
-
-  import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-    getCLS(metric => console.log(`CLS: ${metric.value.toFixed(3)}`));
-    getFID(metric => console.log(`FID: ${metric.value.toFixed(3)}ms`));
-    getFCP(metric => console.log(`FCP: ${metric.value.toFixed(3)}ms`));
-    getLCP(metric => console.log(`LCP: ${metric.value.toFixed(3)}ms`));
-    getTTFB(metric => console.log(`TTFB: ${metric.value.toFixed(3)}ms`));
-  });
+  // Web Vitals reporting disabled - web-vitals package not installed
+  console.log('Web Vitals reporting not available');
 }
 
 // ============================================================================
