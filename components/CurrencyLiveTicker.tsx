@@ -79,7 +79,7 @@ export default function CurrencyLiveTicker() {
                 <p className="text-2xl font-bold text-indigo-600 tabular-nums">
                   {pair.rate.toFixed(6)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">per GMD</p>
+                <p className="text-xs text-gray-500 mt-1">per D</p>
               </div>
 
               {pair.change !== undefined && pair.change !== 0 && (

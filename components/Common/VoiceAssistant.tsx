@@ -351,7 +351,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
         return `Total pilgrims registered: ${pilgrims.data.results?.length || 0}.`;
       } else if (query.includes('payment')) {
         const totalAmount = (payments.data.results || []).reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0);
-        return `Total payments: ${payments.data.results?.length || 0} transactions, totaling approximately ${Math.round(totalAmount).toLocaleString()} GMD.`;
+        return `Total payments: ${payments.data.results?.length || 0} transactions, totaling approximately ${Math.round(totalAmount).toLocaleString()}.`;
       } else {
         return `Pilgrims: ${pilgrims.data.results?.length || 0}. Payments: ${payments.data.results?.length || 0}.`;
       }
@@ -421,7 +421,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
         const confirmed = paymentList.filter((p: any) => p.status === 'confirmed').length;
         const pending = paymentList.filter((p: any) => p.status === 'pending').length;
 
-        report += `Total amount: ${totalAmount.toLocaleString()} GMD. Confirmed: ${confirmed}, Pending: ${pending}.`;
+        report += `Total amount: ${totalAmount.toLocaleString()}. Confirmed: ${confirmed}, Pending: ${pending}.`;
       } else if (reportType.includes('pilgrim')) {
         const pilgrims = await api.get('/pilgrims/').catch(() => ({ data: { results: [] } }));
         const pilgrimList = pilgrims.data.results || [];
@@ -589,7 +589,7 @@ export default function VoiceAssistant({ isOpen: externalIsOpen, onOpenChange, e
 
       report += `Pilgrims registered: ${todaysPilgrims.length}. `;
       report += `Payment submissions: ${todaysPayments.length}. `;
-      report += `Total amount: ${totalAmount.toLocaleString()} GMD.`;
+      report += `Total amount: ${totalAmount.toLocaleString()}.`;
 
       if (todaysPilgrims.length === 0 && todaysPayments.length === 0) {
         report = `Today's Report for ${new Date().toLocaleDateString()}. No new pilgrims or payments recorded today.`;
