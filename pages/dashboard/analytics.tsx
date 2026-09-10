@@ -61,7 +61,16 @@ export default function AnalyticsPage() {
   useEffect(() => {
     // Initialize page currency from global default on mount
     setPageCurrency(useCurrencyStore.getState().defaultCurrency);
+
+    // Subscribe to currency store changes
+    const unsubscribe = useCurrencyStore.subscribe(
+      (state) => state.defaultCurrency,
+      (defaultCurrency) => setPageCurrency(defaultCurrency)
+    );
+
     loadAnalyticsData();
+
+    return unsubscribe;
   }, [dateRange, selectedHajjYear]);
 
   const loadAnalyticsData = async () => {

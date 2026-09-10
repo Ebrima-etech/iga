@@ -48,9 +48,18 @@ export default function PaymentDetailPage() {
   useEffect(() => {
     // Initialize page currency from global default on mount
     setPageCurrency(useCurrencyStore.getState().defaultCurrency);
+
+    // Subscribe to currency store changes
+    const unsubscribe = useCurrencyStore.subscribe(
+      (state) => state.defaultCurrency,
+      (defaultCurrency) => setPageCurrency(defaultCurrency)
+    );
+
     if (id) {
       fetchPayment();
     }
+
+    return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, selectedHajjYear]);
 

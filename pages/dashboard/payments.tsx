@@ -51,8 +51,17 @@ export default function PaymentsPage() {
     console.log('Payments page mounted, fetching data...');
     // Initialize page currency from global default on mount
     setPageCurrency(useCurrencyStore.getState().defaultCurrency);
+
+    // Subscribe to currency store changes so page updates when default currency changes
+    const unsubscribe = useCurrencyStore.subscribe(
+      (state) => state.defaultCurrency,
+      (defaultCurrency) => setPageCurrency(defaultCurrency)
+    );
+
     fetchPayments();
     fetchBanks();
+
+    return unsubscribe;
   }, [selectedHajjYear]);
 
   useEffect(() => {
