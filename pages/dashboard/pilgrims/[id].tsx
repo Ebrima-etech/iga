@@ -8,10 +8,12 @@ import Card from '@/components/Common/Card';
 import ProfessionalButton from '@/components/Common/ProfessionalButton';
 import Loading from '@/components/Common/Loading';
 import PaymentJourneyMap from '@/components/Dashboard/PaymentJourneyMap';
-import { Pilgrim, Payment } from '@/types';
+import { Pilgrim, Payment, CurrencyCode } from '@/types';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import api from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { formatCurrencyWithCode } from '@/lib/currency';
 import toast from 'react-hot-toast';
 import { BiChevronLeft, BiPhone, BiEnvelope, BiCalendar, BiMapPin, BiDollar, BiCheckCircle, BiTrendingUp, BiChevronDown } from 'react-icons/bi';
 
@@ -23,8 +25,13 @@ export default function PilgrimDetailPage() {
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
+  const [pageCurrency, setPageCurrency] = useState<CurrencyCode>(() =>
+    useCurrencyStore.getState().defaultCurrency || 'GMD'
+  );
 
   useEffect(() => {
+    // Initialize page currency from global default on mount
+    setPageCurrency(useCurrencyStore.getState().defaultCurrency);
     if (id) {
       fetchPilgrimAndPayments();
     }
@@ -81,8 +88,8 @@ export default function PilgrimDetailPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-white p-8">
-        {/* Header with Back Button */}
-        <div className="mb-8">
+        {/* Header with Back Button and Currency Selector */}
+        <div className="mb-8 flex items-center justify-between">
           <ProfessionalButton
             variant="ghost"
             size="sm"
@@ -91,6 +98,16 @@ export default function PilgrimDetailPage() {
           >
             Back to Pilgrims
           </ProfessionalButton>
+          <select
+            value={pageCurrency}
+            onChange={(e) => setPageCurrency(e.target.value as CurrencyCode)}
+            className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+          >
+            <option value="GMD">GMD</option>
+            <option value="USD">USD</option>
+            <option value="GBP">GBP</option>
+            <option value="EUR">EUR</option>
+          </select>
         </div>
 
         {/* Pilgrim Info Section */}
@@ -222,7 +239,7 @@ export default function PilgrimDetailPage() {
 
           <Card padding="lg" shadow="none" className="border border-gray-200">
             <p className="text-xs text-gray-600 font-medium uppercase">Total Paid</p>
-            <p className="text-2xl font-bold text-emerald-600 mt-3 font-mono">{formatCurrency(totalPaid)}</p>
+            <p className="text-2xl font-bold text-emerald-600 mt-3 font-mono">{formatCurrencyWithCode(totalPaid, pageCurrency)}</p>
             <p className="text-xs text-gray-500 mt-2">
               {payments.length > 0
                 ? `Last: ${formatDate(payments[0].payment_date)}`
@@ -233,7 +250,7 @@ export default function PilgrimDetailPage() {
           <Card padding="lg" shadow="none" className="border border-gray-200">
             <p className="text-xs text-gray-600 font-medium uppercase">Amount Remaining</p>
             <p className={`text-2xl font-bold mt-3 font-mono ${amountRemaining > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
-              {formatCurrency(amountRemaining)}
+              {formatCurrencyWithCode(amountRemaining, pageCurrency)}
             </p>
             <p className={`text-xs mt-2 ${amountRemaining > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
               {amountRemaining > 0 ? 'Outstanding' : 'Paid in full ✓'}
@@ -343,7 +360,7 @@ export default function PilgrimDetailPage() {
                             </div>
                             <div className="text-right">
                               <p className="text-xl font-bold text-emerald-600 font-mono">
-                                {formatCurrency(payment.amount)}
+                                {formatCurrencyWithCode(payment.amount, pageCurrency)}
                               </p>
                               <p className="text-xs text-gray-500 mt-1">Reference: {payment.reference_number}</p>
                             </div>
@@ -365,11 +382,12 @@ export default function PilgrimDetailPage() {
                             <div>
                               <p className="text-xs text-gray-600">Running Total</p>
                               <p className="font-mono font-medium text-emerald-600">
-                                {formatCurrency(
+                                {formatCurrencyWithCode(
                                   payments
                                     .filter(p => p.status === 'confirmed')
                                     .slice(0, index + 1)
-                                    .reduce((sum, p) => sum + p.amount, 0)
+                                    .reduce((sum, p) => sum + p.amount, 0),
+                                  pageCurrency
                                 )}
                               </p>
                             </div>
@@ -393,8 +411,9 @@ export default function PilgrimDetailPage() {
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600">Average Deposit</p>
                       <p className="text-2xl font-bold text-gray-900 mt-2 font-mono">
-                        {formatCurrency(
-                          totalPaid / payments.filter(p => p.status === 'confirmed').length
+                        {formatCurrencyWithCode(
+                          totalPaid / payments.filter(p => p.status === 'confirmed').length,
+                          pageCurrency
                         )}
                       </p>
                     </div>
