@@ -570,7 +570,7 @@ export default function SettingsPage() {
                                 className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                               />
                             ) : (
-                              <span className="text-sm font-semibold text-gray-900">{currency.rate.toFixed(6)}</span>
+                              <span className="text-sm font-semibold text-gray-900">{Number(currency.rate).toFixed(6)}</span>
                             )}
                           </td>
                         </tr>
