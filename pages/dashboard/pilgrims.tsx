@@ -192,14 +192,8 @@ export default function PilgrimsPage() {
   });
 
   useEffect(() => {
-    // Update page currency when global default currency changes
-    const unsubscribe = useCurrencyStore.subscribe(
-      (state) => setPageCurrency(state.defaultCurrency)
-    );
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
+    // Initialize page currency from global default on mount
+    setPageCurrency(useCurrencyStore.getState().defaultCurrency);
     fetchPilgrims();
     loadDrafts();
     loadHajjPackagePrice();

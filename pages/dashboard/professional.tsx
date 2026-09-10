@@ -54,14 +54,8 @@ export default function ProfessionalDashboard() {
   const [banks, setBanks] = useState<any[]>([]);
 
   useEffect(() => {
-    // Update page currency when global default currency changes
-    const unsubscribe = useCurrencyStore.subscribe(
-      (state) => setPageCurrency(state.defaultCurrency)
-    );
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
+    // Initialize page currency from global default on mount
+    setPageCurrency(useCurrencyStore.getState().defaultCurrency);
     loadDashboardData();
     setCurrentTime(new Date().toLocaleTimeString());
   }, [selectedHajjYear]);
