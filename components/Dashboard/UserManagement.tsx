@@ -380,7 +380,7 @@ export default function UserManagement() {
               Users & Staff ({filteredUsers.length})
             </h2>
             <p className="text-sm text-gray-600 mt-1">
-              💡 Bank users are displayed for reference but cannot be edited here
+              💡 Bank users are displayed as view-only for reference only (cannot edit or delete)
             </p>
           </div>
         </div>
@@ -454,27 +454,26 @@ export default function UserManagement() {
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEditClick(userRole)}
-                          disabled={isBankUser(userRole.role)}
-                          className={`p-2 rounded transition ${
-                            isBankUser(userRole.role)
-                              ? 'text-gray-400 cursor-not-allowed'
-                              : 'hover:bg-blue-100 rounded text-blue-600'
-                          }`}
-                          title={isBankUser(userRole.role) ? 'Bank users cannot be edited' : 'Edit user'}
-                        >
-                          <BiPencil size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(userRole.id)}
-                          className="p-2 hover:bg-red-100 rounded text-red-600 transition"
-                          title="Delete user"
-                        >
-                          <BiTrash size={16} />
-                        </button>
-                      </div>
+                      {isBankUser(userRole.role) ? (
+                        <span className="text-xs text-gray-500">View Only</span>
+                      ) : (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditClick(userRole)}
+                            className="p-2 hover:bg-blue-100 rounded text-blue-600 transition"
+                            title="Edit user"
+                          >
+                            <BiPencil size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(userRole.id)}
+                            className="p-2 hover:bg-red-100 rounded text-red-600 transition"
+                            title="Delete user"
+                          >
+                            <BiTrash size={16} />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
