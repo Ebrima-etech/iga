@@ -243,11 +243,23 @@ export default function SettingsPage() {
     }
   };
 
+  const settingsTabs = [
+    { id: 'profile', label: 'Profile', icon: <BiUser size={18} /> },
+    { id: 'currency', label: 'Currency', icon: <BiGlobe size={18} /> },
+    { id: 'system', label: 'System', icon: <BiCog size={18} /> },
+    { id: 'hajj-years', label: 'Hajj Years', icon: <BiCalendar size={18} /> },
+    ...(user?.is_staff ? [
+      { id: 'signatory', label: 'Signatory', icon: <BiCog size={18} /> },
+      { id: 'email-notifications', label: 'Email', icon: <BiEnvelope size={18} /> },
+      { id: 'users', label: 'Users & Staff', icon: <BiUser size={18} /> },
+    ] : []),
+  ];
+
   if (loading) {
     return (
-      <Layout>
-        <div className="min-h-screen bg-white p-8">
-          <div className="animate-pulse space-y-4">
+      <Layout hideSidebar={true}>
+        <div className="min-h-screen bg-white">
+          <div className="animate-pulse space-y-4 p-8">
             <div className="h-12 bg-gray-200 rounded-lg"></div>
             <div className="h-64 bg-gray-200 rounded-lg"></div>
           </div>
@@ -257,116 +269,57 @@ export default function SettingsPage() {
   }
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-white p-8">
-        {/* Page Header */}
-        <div className="mb-8 pb-6 border-b border-gray-200">
-          <h1 className="text-3xl font-semibold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-1">Manage profile, currency, and system preferences</p>
-        </div>
-
-        {/* Tabs Navigation */}
-        <div className="mb-8 border-b border-gray-200">
-            <div className="flex gap-8">
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`pb-4 px-2 font-medium text-sm transition-all ${
-                  activeTab === 'profile'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <BiUser size={18} />
-                  Profile
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('currency')}
-                className={`pb-4 px-2 font-medium text-sm transition-all ${
-                  activeTab === 'currency'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <BiGlobe size={18} />
-                  Currency
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('system')}
-                className={`pb-4 px-2 font-medium text-sm transition-all ${
-                  activeTab === 'system'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <BiCog size={18} />
-                  System
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('hajj-years')}
-                className={`pb-4 px-2 font-medium text-sm transition-all ${
-                  activeTab === 'hajj-years'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <BiCalendar size={18} />
-                  Hajj Years
-                </div>
-              </button>
-              {user?.is_staff && (
-                <>
-                  <button
-                    onClick={() => setActiveTab('signatory')}
-                    className={`pb-4 px-2 font-medium text-sm transition-all ${
-                      activeTab === 'signatory'
-                        ? 'border-b-2 border-indigo-600 text-indigo-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <BiCog size={18} />
-                      Signatory
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('email-notifications')}
-                    className={`pb-4 px-2 font-medium text-sm transition-all ${
-                      activeTab === 'email-notifications'
-                        ? 'border-b-2 border-indigo-600 text-indigo-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <BiEnvelope size={18} />
-                      Email Notifications
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('users')}
-                    className={`pb-4 px-2 font-medium text-sm transition-all ${
-                      activeTab === 'users'
-                        ? 'border-b-2 border-indigo-600 text-indigo-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <BiUser size={18} />
-                      Users & Staff
-                    </div>
-                  </button>
-                </>
-              )}
-            </div>
+    <Layout hideSidebar={true}>
+      <div className="min-h-screen bg-gray-50 flex">
+        {/* Settings Sidebar */}
+        <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0">
+          {/* Sidebar Header */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900">Settings</h2>
+            <p className="text-xs text-gray-500 mt-1">Configure your preferences</p>
           </div>
 
-          {/* Profile Tab */}
+          {/* Sidebar Navigation */}
+          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+            {settingsTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as SettingsTab)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-sm font-medium ${
+                  activeTab === tab.id
+                    ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-auto">
+          <div className="min-h-screen bg-white">
+            {/* Content Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 z-10">
+              <h1 className="text-3xl font-bold text-gray-900">
+                {settingsTabs.find(t => t.id === activeTab)?.label || 'Settings'}
+              </h1>
+              <p className="text-gray-600 mt-1">
+                {activeTab === 'profile' && 'Manage your personal information'}
+                {activeTab === 'currency' && 'Configure currency settings and exchange rates'}
+                {activeTab === 'system' && 'System-wide preferences'}
+                {activeTab === 'hajj-years' && 'Manage Hajj years and events'}
+                {activeTab === 'signatory' && 'Signatory management'}
+                {activeTab === 'email-notifications' && 'Email notification settings'}
+                {activeTab === 'users' && 'Manage GIA team members and view bank users'}
+              </p>
+            </div>
+
+            {/* Content Area */}
+            <div className="p-8">
+              {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Profile Card */}
@@ -909,27 +862,29 @@ export default function SettingsPage() {
             </Card>
           )}
 
-        {/* Hajj Year Create Modal */}
-        <HajjYearCreateModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
-            fetchHajjYears();
-          }}
-        />
+            {/* Hajj Year Create Modal */}
+            <HajjYearCreateModal
+              isOpen={showCreateModal}
+              onClose={() => setShowCreateModal(false)}
+              onSuccess={() => {
+                fetchHajjYears();
+              }}
+            />
 
-        {/* Hajj Year Detail Modal */}
-        <HajjYearDetailModal
-          isOpen={showDetailModal}
-          year={selectedYear}
-          onClose={() => {
-            setShowDetailModal(false);
-            setSelectedYear(null);
-          }}
-          onSuccess={() => {
-            fetchHajjYears();
-          }}
-        />
+            {/* Hajj Year Detail Modal */}
+            <HajjYearDetailModal
+              isOpen={showDetailModal}
+              year={selectedYear}
+              onClose={() => {
+                setShowDetailModal(false);
+                setSelectedYear(null);
+              }}
+              onSuccess={() => {
+                fetchHajjYears();
+              }}
+            />
+          </div>
+        </div>
       </div>
     </Layout>
   );

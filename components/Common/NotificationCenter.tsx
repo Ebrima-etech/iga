@@ -3,11 +3,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { BiBell, BiX, BiCheckDouble } from 'react-icons/bi';
 import { useNotification, NotificationType } from '@/lib/notificationContext';
+import { useChatNotificationStore } from '@/lib/stores/chatNotificationStore';
 
 export default function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotification();
+  const { chatNotifications, totalUnreadChats, markAllChatsAsRead } = useChatNotificationStore();
+
+  // Combine unread counts
+  const totalUnread = unreadCount + totalUnreadChats;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -69,9 +74,9 @@ export default function NotificationCenter() {
         title="Notifications"
       >
         <BiBell size={24} />
-        {unreadCount > 0 && (
+        {totalUnread > 0 && (
           <span className="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {totalUnread > 9 ? '9+' : totalUnread}
           </span>
         )}
       </button>
@@ -82,9 +87,12 @@ export default function NotificationCenter() {
           {/* Header */}
           <div className="p-4 border-b border-gray-200 flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">Notifications</h3>
-            {unreadCount > 0 && (
+            {totalUnread > 0 && (
               <button
-                onClick={() => markAllAsRead()}
+                onClick={() => {
+                  markAllAsRead();
+                  markAllChatsAsRead();
+                }}
                 className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
                 <BiCheckDouble size={16} />
@@ -95,13 +103,50 @@ export default function NotificationCenter() {
 
           {/* Notifications List */}
           <div className="overflow-y-auto flex-1">
-            {notifications.length === 0 ? (
+            {notifications.length === 0 && totalUnreadChats === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <BiBell size={40} className="mx-auto mb-2 opacity-50" />
                 <p>No notifications yet</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
+                {/* Chat Notifications */}
+                {Array.from(chatNotifications.values()).map((chatNotif) => (
+                  <div
+                    key={`chat-${chatNotif.staffId}`}
+                    className="p-4 bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="p-1 rounded-full bg-blue-100">
+                            <span className="text-sm font-bold text-blue-600">💬</span>
+                          </div>
+                          <h4 className="font-semibold text-gray-900 text-sm">
+                            New message from {chatNotif.staffName}
+                          </h4>
+                          <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        </div>
+                        <p className="text-sm text-gray-600 leading-snug line-clamp-2">{chatNotif.lastMessage}</p>
+                        <p className="text-xs text-gray-500 mt-1">{formatTime(chatNotif.timestamp)}</p>
+                        {chatNotif.unreadCount > 1 && (
+                          <p className="text-xs text-blue-600 font-medium mt-1">
+                            +{chatNotif.unreadCount - 1} more message{chatNotif.unreadCount > 2 ? 's' : ''}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          chatNotifications.delete(chatNotif.staffId);
+                        }}
+                        className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <BiX size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}

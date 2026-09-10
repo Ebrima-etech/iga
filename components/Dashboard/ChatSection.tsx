@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { BiSend, BiRefresh } from 'react-icons/bi';
+import { useChatNotificationStore } from '@/lib/stores/chatNotificationStore';
 
 interface ChatMessage {
   id: number;
@@ -27,7 +28,10 @@ export default function ChatSection() {
   const [error, setError] = useState<string | null>(null);
   const [staffList, setStaffList] = useState<Staff[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<number | null>(null);
+  const [previousMessageCount, setPreviousMessageCount] = useState(0);
+  const [isFocused, setIsFocused] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { incrementUnread, markChatAsRead } = useChatNotificationStore();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -74,9 +78,35 @@ export default function ChatSection() {
     }
   }, [selectedStaff]);
 
+  // Track window focus for unread notifications
+  useEffect(() => {
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = () => setIsFocused(false);
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
+
+  // Detect new messages and send notifications
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+
+    // Check for new messages when not focused
+    if (!isFocused && messages.length > previousMessageCount && selectedStaff) {
+      const staffMember = staffList.find(s => s.id === selectedStaff);
+      if (staffMember) {
+        const lastMsg = messages[messages.length - 1];
+        incrementUnread(selectedStaff, staffMember.username, lastMsg.message);
+      }
+    }
+
+    setPreviousMessageCount(messages.length);
+  }, [messages, isFocused, selectedStaff, previousMessageCount, staffList, incrementUnread]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +151,14 @@ export default function ChatSection() {
         {/* Staff Selector */}
         <select
           value={selectedStaff || ''}
-          onChange={(e) => setSelectedStaff(Number(e.target.value) || null)}
+          onChange={(e) => {
+            const staffId = Number(e.target.value) || null;
+            setSelectedStaff(staffId);
+            // Mark notifications as read when switching to this staff
+            if (staffId) {
+              markChatAsRead(staffId);
+            }
+          }}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select staff member...</option>
