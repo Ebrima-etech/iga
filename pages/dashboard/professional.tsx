@@ -16,7 +16,7 @@ import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
-import { getCurrencySymbol } from '@/lib/currency';
+import { getCurrencySymbol, convertCurrency } from '@/lib/currency';
 import {
   LineChart,
   Line,
@@ -157,7 +157,7 @@ export default function ProfessionalDashboard() {
         ['STATISTICS'].join(','),
         ['Metric', 'Value'].join(','),
         ['Total Pilgrims', stats.totalPilgrims].join(','),
-        ['Total Payments', `${symbol}${stats.totalPayments.toLocaleString()}`].join(','),
+        ['Total Payments', `${symbol}${convertCurrency(stats.totalPayments, 'GMD', useCurrencyStore.getState().defaultCurrency).toLocaleString()}`].join(','),
         ['Completion Rate', `${stats.paymentRate}%`].join(','),
         ['Banks Connected', stats.activeBanks].join(','),
         '',
@@ -260,8 +260,10 @@ export default function ProfessionalDashboard() {
       label: 'Amount',
       width: '15%',
       render: (value: number) => {
-        const symbol = getCurrencySymbol(useCurrencyStore.getState().defaultCurrency);
-        return <span className="font-mono font-medium text-gray-900">{symbol}{value.toLocaleString()}</span>;
+        const currency = useCurrencyStore.getState().defaultCurrency;
+        const symbol = getCurrencySymbol(currency);
+        const converted = convertCurrency(value, 'GMD', currency);
+        return <span className="font-mono font-medium text-gray-900">{symbol}{converted.toLocaleString()}</span>;
       },
     },
     {
@@ -526,7 +528,7 @@ export default function ProfessionalDashboard() {
                           <p className="text-xs text-gray-500 leading-tight">{payment.bank_name}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs font-semibold text-gray-900">{getCurrencySymbol(useCurrencyStore.getState().defaultCurrency)}{parseFloat(payment.amount || 0).toLocaleString()}</p>
+                          <p className="text-xs font-semibold text-gray-900">{getCurrencySymbol(useCurrencyStore.getState().defaultCurrency)}{convertCurrency(parseFloat(payment.amount || 0), 'GMD', useCurrencyStore.getState().defaultCurrency).toLocaleString()}</p>
                           <p className={`text-xs font-medium leading-tight ${
                             payment.status === 'verified' || payment.status === 'confirmed' ? 'text-emerald-600' :
                             payment.status === 'pending' ? 'text-amber-600' : 'text-red-600'

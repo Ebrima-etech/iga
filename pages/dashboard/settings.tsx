@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { User, CurrencyCode, HajjYear } from '@/types';
 import api from '@/lib/api';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
+import { convertCurrency } from '@/lib/currency';
 import { useHajjYear } from '@/lib/stores/hajjYearStore';
 import { setCurrencyMode, startRealtimeUpdates, stopRealtimeUpdates, getCurrencyMode } from '@/lib/realtimeCurrency';
 import HajjYearCreateModal from '@/components/Common/HajjYearCreateModal';
@@ -633,7 +634,7 @@ export default function SettingsPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-500">Hajj Package Price</p>
                       <p className="text-2xl font-semibold text-gray-900 mt-1.5">
-                        {currencies.find(c => c.code === defaultCurrency)?.symbol} {hajjPackagePrice.toLocaleString()}
+                        {currencies.find(c => c.code === defaultCurrency)?.symbol} {convertCurrency(hajjPackagePrice, 'GMD', defaultCurrency).toLocaleString()}
                       </p>
                     </div>
                     <ProfessionalButton
@@ -772,13 +773,13 @@ export default function SettingsPage() {
                               {year.first_deposit_amount && (
                                 <div>
                                   <p className="text-gray-500 text-xs">First Deposit</p>
-                                  <p className="text-gray-900 font-medium">${parseFloat(String(year.first_deposit_amount)).toLocaleString()}</p>
+                                  <p className="text-gray-900 font-medium">{currencies.find(c => c.code === defaultCurrency)?.symbol}{convertCurrency(parseFloat(String(year.first_deposit_amount)), 'GMD', defaultCurrency).toLocaleString()}</p>
                                 </div>
                               )}
                               {year.total_package_fee && (
                                 <div>
                                   <p className="text-gray-500 text-xs">Package Fee</p>
-                                  <p className="text-gray-900 font-medium">${parseFloat(String(year.total_package_fee)).toLocaleString()}</p>
+                                  <p className="text-gray-900 font-medium">{currencies.find(c => c.code === defaultCurrency)?.symbol}{convertCurrency(parseFloat(String(year.total_package_fee)), 'GMD', defaultCurrency).toLocaleString()}</p>
                                 </div>
                               )}
                             </div>
