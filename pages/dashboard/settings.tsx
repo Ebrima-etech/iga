@@ -260,7 +260,7 @@ export default function SettingsPage() {
     <Layout>
       <div className="min-h-screen bg-white flex">
         {/* Settings Sidebar */}
-        <div className="w-64 bg-gray-50 border-r border-gray-200 p-6 overflow-y-auto">
+        <div className="w-64 bg-gray-50 border-r border-gray-200 p-6 h-screen sticky top-0 overflow-y-auto">
           <h2 className="text-lg font-bold text-gray-900 mb-6">Settings</h2>
           <nav className="space-y-2">
             <button onClick={() => setActiveTab('profile')} className={`w-full text-left px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'profile' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}`}><BiUser className="inline mr-2" />Profile</button>
