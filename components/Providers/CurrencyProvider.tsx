@@ -53,7 +53,7 @@ export default function CurrencyProvider({ children }: CurrencyProviderProps) {
     };
 
     loadCurrencySettings();
-  }, [currencyStore]);
+  }, []);
 
   return <>{children}</>;
 }
